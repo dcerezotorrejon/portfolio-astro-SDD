@@ -26,6 +26,12 @@
 - `runAxeOnHtml(html)` (new) — runs axe-core against a JSDOM document.
 - `formatViolations(results)` (new) — readable axe violation output.
 
+## Commits
+
+- `7b0858d` — `chore: initialize repo with spec-anchored SDD setup`. This commit
+  is fused with the initial repo scaffolding (Astro starter + tooling), so it
+  predates the `spec-<NNN>` scope convention and is not scoped to `spec-001`.
+
 ## Notes
 
 - The `site` constant is a placeholder (`https://example.com`); replace it before
