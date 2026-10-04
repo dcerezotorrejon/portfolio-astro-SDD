@@ -27,6 +27,10 @@
 - `Counter` (new) — test-only React component proving SSR and client interactivity; not imported by `src/`.
 - `getContainer()` (updated in `tests/helpers/render.ts`) — now registers the `@astrojs/react` SSR renderer so framework components can be rendered through the shared container.
 
+## Commits
+
+- `2c0e4d1` — `feat(spec-002): add tailwind and react integration to the stack`.
+
 ## Notes
 
 - **`eslint-plugin-react` is intentionally not installed**: its latest stable (7.37.5) calls the removed `context.getFilename()` API and crashes under ESLint 10. `eslint-plugin-react-hooks` (declares ESLint 10 support) and `eslint-plugin-jsx-a11y` (works at runtime) cover hooks and accessibility linting.
