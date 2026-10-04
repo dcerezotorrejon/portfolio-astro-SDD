@@ -6,9 +6,9 @@ how to work here and links to the details.
 
 ## Project
 
-A personal **portfolio built with Astro**. Content is hydrated from Markdown files
+A personal **portfolio built with Astro**, styled with **Tailwind CSS v4**. Content is hydrated from Markdown files
 through Astro content collections — components render content, they do not hardcode
-it. See [Constitution §2](./docs/constitution.md#2-project-nature).
+it. The site is static by default with zero client JavaScript; React components are used exclusively for interactive islands with explicit `client:*` directives. See [Constitution §2](./docs/constitution.md#2-project-nature).
 
 ## Development
 

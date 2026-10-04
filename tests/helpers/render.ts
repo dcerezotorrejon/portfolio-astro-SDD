@@ -1,6 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 
+import reactRenderer from "@astrojs/react/server.js";
 import { site } from "../../astro.config.mjs";
 
 let container: Promise<AstroContainer> | undefined;
@@ -11,7 +12,15 @@ let container: Promise<AstroContainer> | undefined;
  * build absolute URLs (e.g. canonical) behave like the real build.
  */
 export function getContainer(): Promise<AstroContainer> {
-  container ??= AstroContainer.create({ astroConfig: { site } });
+  container ??= AstroContainer.create({
+    astroConfig: { site },
+    renderers: [
+      {
+        name: reactRenderer.name,
+        ssr: reactRenderer,
+      },
+    ],
+  });
   return container;
 }
 

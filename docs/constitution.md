@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.0.0
+- **Version**: 1.1.0
 - **Last amended**: 2026-10-05
 
 ---
@@ -18,13 +18,14 @@ conventions already present in the codebase, in that order.
 
 ## 2. Project nature
 
-- The project is a **personal portfolio built with Astro**.
+- The project is a **personal portfolio built with Astro**, styled with **Tailwind CSS v4**.
 - **Content is hydrated from Markdown files**. Portfolio content (projects,
   experience, posts, metadata, etc.) MUST live in `.md` files consumed through
   Astro content collections.
 - Components MUST render content they receive; they MUST NOT hardcode portfolio
   content that belongs in Markdown.
 - Static assets live in `public/` (or are imported when they need optimization).
+- **Interactivity policy**: By default, the site is static and sends no client JavaScript. Framework components (such as React components) are reserved exclusively for interactive islands that require real client-side interactivity, and they MUST always be declared with an explicit `client:*` directive. Content and logic that can be resolved at build/Markdown time must remain unhydrated.
 
 ## 3. Spec-Anchored Development
 
@@ -142,6 +143,8 @@ The approved verification stack is:
 - **Accessibility**: `axe-core` against rendered HTML in tests, plus the `a11y`
   MCP server configured in `opencode.json` for URL-based audits.
 - **Lint / format**: ESLint and Prettier (already configured).
+- **CSS**: Tailwind CSS v4 through the official Vite plugin `@tailwindcss/vite` (global stylesheet at `src/styles/global.css` with `@import "tailwindcss";`). (Note: `@astrojs/tailwind`/Tailwind 3 is legacy and not used.)
+- **Client interactivity**: React through `@astrojs/react`, used only for interactive islands (see §2). The React Compiler is enabled (`react({ compiler: true })`) via the `oxc-transform-react` dev dependency.
 
 Adding or replacing tools requires updating this section.
 
