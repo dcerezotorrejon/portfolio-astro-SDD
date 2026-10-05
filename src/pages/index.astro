@@ -1,19 +1,29 @@
 ---
-import "../styles/global.css";
+import { getCollection, getEntry } from "astro:content";
+import FloatingNav from "../components/FloatingNav";
+import ExperienceHistory from "../components/ExperienceHistory.astro";
+import ProfileIntroduction from "../components/ProfileIntroduction.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { assertUniqueExperienceSlugs, sortExperiences } from "../lib/content";
+
+const profileEntry = await getEntry("profile", "profile");
+if (!profileEntry)
+  throw new Error('The required "profile/profile" content entry is missing.');
+
+const profile = profileEntry.data;
+const experienceEntries = await getCollection("experience");
+assertUniqueExperienceSlugs(experienceEntries);
+const experiences = sortExperiences(experienceEntries);
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Astro</title>
-    <meta name="description" content="Personal portfolio built with Astro." />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold">Astro</h1>
-  </body>
-</html>
+<SiteLayout
+  title={profile.seo.title}
+  description={profile.seo.description}
+  isHome
+>
+  <main class="site-container home-main">
+    <ProfileIntroduction profile={profile} />
+    <ExperienceHistory experiences={experiences} profile={profile} />
+  </main>
+  <FloatingNav sections={profile.navigation} client:load />
+</SiteLayout>

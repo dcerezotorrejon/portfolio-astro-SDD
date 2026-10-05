@@ -1,0 +1,72 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import TechnologyBadges from "../../components/TechnologyBadges.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import {
+  assertUniqueExperienceSlugs,
+  formatDateRange,
+  resolveCompanyIcon,
+} from "../../lib/content";
+import type { ProfileData } from "../../lib/content-schema";
+
+interface Props {
+  experience: CollectionEntry<"experience">;
+  profile: ProfileData;
+}
+
+export async function getStaticPaths() {
+  const experiences = await getCollection("experience");
+  assertUniqueExperienceSlugs(experiences);
+
+  const profileEntry = await getEntry("profile", "profile");
+  if (!profileEntry)
+    throw new Error('The required "profile/profile" content entry is missing.');
+
+  return experiences.map((experience) => ({
+    params: { slug: experience.data.slug },
+    props: { experience, profile: profileEntry.data },
+  }));
+}
+
+const { experience, profile } = Astro.props as Props;
+const { Content } = await render(experience);
+const { slug, role, company, startDate, endDate, technologies, seo } =
+  experience.data;
+const companyIcon = resolveCompanyIcon(experience);
+---
+
+<SiteLayout title={seo.title} description={seo.description}>
+  <main class="site-container">
+    <article
+      class="experience-card experience-detail-card"
+      data-experience-slug={slug}
+      style={`view-transition-name: experience-${slug}`}
+    >
+      <header class="experience-detail-header">
+        <h1>{role}</h1>
+        <p class="company-identity">
+          <img
+            class="company-icon"
+            src={companyIcon.src}
+            alt={companyIcon.alt}
+            width="40"
+            height="40"
+          />
+          <span>{company}</span>
+        </p>
+        <p>{formatDateRange(startDate, endDate)}</p>
+      </header>
+      <div class="experience-detail-body">
+        <TechnologyBadges technologies={technologies} />
+        <div class="detail-content">
+          <Content />
+        </div>
+        <p class="provisional-notice">{profile.notice}</p>
+        <a class="button-link" href="/#trayectoria">
+          {profile.backLabel}
+        </a>
+      </div>
+    </article>
+  </main>
+</SiteLayout>

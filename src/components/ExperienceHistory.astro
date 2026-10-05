@@ -1,0 +1,59 @@
+---
+import type { ExperienceData, ProfileData } from "../lib/content-schema";
+import { formatDateRange, resolveCompanyIcon } from "../lib/content";
+import TechnologyBadges from "./TechnologyBadges.astro";
+
+interface ExperienceRecord {
+  data: ExperienceData;
+}
+
+interface Props {
+  experiences: ExperienceRecord[];
+  profile: ProfileData;
+}
+
+const { experiences, profile } = Astro.props;
+---
+
+<section id="trayectoria" aria-labelledby="history-heading">
+  <h2 id="history-heading" class="section-heading">
+    {profile.historyHeading}
+  </h2>
+  <div class="experience-list">
+    {experiences.map((experience) => {
+      const { role, company, startDate, endDate, summary, technologies, slug } =
+        experience.data;
+      const companyIcon = resolveCompanyIcon(experience);
+      const startYear = startDate.getUTCFullYear();
+
+      return (
+        <article
+          class="experience-card"
+          style={`view-transition-name: experience-${slug}`}
+        >
+          <h3>{role}</h3>
+          <p class="company-identity">
+            <img
+              class="company-icon"
+              src={companyIcon.src}
+              alt={companyIcon.alt}
+              width="40"
+              height="40"
+            />
+            <span>{company}</span>
+          </p>
+          <p>{formatDateRange(startDate, endDate)}</p>
+          <p>{summary}</p>
+          <TechnologyBadges technologies={technologies} />
+          <a
+            class="button-link"
+            href={`/experiencia/${slug}/`}
+            aria-label={`${profile.moreInfoLabel} sobre ${role} en ${company} (${startYear})`}
+          >
+            {profile.moreInfoLabel}
+          </a>
+        </article>
+      );
+    })}
+  </div>
+</section>

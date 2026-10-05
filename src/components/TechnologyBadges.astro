@@ -1,0 +1,13 @@
+---
+interface Props {
+  technologies: string[];
+}
+
+const { technologies } = Astro.props;
+---
+
+<ul class="technology-list">
+  {technologies.map((technology) => (
+    <li class="technology-badge">{technology}</li>
+  ))}
+</ul>

@@ -1,0 +1,29 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  isHome?: boolean;
+}
+
+const { title, description, isHome = false } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="es" class:list={{ "home-page": isHome }}>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

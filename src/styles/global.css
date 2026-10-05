@@ -1,1 +1,532 @@
 @import "tailwindcss";
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Native cross-document transitions ship a UA default of 250 ms, while the
+   global design specifies 200 ms for shared-element transitions. Pin that
+   timing explicitly instead of inferring it from the navigator's CSS duration.
+   Only the native view-transition pseudo-elements are targeted; the reduced
+   motion block below resets these with `animation: none` and, appearing later
+   with equal specificity, wins over this duration. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--duration-control);
+}
+
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/open-sans-latin.woff2") format("woff2");
+  /* Latin subset covers Spanish's accented letters and punctuation. */
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+/* ==========================================================================
+   Design tokens
+
+   Three explicit layers, with one source for each reusable value (see
+   docs/design.md "Token organization"):
+
+   1. Primitive tokens — raw palette colors, the spacing/radius/type/motion
+      scales. They describe values, never a component's role.
+   2. Semantic tokens — role-based aliases (page/surface/text/border/focus and
+      button states, container width, page gutter, control motion) that point at
+      primitives. The public --color-* names are kept as aliases so styles,
+      tests and other consumers can keep referencing them by role.
+   3. Component tokens — per-component properties (profile, card, badge, button
+      and floating navigator) built on the semantic/primitive layers.
+
+   CSS custom properties do not resolve inside standard media-query conditions,
+   so the 768 px breakpoint stays explicit. The 768 px block only re-aliases
+   --page-gutter to the larger spacing primitive; it does not redefine raw
+   values, so the cascade still composes correctly when --page-gutter changes.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- 1. Primitive tokens --------------------------------------------- */
+
+  /* Palette */
+  --palette-primary-blue: #1d9bf0; /* general blue accent / navigator indicator */
+  --palette-action-blue: #0c7abf; /* primary button background */
+  --palette-action-blue-hover: #096aa7; /* primary button hover background */
+  --palette-action-blue-active: #075985; /* primary button pressed background */
+  --palette-link-blue: #075985; /* links and focus outlines */
+  --palette-ink: #0f1419; /* main text and inactive navigator labels */
+  --palette-surface: #ffffff; /* cards, navigator, button label */
+  --palette-page: #eff3f8; /* page canvas */
+  --palette-border: #cfd9de; /* subtle 1 px borders */
+
+  /* Spacing scale (reusable across components) */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+
+  /* Radii */
+  --radius-pill: 999px;
+  --radius-card: 24px;
+
+  /* Type scale (reused sizes, leading and weights) */
+  --type-size-24: 24px;
+  --type-size-32: 32px;
+  --type-leading-tight: 1.25;
+  --type-weight-regular: 400;
+  --type-weight-semibold: 600;
+  --type-weight-bold: 700;
+  --type-control-leading: var(--type-leading-tight);
+
+  /* Motion */
+  --duration-control: 200ms;
+
+  /* --- 2. Semantic tokens ---------------------------------------------- */
+
+  /* Color roles. Public names are preserved as aliases of the palette
+     primitives so existing styles, tests and consumers keep working. */
+  --color-primary: var(--palette-primary-blue);
+  --color-button: var(--palette-action-blue);
+  --color-button-hover: var(--palette-action-blue-hover);
+  --color-button-active: var(--palette-action-blue-active);
+  --color-ink: var(--palette-ink);
+  --color-surface: var(--palette-surface);
+  --color-page: var(--palette-page);
+  --color-border: var(--palette-border);
+  --color-link: var(--palette-link-blue);
+  --color-focus: var(--color-link);
+
+  /* Layout and motion roles */
+  --content-width: 1120px;
+  --page-gutter: var(--space-16);
+  --control-transition-duration: var(--duration-control);
+
+  /* --- 3. Component tokens -------------------------------------------- */
+
+  /* Profile introduction */
+  --profile-image-width: 200px;
+  --profile-image-width-desktop: 240px;
+  --profile-image-radius: var(--radius-card);
+  --profile-intro-gap: 28px;
+  --profile-intro-gap-desktop: 48px;
+  --profile-intro-block-padding: var(--space-40);
+
+  /* Card */
+  --card-padding: var(--space-24);
+  --card-border: 1px solid var(--color-border);
+  --card-radius: var(--radius-card);
+  --card-surface: var(--color-surface);
+
+  /* Section heading (professional-history h2 and expanded Markdown headings) */
+  --section-heading-size: var(--type-size-24);
+  --section-heading-size-desktop: var(--type-size-32);
+  --section-heading-weight: var(--type-weight-bold);
+  --section-heading-leading: var(--type-leading-tight);
+  --section-heading-gap: var(--space-24);
+  --section-heading-ink: var(--color-ink);
+
+  /* Technology badge */
+  --badge-padding-y: var(--space-4);
+  --badge-padding-x: var(--space-12);
+  --badge-border: 1px solid var(--color-border);
+  --badge-radius: var(--radius-pill);
+  --badge-surface: var(--color-surface);
+  --badge-text: var(--color-ink);
+
+  /* Primary button */
+  --button-min-target: 44px;
+  --button-padding-y: 10px;
+  --button-padding-x: var(--space-20);
+  --button-border: 1px solid transparent;
+  --button-radius: var(--radius-pill);
+  --button-label: var(--color-surface);
+  --button-background: var(--color-button);
+  --button-background-hover: var(--color-button-hover);
+  --button-background-active: var(--color-button-active);
+
+  /* Floating navigator */
+  --nav-max-width: 360px;
+  --nav-clearance: var(--space-16);
+  --nav-padding: var(--space-4);
+  --nav-radius: var(--radius-pill);
+  --nav-surface: var(--color-surface);
+  --nav-link-min-target: var(--button-min-target);
+  --nav-link-padding-y: var(--space-8);
+  --nav-link-padding-x: var(--space-12);
+  --nav-link-radius: var(--radius-pill);
+  --nav-link-text: var(--color-ink);
+  --nav-link-text-active: var(--color-surface);
+  --nav-indicator-inset: var(--space-4);
+  --nav-indicator-width: calc(50% - var(--nav-indicator-inset));
+  --nav-indicator-radius: var(--radius-pill);
+  /* Action blue (not the general --color-primary accent) so the white
+     active label reaches >= 4.5:1 contrast. */
+  --nav-indicator-background: var(--color-button);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-page);
+  scroll-padding-block-start: var(--space-16);
+}
+
+html.home-page {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: var(--type-weight-regular);
+  line-height: 1.6;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: var(--color-link);
+  text-underline-offset: 0.16em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+img,
+svg {
+  display: block;
+}
+
+.site-container {
+  width: min(var(--content-width), calc(100% - 2 * var(--page-gutter)));
+  margin-inline: auto;
+}
+
+.home-main {
+  --home-end-scroll-space: max(112px, calc(100svh - 610px));
+
+  padding-block-end: calc(
+    var(--home-end-scroll-space) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+#inicio,
+#trayectoria {
+  /* The single 16 px start inset comes from html scroll-padding-block-start;
+     adding scroll-margin here would stack a second inset (32 px total). */
+  scroll-snap-align: start;
+}
+
+.profile-intro {
+  display: flex;
+  min-height: min(70svh, 640px);
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--profile-intro-gap);
+  padding-block: var(--profile-intro-block-padding);
+}
+
+.profile-image {
+  width: min(var(--profile-image-width), 100%);
+  height: auto;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  align-self: center;
+  border-radius: var(--profile-image-radius);
+  object-fit: cover;
+}
+
+.profile-details {
+  min-width: 0;
+  text-align: left;
+}
+
+.profile-details h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: var(--type-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.profile-details p {
+  margin-block: var(--space-12) var(--space-20);
+}
+
+.provisional-notice {
+  width: fit-content;
+  max-width: 100%;
+  margin-block: 0 var(--space-24);
+  padding: var(--space-8) 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: var(--type-weight-semibold);
+}
+
+.experience-list {
+  display: grid;
+  gap: var(--space-20);
+}
+
+.experience-card {
+  width: 100%;
+  padding: var(--card-padding);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-surface);
+}
+
+.experience-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: var(--type-weight-bold);
+  line-height: 1.35;
+}
+
+.company-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.company-icon {
+  width: var(--space-40);
+  height: var(--space-40);
+  flex: 0 0 var(--space-40);
+  object-fit: contain;
+}
+
+.technology-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: var(--space-16) 0 var(--space-20);
+  padding: 0;
+  list-style: none;
+}
+
+.technology-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: var(--badge-padding-y) var(--badge-padding-x);
+  border: var(--badge-border);
+  border-radius: var(--badge-radius);
+  background: var(--badge-surface);
+  color: var(--badge-text);
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.button-link {
+  display: inline-flex;
+  min-width: var(--button-min-target);
+  min-height: var(--button-min-target);
+  align-items: center;
+  justify-content: center;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border: var(--button-border);
+  border-radius: var(--button-radius);
+  background: var(--button-background);
+  color: var(--button-label);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-control-leading);
+  text-align: center;
+  text-decoration: none;
+  transition: background-color var(--control-transition-duration) ease;
+}
+
+.button-link:hover {
+  background: var(--button-background-hover);
+  text-decoration: none;
+}
+
+.button-link:active {
+  background: var(--button-background-active);
+}
+
+/* Shared section-heading style: the professional-history h2 and expanded
+   Markdown section headings on detail pages. Employment card titles keep their
+   smaller .experience-card h3 treatment instead. */
+.section-heading,
+.detail-content h2,
+.detail-content h3 {
+  margin-block-end: var(--section-heading-gap);
+  color: var(--section-heading-ink);
+  font-size: var(--section-heading-size);
+  font-weight: var(--section-heading-weight);
+  line-height: var(--section-heading-leading);
+}
+
+.detail-content {
+  max-width: 70ch;
+  line-height: 1.75;
+}
+
+.detail-content p {
+  margin-block: 0 1.25em;
+}
+
+.floating-nav {
+  position: fixed;
+  z-index: 10;
+  right: 0;
+  bottom: calc(var(--nav-clearance) + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  width: min(var(--nav-max-width), calc(100% - 2 * var(--nav-clearance)));
+  margin-inline: auto;
+  padding: var(--nav-padding);
+  /* Ink-based tint; kept literal because it is a one-off decorative edge. */
+  border: 1px solid rgb(15 20 25 / 8%);
+  border-radius: var(--nav-radius);
+  background: var(--nav-surface);
+  box-shadow: 0 4px 20px rgb(15 20 25 / 14%);
+}
+
+/* Keyboard focus safeguard: when a focus-visible control outside the navigator
+   would be covered by it, the navigator is hidden (not removed from the tab
+   order) until focus enters the navigator or leaves the overlapping region. */
+.floating-nav[data-focus-obscured="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.floating-nav-list {
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.floating-nav-link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  min-height: var(--nav-link-min-target);
+  align-items: center;
+  justify-content: center;
+  padding: var(--nav-link-padding-y) var(--nav-link-padding-x);
+  border-radius: var(--nav-link-radius);
+  color: var(--nav-link-text);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-control-leading);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.floating-nav-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Active label sits over the indicator; it must be legible as white text.
+   Hover intentionally does not change color, so the current label stays white
+   and inactive labels keep the dark ink color. */
+.floating-nav-link[aria-current="location"] {
+  color: var(--nav-link-text-active);
+}
+
+.floating-nav-indicator {
+  position: absolute;
+  top: var(--nav-indicator-inset);
+  bottom: var(--nav-indicator-inset);
+  left: var(--nav-indicator-inset);
+  width: var(--nav-indicator-width);
+  border-radius: var(--nav-indicator-radius);
+  background: var(--nav-indicator-background);
+  pointer-events: none;
+  transition: transform var(--control-transition-duration) ease;
+}
+
+.floating-nav[data-active-index="0"] .floating-nav-indicator {
+  transform: translateX(0);
+}
+
+.floating-nav[data-active-index="1"] .floating-nav-indicator {
+  transform: translateX(100%);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-gutter: var(--space-32);
+    --section-heading-size: var(--section-heading-size-desktop);
+  }
+
+  .profile-intro {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--profile-intro-gap-desktop);
+  }
+
+  .profile-image {
+    width: var(--profile-image-width-desktop);
+    align-self: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  html.home-page {
+    scroll-behavior: auto;
+  }
+
+  .floating-nav-indicator,
+  .button-link {
+    transition: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
