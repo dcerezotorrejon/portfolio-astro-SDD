@@ -80,8 +80,9 @@ through `dev` and `qa` subagents on one shared spec branch.
    recorded evidence, run all final quality gates in Constitution §6. Only when
    all pass, use the repository's commit skill to create final feature commit(s)
    and push the shared spec branch to `origin`. No per-task commit/push is allowed.
-   Keep the spec branch available for a later separately managed merge; do not
-   merge it into the base branch or delete it as part of this workflow.
+   After a successful final push, explicitly ask the maintainer to merge the
+   published feature branch into `main`. Keep the branch available; do not merge
+   it yourself or delete it.
 
 ## Rules
 

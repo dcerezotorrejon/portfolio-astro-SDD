@@ -142,7 +142,10 @@ unreported. Evidence files record model claims and exact command results.
   portfolio page, content, or UI requirement changes.
 - `008-lib-reorganization` — modifies the locations of this feature's content
   schema/utilities and floating navigator/helper, with imports updated and no
-  004 behavior or requirements changed.
+  004 behavior or requirements changed. It also updates shared Dev Lead workflow
+  guidance to request maintainer integration after the final push and lets QA mark
+  only evidence-backed acceptance checkboxes in its assigned current spec;
+  portfolio behavior and its requirements remain unchanged.
 
 ## Notes and remaining limits
 

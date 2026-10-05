@@ -297,6 +297,7 @@ describe("custom agent definitions", () => {
       ["edit", "tests/**", "allow"],
       ["edit", "specs/*/tasks.md", "allow"],
       ["edit", "specs/**/spec.md", "deny"],
+      ["edit", "specs/*/spec.md", "allow"],
       ["shell", "git branch *", "deny"],
       ["shell", "git branch --show-current", "allow"],
       ["shell", "git checkout *", "deny"],
@@ -312,18 +313,31 @@ describe("custom agent definitions", () => {
       "tests/unit/agents.test.ts",
       "tests/a11y/floating-nav.test.ts",
       "specs/008-lib-reorganization/tasks.md",
+      "specs/008-lib-reorganization/spec.md",
     ]) {
       expect(effectivePermission(qa, "edit", resource), resource).toBe("allow");
     }
     for (const resource of [
       "src/lib/navigation.ts",
       "docs/design.md",
-      "specs/008-lib-reorganization/spec.md",
       "specs/008-lib-reorganization/plan.md",
       "specs/008-lib-reorganization/summary.md",
+      "specs/008-lib-reorganization/nested/spec.md",
     ]) {
       expect(effectivePermission(qa, "edit", resource), resource).toBe("deny");
     }
+
+    // The path-family rule also matches a sibling current spec; the prompt must
+    // keep that broader tool permission constrained to the assigned spec only.
+    expect(
+      effectivePermission(qa, "edit", "specs/007-workflow-changes/spec.md"),
+    ).toBe("allow");
+    expectPromptFragments(qa, [
+      "Do not edit plans, summaries, operational docs, or any unassigned spec.",
+      "In the assigned current `spec.md`, edit only verified acceptance checkbox markers from `[ ]` to `[x]`, and only after recording the supporting evidence in the assigned task entry.",
+      "Never change criterion wording, spec status or metadata, or any other spec content.",
+      "spec edits to the assigned current spec's evidence-backed `[ ]`→`[x]` checkbox changes.",
+    ]);
 
     for (const agent of [dev, qa]) {
       expect(
@@ -389,9 +403,11 @@ describe("custom agent definitions", () => {
       "Permission-family globs and the available permission exceptions are broader than the assigned task.",
     ]);
     expectPromptFragments(agents.get("qa")!, [
-      "Edit only assigned tests and this spec's assigned task evidence.",
-      "constrain actual edits to named test files.",
-      "The exact `tasks.md` exception authorizes only the assigned task's evidence",
+      "Edit only assigned tests, this spec's assigned task evidence, and the narrowly authorized acceptance checkboxes in the assigned current spec.",
+      "constrain test edits to named test files",
+      "evidence edits to the assigned task entry",
+      "spec edits to the assigned current spec's evidence-backed `[ ]`→`[x]` checkbox changes",
+      "Never change criterion wording, spec status or metadata, or any other spec content.",
       "Never edit production files",
     ]);
   });
@@ -478,34 +494,81 @@ describe("agent workflow documentation", () => {
     },
   );
 
-  it("amends the constitution with spec relationships and version 1.4.0", () => {
-    expect(constitution).toContain("**Version**: 1.4.0");
+  it("amends the constitution with spec relationships and version 1.5.0", () => {
+    expect(constitution).toContain("**Version**: 1.5.0");
+    expect(constitution).toContain("**Last amended**: 2026-10-06");
     expect(constitution).toContain("### 4.2 Spec relationships");
     expect(constitution).toContain("Related specs");
   });
 
-  it("records the approved shared-branch workflow amendment consistently", () => {
+  it("retains the concise normative shared-branch safeguards", () => {
     const guide = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
     const specsReadme = readFileSync(
       join(repoRoot, "specs", "README.md"),
       "utf8",
     );
+    const sectionStart = constitution.indexOf(
+      "### 5.1 Shared feature-branch workflow",
+    );
+    const sectionEnd = constitution.indexOf(
+      "## 6. Quality gates",
+      sectionStart,
+    );
+    const workflowPolicy = constitution
+      .slice(sectionStart, sectionEnd)
+      .replace(/\s+/g, " ");
 
-    expect(constitution).toContain("**Last amended**: 2026-10-05");
-    expect(constitution).toContain("### 5.1 Shared feature-branch workflow");
-    expect(constitution).toContain(
-      "No more than four tasks may be active at once.",
+    expect(sectionStart).toBeGreaterThanOrEqual(0);
+    expect(sectionEnd).toBeGreaterThan(sectionStart);
+    expect(workflowPolicy.length).toBeLessThan(2000);
+    expect(workflowPolicy).toContain("exactly one shared feature branch");
+    expect(workflowPolicy).toContain(
+      "no task/developer branches may be created or used",
     );
-    expect(constitution).toContain("the same Dev corrects them on that branch");
-    expect(constitution).toContain(
-      "MUST NOT create branches, merge branches, or commit or push task work.",
+    expect(workflowPolicy).toContain("At most four tasks may be active");
+    expect(workflowPolicy).toContain(
+      "parallel work is permitted only for independent tasks with disjoint scopes and no unfinished dependencies",
     );
-    expect(constitution).toContain(
-      "only the Dev Lead uses the repository's commit skill",
+    expect(workflowPolicy).toContain(
+      "A task stays active from assignment through QA approval, evidence, and any rework",
     );
-    expect(constitution).toContain(
-      "Historical `spec.md` files MUST NOT be rewritten",
+    expect(workflowPolicy).toContain(
+      "the task closes only after QA approval and recorded evidence",
     );
+    expect(workflowPolicy).toContain("and may update tests and task evidence");
+    expect(workflowPolicy).toContain("MUST NOT edit production code");
+    expect(workflowPolicy).toContain(
+      "defects return to the same Dev on that branch",
+    );
+    expect(workflowPolicy).toContain(
+      "Dev and QA MUST NOT create branches, merge, commit, or push",
+    );
+    expect(workflowPolicy).toContain(
+      "agents MUST stop the affected operation and notify the Dev Lead",
+    );
+    expect(workflowPolicy).toContain(
+      "MUST NOT overwrite work or guess a resolution",
+    );
+    expect(workflowPolicy).toContain(
+      "The Lead escalates decisions requiring judgment to the maintainer, and work resumes only after an agreed resolution",
+    );
+    expect(workflowPolicy).toContain(
+      "Before planning or delegating work affected by a material technical decision",
+    );
+    expect(workflowPolicy).toContain(
+      "the Lead MUST obtain maintainer approval and record it",
+    );
+    expect(workflowPolicy).toContain(
+      "Only the Dev Lead may use the repository's commit skill",
+    );
+    expect(workflowPolicy).toContain(
+      "only after every task has QA approval and evidence and all §6 gates pass",
+    );
+    expect(workflowPolicy).toContain("The Lead MUST NOT merge or delete");
+    expect(workflowPolicy).toContain(
+      "After a successful final push, the Lead MUST ask the maintainer to merge",
+    );
+    expect(workflowPolicy).toContain("that branch into `main`");
 
     for (const guidance of [guide, specsReadme]) {
       expect(guidance).toContain("spec/[NNN]-[slug]");
@@ -514,9 +577,105 @@ describe("agent workflow documentation", () => {
     expect(guide).toContain("overlapping or dependent tasks are serialized");
     expect(guide).toContain("reworks them on that branch");
     expect(guide).toContain("Lead alone uses the commit skill");
+    expect(guide).toContain(
+      "After a successful final push, the Lead explicitly asks the maintainer to merge",
+    );
+    expect(guide).toContain(
+      "does not merge the feature branch into the base branch or delete it",
+    );
     expect(specsReadme).toContain("task/developer branches are not created");
     expect(specsReadme).toContain(
       "preserve earlier, historical `spec.md` files unchanged",
+    );
+  });
+
+  it("requires QA to verify tasks on the shared feature branch", () => {
+    const workflowPolicy = constitution
+      .slice(
+        constitution.indexOf("### 5.1 Shared feature-branch workflow"),
+        constitution.indexOf("## 6. Quality gates"),
+      )
+      .replace(/\s+/g, " ");
+
+    expect(workflowPolicy).toContain(
+      "QA MUST verify each task on the shared feature branch",
+    );
+  });
+
+  it("prohibits Dev and QA from creating branches", () => {
+    const workflowPolicy = constitution
+      .slice(
+        constitution.indexOf("### 5.1 Shared feature-branch workflow"),
+        constitution.indexOf("## 6. Quality gates"),
+      )
+      .replace(/\s+/g, " ");
+
+    expect(workflowPolicy).toContain("Dev and QA MUST NOT create branches");
+  });
+
+  it("keeps all four agent role boundaries and the generic QA evidence path", () => {
+    const specRefiner = agents.get("spec-refiner")!;
+    const lead = agents.get("dev-lead")!;
+    const dev = agents.get("dev")!;
+    const qa = agents.get("qa")!;
+
+    expectPromptFragments(specRefiner, [
+      "Write only the assigned current `spec.md`",
+      "All subsequent Dev and QA work uses that shared branch",
+      "Only the Lead performs final commit/push",
+    ]);
+    expectPromptFragments(lead, [
+      "Never write or modify any `spec.md`.",
+      "Limit actual edits to the current feature's named `plan.md`, `tasks.md`, and `summary.md`",
+      "After a successful final push, explicitly ask the maintainer to merge",
+      "do not merge it yourself or delete it",
+    ]);
+    expectPromptFragments(dev, [
+      "implement exactly one task",
+      "Do not write or modify tests",
+      "do not merge, commit, or push",
+      "Only the Lead uses the commit skill for final feature commit/push",
+    ]);
+    expectPromptFragments(qa, [
+      "Edit only assigned tests, this spec's assigned task evidence, and the narrowly authorized acceptance checkboxes in the assigned current spec.",
+      "in this spec's `tasks.md`",
+      "Never edit production files",
+      "do not merge, commit, or push",
+    ]);
+    expectPromptFragments(qa, [
+      "After verifying an acceptance criterion and recording its supporting evidence",
+      "change only that criterion's checkbox from `[ ]` to `[x]` in the assigned current `spec.md`",
+    ]);
+    const guide = readFileSync(join(repoRoot, "AGENTS.md"), "utf8").replace(
+      /\s+/g,
+      " ",
+    );
+    expect(guide).toContain(
+      "QA completes verification before the Lead's final commit and push; no post-push QA task is introduced.",
+    );
+    expectPromptFragments(qa, ["operational docs, or any unassigned spec."]);
+    expect(qa.body).toContain("spec status or metadata");
+    expect(qa.body).not.toContain("specs/007-workflow-changes/tasks.md");
+
+    expect(
+      effectivePermission(lead, "edit", "specs/008-lib-reorganization/spec.md"),
+    ).toBe("deny");
+  });
+
+  it("requires the Lead's maintainer merge request only after the final push", () => {
+    const leadPrompt = agents.get("dev-lead")!.body.replace(/\s+/g, " ");
+    const sharedGuidance = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
+    const normalizedGuidance = sharedGuidance.replace(/\s+/g, " ");
+
+    expect(leadPrompt).toMatch(
+      /After every task has QA approval and recorded evidence[\s\S]*?all final quality gates[\s\S]*?commit skill[\s\S]*?push the shared spec branch[\s\S]*?After a successful final push, explicitly ask the maintainer to merge/,
+    );
+    expect(leadPrompt).toContain("do not merge it yourself or delete it");
+    expect(normalizedGuidance).toMatch(
+      /After all task QA approvals and evidence are recorded and final gates pass[\s\S]*?Lead alone uses the commit skill[\s\S]*?push[\s\S]*?After a successful final push, the Lead explicitly asks the maintainer to merge/,
+    );
+    expect(normalizedGuidance).toContain(
+      "the Lead explicitly asks the maintainer to merge the published feature branch into `main`",
     );
   });
 

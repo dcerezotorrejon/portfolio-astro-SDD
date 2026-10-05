@@ -1,7 +1,7 @@
 # Summary — Agent workflow
 
 - **Spec ID**: `003-agent-workflow`
-- **Last updated**: 2026-10-05
+- **Last updated**: 2026-10-06
 
 ## Files changed
 
@@ -10,25 +10,33 @@
   `openrouter/openai/gpt-6-luna#medium` (`007-workflow-changes` supersedes the
   Auto Router assignment from `005-auto-router-agents`).
 - `.opencode/agents/dev-lead.md` — new `primary` agent: writes `plan.md`/`tasks.md`
-  and orchestrates `dev` then `qa`; now uses
+  and orchestrates `dev` then `qa`; the final workflow now explicitly requests
+  the maintainer to merge the pushed branch without performing the merge; it now uses
   `openrouter/openai/gpt-6-luna#high` (`007-workflow-changes` supersedes the Auto
   Router assignment from `005-auto-router-agents`).
 - `.opencode/agents/dev.md` — new `subagent`: implements one task, never
   self-validates.
-- `.opencode/agents/qa.md` — new `subagent`: writes and runs the quality tests and
-  records evidence.
-- `docs/constitution.md` — `1.1.0` → `1.2.0`; §4.1 `summary.md` adds `Related
-specs`; new §4.2 `Spec relationships`.
+- `.opencode/agents/qa.md` — new `subagent`: writes and runs the quality tests,
+  records evidence, and may mark only evidence-backed acceptance checkboxes in
+  its assigned current spec (`008-lib-reorganization`).
+- `docs/constitution.md` — initially `1.1.0` → `1.2.0`; under
+  `008-lib-reorganization`, §5.1 was condensed and amended to version `1.5.0` on
+  `2026-10-06`, retaining workflow safeguards and requiring the final merge
+  request.
 - `specs/003-agent-workflow/{spec,plan,tasks,summary}.md` — re-anchored all four
   model preferences to OpenRouter Auto Router variants owned by spec 005.
 - `AGENTS.md` — new `Agent workflow` section (the four agents, manual handoff,
-  model tiers, portable format).
+  model tiers, portable format); now explicitly requires the Lead to ask the
+  maintainer to merge after final push and documents QA's checkbox-only spec
+  update authority (`008-lib-reorganization`).
 - `specs/README.md` — `summary.md` describes `Related specs`; new section on
   relationships.
 - `specs/_template/summary.md` — new `Related specs` section.
 - `specs/001-sdd-baseline/summary.md`, `specs/002-front-extra-dependencies/summary.md`
   — backfilled `Related specs`.
-- `tests/unit/agents.test.ts` — frontmatter + documentation consistency test.
+- `tests/unit/agents.test.ts` — frontmatter and documentation consistency tests,
+  including QA's checkbox-only boundary, constitutional workflow, and final
+  handoff (`008-lib-reorganization`).
 - `specs/003-agent-workflow/{spec,plan,tasks,summary}.md` — this spec.
 
 ## Functions / components changed
@@ -58,6 +66,11 @@ specs`; new §4.2 `Spec relationships`.
   QA/rework/evidence gate the final commit and push. The pinned GPT-6 Luna models
   supersede the Auto Router agent assignments; the Auto Router configuration
   remains unchanged. This summary is updated; the historical `spec.md` is not.
+- `008-lib-reorganization` — modifies the agent workflow guidance and condenses
+  Constitution §5.1 while preserving established roles; its final push workflow
+  requires an explicit maintainer merge request and leaves the actual merge to
+  the maintainer. It also authorizes QA to mark only verified acceptance
+  checkboxes in its assigned current spec.
 
 ## Notes
 

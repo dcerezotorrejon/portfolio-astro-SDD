@@ -1,7 +1,7 @@
 # Summary — SDD baseline
 
 - **Spec ID**: `001-sdd-baseline`
-- **Last updated**: 2026-10-05
+- **Last updated**: 2026-10-06
 
 ## Files changed
 
@@ -43,6 +43,9 @@
   workflow, four-task concurrency limit, QA lifecycle, and historical `spec.md`
   immutability rule; this summary records the relationship without changing this
   spec's historical requirements.
+- `008-lib-reorganization` — further amends the constitution's §5.1 workflow
+  policy, including the Dev Lead's required post-push request for the maintainer
+  to merge; the baseline spec remains unchanged.
 
 ## Notes
 

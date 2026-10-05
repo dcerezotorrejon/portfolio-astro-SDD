@@ -4,8 +4,8 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.4.0
-- **Last amended**: 2026-10-05
+- **Version**: 1.5.0
+- **Last amended**: 2026-10-06
 
 ---
 
@@ -130,35 +130,27 @@ others, and specs must keep those links visible.
 ### 5.1 Shared feature-branch workflow
 
 - After a spec is agreed and planning begins, the Dev Lead MUST create and publish
-  exactly one feature-work branch named `spec/[NNN]-[slug]`, using the complete
-  spec directory name. This is the shared branch for every Dev and QA working on
-  that feature. Task/developer branches (including `dev/...`) MUST NOT be created.
-- The Dev Lead MAY run independent tasks in parallel only when their file scopes
-  do not overlap and they have no unfinished dependencies. Overlapping tasks and
-  tasks with dependencies MUST be serialized.
-- No more than four tasks may be active at once. A task becomes active when
-  assigned to a Dev and remains active through QA verification, evidence
-  recording, and any rework. It closes only when QA approves it and records
-  evidence; a fifth task MUST NOT be assigned while four tasks are active.
-- QA verifies the task on the shared feature branch, may update tests and task
-  evidence there, and MUST NOT edit production code or commit or push. If QA finds
-  defects, the same Dev corrects them on that branch and returns the task to QA.
-  Dev and QA MUST NOT create branches, merge branches, or commit or push task work.
-- If an agent encounters a Git or change conflict, it MUST stop the affected
-  operation and notify the Dev Lead with the conflicting branches/files and
-  blocking state. Agents MUST NOT overwrite another agent's work or guess at a
-  resolution. The Lead escalates decisions requiring judgment to the maintainer;
-  work resumes only after an agreed resolution.
-- Before planning or delegating implementation affected by a material technical
-  decision not settled by the spec, constitution, or established conventions, the
-  Dev Lead MUST present the decision and options to the maintainer and receive
-  approval. The Lead records the approved decision in the relevant planning
-  artifact.
-- After every task has QA approval and evidence, and the final quality gates in
-  §6 pass, only the Dev Lead uses the repository's commit skill for the final
-  feature commit(s) and push of the shared branch. This workflow does not merge
-  the feature branch into the repository's base branch or delete the feature
-  branch; base-branch integration is separately managed.
+  exactly one shared feature branch named `spec/[NNN]-[slug]` from the complete
+  spec directory; no task/developer branches may be created or used. At most four
+  tasks may be active, and parallel work is permitted only for independent tasks
+  with disjoint scopes and no unfinished dependencies. A task stays active from
+  assignment through QA approval, evidence, and any rework. QA MUST verify each
+  task on the shared feature branch and may update tests and task evidence but
+  MUST NOT edit production code; defects return to the same Dev on that branch, and
+  the task closes only after QA approval and recorded evidence. Dev and QA MUST
+  NOT create branches, merge, commit, or push.
+- On a Git or change conflict, agents MUST stop the affected operation and notify
+  the Dev Lead with the conflicting branches/files and blocking state; they MUST
+  NOT overwrite work or guess a resolution. The Lead escalates decisions requiring
+  judgment to the maintainer, and work resumes only after an agreed resolution.
+  Before planning or delegating work affected by a material technical decision
+  not settled by the spec, constitution, or established conventions, the Lead MUST
+  obtain maintainer approval and record it in the relevant planning artifact.
+- Only the Dev Lead may use the repository's commit skill for final feature
+  commit(s) and push, and only after every task has QA approval and evidence and
+  all §6 gates pass. The Lead MUST NOT merge or delete the published feature
+  branch. After a successful final push, the Lead MUST ask the maintainer to merge
+  that branch into `main`; base-branch integration remains maintainer-managed.
 
 ## 6. Quality gates
 

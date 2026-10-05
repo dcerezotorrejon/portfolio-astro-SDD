@@ -54,7 +54,7 @@ Development is split across four specialized agents defined under
 | `spec-refiner` | `primary`  | Clarifies the feature with you and writes `spec.md`.                       |
 | `dev-lead`     | `primary`  | Turns the spec into `plan.md`/`tasks.md` and orchestrates `dev` then `qa`. |
 | `dev`          | `subagent` | Implements one task. Does not validate its own work.                       |
-| `qa`           | `subagent` | Tests a finished task against the quality gates and records evidence.      |
+| `qa`           | `subagent` | Tests, records evidence, marks only evidenced acceptance boxes.            |
 
 - The `spec-refiner` → `dev-lead` handoff is **manual**: switch the primary agent
   once the spec is agreed.
@@ -78,10 +78,15 @@ Development is split across four specialized agents defined under
   independent tasks with disjoint file scopes and no unfinished dependencies run
   in parallel; overlapping or dependent tasks are serialized.
 - Dev implements only the assigned task scope and does not commit or push. QA
-  verifies on the shared branch, may update tests and task evidence, and does not
+  verifies on the shared branch and may update assigned tests and task evidence.
+  After verifying an acceptance criterion and recording its evidence in the
+  assigned task entry, QA may change only that criterion's `[ ]` checkbox to
+  `[x]` in the assigned current spec; QA may not edit criterion wording, spec
+  status or metadata, any other spec content, or an unassigned spec. QA does not
   edit production code or commit/push. QA returns defects to the same Dev, who
-  reworks them on that branch; the task closes only after QA approval and recorded
-  evidence.
+  reworks them on that branch; the task closes only after QA approval and
+  recorded evidence. QA completes verification before the Lead's final commit and
+  push; no post-push QA task is introduced.
 - On a Git or change conflict, stop the affected operation and notify the Lead
   with the conflicting branches/files and blocking state. Do not overwrite work
   or guess at a resolution. The Lead escalates decisions to the maintainer when
@@ -91,12 +96,15 @@ Development is split across four specialized agents defined under
   in the relevant planning artifact.
 - After all task QA approvals and evidence are recorded and final gates pass, the
   Lead alone uses the commit skill for final feature commit(s) and push. This
-  workflow does not merge the feature branch into the base branch or delete it;
-  base-branch integration is separately managed.
-- Writing boundaries: the Spec Refiner writes only the current `spec.md`; the
-  Lead does not write `spec.md` and owns planning/task/summary artifacts. Dev and
-  QA stay within their assigned task responsibilities; QA's test/evidence work
-  does not grant production-code authority.
+  workflow does not merge the feature branch into the base branch or delete it.
+  After a successful final push, the Lead explicitly asks the maintainer to merge
+  the published feature branch into `main`; base-branch integration remains
+  maintainer-managed.
+- Writing boundaries: the Spec Refiner owns current `spec.md` wording and
+  status/metadata; QA has only the evidence-backed acceptance-checkbox exception
+  described above. The Lead does not write `spec.md` and owns planning/task/summary
+  artifacts. Dev and QA stay within their assigned task responsibilities; QA's
+  test/evidence work does not grant production-code authority.
 
 ## Verification gates
 

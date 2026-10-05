@@ -16,6 +16,9 @@ permissions:
   - action: edit
     resource: "specs/**/spec.md"
     effect: deny
+  - action: edit
+    resource: "specs/*/spec.md"
+    effect: allow
   - action: shell
     resource: "git branch *"
     effect: deny
@@ -61,10 +64,14 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    - **Accessibility** checks (axe-core) when markup is involved.
 3. Run the gates: `pnpm lint`, `pnpm format:check`, `pnpm build`,
    `pnpm test:run`, and `pnpm test:a11y` as required by Constitution §6.
-4. Record evidence for the assigned task in
-   `specs/007-workflow-changes/tasks.md` on the same branch. If a gate does not
-   apply, say so explicitly rather than skipping it silently.
-5. Return either approval with evidence for all applicable gates or specific
+4. Record evidence for the assigned task in this spec's `tasks.md` on the same
+   branch. If a gate does not apply, say so explicitly rather than skipping it
+   silently.
+5. After verifying an acceptance criterion and recording its supporting evidence
+   in the assigned task entry, change only that criterion's checkbox from `[ ]`
+   to `[x]` in the assigned current `spec.md`. Do not change any other spec text
+   or checkbox.
+6. Return either approval with evidence for all applicable gates or specific
    defects to the Lead. The Lead returns defects to the same Dev for correction
    on the shared branch, then QA verifies again. A task remains active through
    verification, evidence recording, and rework; it closes only after QA approval
@@ -73,13 +80,20 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
 ## Rules
 
 - Never edit production files, including source, content, assets, configuration,
-  or agent definitions. Do not edit operational docs, any `spec.md`, plans, or
-  summaries. Report defects rather than fixing production code yourself.
-- Edit only assigned tests and this spec's assigned task evidence. The
-  permission-family glob `tests/**` is broader than the assigned task; constrain
-  actual edits to named test files. The exact `tasks.md` exception authorizes
-  only the assigned task's evidence, not unrelated task changes. Ask the Lead to
-  serialize QA work if tests or evidence ownership overlaps.
+  or agent definitions. Do not edit plans, summaries, operational docs, or any
+  unassigned spec. In the assigned current `spec.md`, edit only verified
+  acceptance checkbox markers from `[ ]` to `[x]`, and only after recording the
+  supporting evidence in the assigned task entry. Never change criterion wording,
+  spec status or metadata, or any other spec content. Report defects rather than
+  fixing production code yourself.
+- Edit only assigned tests, this spec's assigned task evidence, and the narrowly
+  authorized acceptance checkboxes in the assigned current spec. The permission-
+  family globs `tests/**` and `specs/*/spec.md` are broader than actual authority:
+  constrain test edits to named test files, evidence edits to the assigned task
+  entry, and spec edits to the assigned current spec's evidence-backed `[ ]`→`[x]`
+  checkbox changes. The `specs/*/tasks.md` permission authorizes only assigned
+  task evidence, not unrelated task changes. Ask the Lead to serialize QA work if
+  tests or evidence ownership overlaps.
 - Do not create, switch, or use task/developer branches (`dev/...`); do not merge,
   commit, or push. No per-task commits/pushes are performed. QA approval never
   authorizes Dev or QA to commit/push; only the Lead uses the commit skill after
