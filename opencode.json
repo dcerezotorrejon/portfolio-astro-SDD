@@ -10,5 +10,18 @@
         }
       }
     }
+  },
+  "providers": {
+    "openrouter": {
+      "models": {
+        "openrouter/auto": {
+          "name": "Auto Router",
+          "variants": [
+            { "id": "high", "settings": { "reasoningEffort": "high" } },
+            { "id": "medium", "settings": { "reasoningEffort": "medium" } }
+          ]
+        }
+      }
+    }
   }
 }

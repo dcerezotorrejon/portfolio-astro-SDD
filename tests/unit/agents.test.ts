@@ -141,21 +141,36 @@ describe("custom agent definitions", () => {
   it("uses the expected mode and model for each agent", () => {
     expect(agents.get("spec-refiner")).toMatchObject({
       mode: "primary",
-      model: "openrouter/openai/gpt-6.1-sol#medium",
+      model: "openrouter/openrouter/auto#medium",
     });
     expect(agents.get("dev-lead")).toMatchObject({
       mode: "primary",
-      model: "openrouter/openai/gpt-6.1-sol#high",
+      model: "openrouter/openrouter/auto#high",
     });
     expect(agents.get("dev")).toMatchObject({
       mode: "subagent",
-      model: "openrouter/openai/gpt-6-luna#medium",
+      model: "openrouter/openrouter/auto#medium",
     });
     expect(agents.get("qa")).toMatchObject({
       mode: "subagent",
-      model: "openrouter/openai/gpt-6-luna#medium",
+      model: "openrouter/openrouter/auto#medium",
     });
   });
+
+  it.each([...agents.values()])(
+    "$id routes through the Auto Router",
+    (agent) => {
+      expect(agent.model).toMatch(/^openrouter\/openrouter\/auto#/);
+    },
+  );
+
+  it.each([...agents.values()])(
+    "$id documents its reasoning intent",
+    (agent) => {
+      expect(agent.body).toContain("## Model intent");
+      expect(agent.body).toMatch(/reasoning effort/i);
+    },
+  );
 
   it("lets the dev lead launch dev and qa, and no one else launch subagents", () => {
     const lead = agents.get("dev-lead")!;
@@ -191,10 +206,25 @@ describe("agent workflow documentation", () => {
     },
   );
 
-  it("amends the constitution with spec relationships and version 1.2.0", () => {
-    expect(constitution).toContain("**Version**: 1.2.0");
+  it("amends the constitution with spec relationships and version 1.3.0", () => {
+    expect(constitution).toContain("**Version**: 1.3.0");
     expect(constitution).toContain("### 4.2 Spec relationships");
     expect(constitution).toContain("Related specs");
+  });
+
+  it("establishes the global design document under constitutional precedence", () => {
+    expect(constitution).toContain("### 2.1 Global design");
+    expect(constitution).toContain("[`docs/design.md`](./design.md)");
+    expect(constitution).toContain(
+      "Specs, technical plans, and UI implementations MUST reference",
+    );
+    expect(constitution).toContain(
+      "The design document is subordinate to this constitution, including the",
+    );
+    expect(constitution).toContain("accessibility requirements in §7");
+    expect(constitution).toContain(
+      "When a practice is not covered here, use the Astro documentation",
+    );
   });
 
   it("documents Related specs in the spec template and README", () => {
@@ -205,5 +235,47 @@ describe("agent workflow documentation", () => {
     const readme = readFileSync(join(repoRoot, "specs", "README.md"), "utf8");
     expect(template).toContain("## Related specs");
     expect(readme).toContain("Related specs");
+  });
+});
+
+describe("auto router model variants", () => {
+  const config = JSON.parse(
+    readFileSync(join(repoRoot, "opencode.json"), "utf8"),
+  ) as {
+    providers?: {
+      openrouter?: {
+        models?: Record<
+          string,
+          {
+            variants?: Array<{
+              id?: string;
+              settings?: Record<string, unknown>;
+            }>;
+          }
+        >;
+      };
+    };
+  };
+
+  const auto = config.providers?.openrouter?.models?.["openrouter/auto"];
+
+  it("defines the Auto Router with high and medium reasoning variants", () => {
+    expect(auto).toBeDefined();
+    const variants = auto?.variants ?? [];
+    const effort = Object.fromEntries(
+      variants.map((variant) => [
+        variant.id,
+        variant.settings?.reasoningEffort,
+      ]),
+    );
+    expect(effort.high).toBe("high");
+    expect(effort.medium).toBe("medium");
+  });
+
+  it("controls reasoning effort, not cost, in the variants", () => {
+    for (const variant of auto?.variants ?? []) {
+      expect(variant.settings).toHaveProperty("reasoningEffort");
+      expect(variant.settings).not.toHaveProperty("cost_tier");
+    }
   });
 });

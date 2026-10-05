@@ -42,10 +42,10 @@
   with the maintainer, so they are `primary`; `dev` and `qa` are launched by the
   lead, so they are `subagent`. The primary handoff is manual because V2 has no
   direct primary-to-primary delegation.
-- **Model tiers**: `gpt-6.1-sol` (medium cost) at `#medium`/`#high` reasoning for
-  the two primary agents; `gpt-6-luna` for `dev`/`qa`, with the lead allowed to
-  override the subagent's model per task to escalate harder work without moving
-  the whole session to an expensive model.
+- **Model tiers**: `gpt-6-luna` at `#medium`/`#high` reasoning for the two primary
+  agents and `#medium` for `dev`/`qa`, with the lead allowed to override a
+  subagent's model per task. The maintainer selected Luna for all four roles; no
+  OpenRouter router is configured by this spec.
 - **Permission by role**: agents only edit what their role owns (`specs`/`docs`
   vs `src` vs `tests`), and only `dev-lead` may launch subagents.
 - **No new dependencies**: the frontmatter test uses a small local parser instead

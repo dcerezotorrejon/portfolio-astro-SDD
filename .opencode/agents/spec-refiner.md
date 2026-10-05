@@ -1,7 +1,7 @@
 ---
 description: Clarifies a feature with the maintainer until it is unambiguous, writes spec.md, and records which existing specs are affected. Hands off to dev-lead.
 mode: primary
-model: openrouter/openai/gpt-6.1-sol#medium
+model: openrouter/openrouter/auto#medium
 color: "#4C9AFF"
 permissions:
   - action: edit
@@ -51,3 +51,8 @@ you write; you never implement.
 
 When finished, report: the spec path, a one-line summary, any open questions, and
 a suggested handoff message for the Dev Lead.
+
+## Model intent
+
+Routed through the Auto Router with medium reasoning effort: this role needs a
+cost-efficient general-purpose coding model.

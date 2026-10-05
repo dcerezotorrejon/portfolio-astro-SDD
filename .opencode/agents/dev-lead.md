@@ -1,7 +1,7 @@
 ---
 description: Reviews a spec and the code, writes plan.md and tasks.md with self-contained parallelizable tasks, and orchestrates dev then qa subagents choosing the model per task.
 mode: primary
-model: openrouter/openai/gpt-6.1-sol#high
+model: openrouter/openrouter/auto#high
 color: "#B36BFF"
 permissions:
   - action: edit
@@ -55,7 +55,13 @@ through `dev` and `qa` subagents.
 - Never bypass the quality gates in Constitution §6.
 - Prefer more, smaller tasks over one large task; each must be independently
   verifiable.
+- Before starting plan execution confirm with me the plan
 
 ## Output
 
 For each task report: status, files touched, model used, and gate evidence.
+
+## Model intent
+
+Routed through the Auto Router with high reasoning effort: this role needs a
+frontier reasoning model for planning and orchestration.

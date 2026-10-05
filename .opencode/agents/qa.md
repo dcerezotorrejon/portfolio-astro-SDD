@@ -1,7 +1,7 @@
 ---
 description: Verifies one completed dev task against the constitution's quality gates, writing the required unit, SEO and accessibility tests and recording evidence.
 mode: subagent
-model: openrouter/openai/gpt-6-luna#medium
+model: openrouter/openrouter/auto#medium
 color: "#E3B341"
 permissions:
   - action: edit
@@ -44,3 +44,8 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
 
 Report: tests added/changed, commands run with their results, gate status, and any
 defects found (with file and line references).
+
+## Model intent
+
+Routed through the Auto Router with medium reasoning effort: this role needs a
+cost-efficient general-purpose coding model.

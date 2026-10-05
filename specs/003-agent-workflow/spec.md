@@ -1,7 +1,7 @@
 # Agent workflow
 
 - **Spec ID**: `003-agent-workflow`
-- **Status**: done
+- **Status**: in progress
 - **Last updated**: 2026-10-05
 
 ## Context
@@ -32,21 +32,22 @@ specs explicit so changes can be traced across features.
 - **R1 (Agent definitions)**: Exactly four agents exist under `.opencode/agents/`
   — `spec-refiner`, `dev-lead`, `dev`, `qa` — each a Markdown file with valid YAML
   frontmatter: `description`, `mode`, `model`, and `permissions`.
-- **R2 (Spec Refiner)**: `spec-refiner` is a `primary` agent using a medium-cost,
-  medium-reasoning model (`openrouter/openai/gpt-6.1-sol#medium`). It clarifies
-  requirements with the maintainer, writes `spec.md`, and reviews existing specs to
-  record the relationships that the final `summary.md` will consolidate.
-- **R3 (Dev Lead)**: `dev-lead` is a `primary` agent using a medium-cost,
-  high-reasoning model (`openrouter/openai/gpt-6.1-sol#high`). It reviews the spec
-  and code, clarifies technical decisions with the maintainer, writes `plan.md`
-  and `tasks.md` with self-contained and parallelizable tasks, and for each task
-  launches a `dev` then a `qa` subagent, choosing the model per task to optimize
-  cost.
+- **R2 (Spec Refiner)**: `spec-refiner` is a `primary` agent using a
+  medium-reasoning Auto Router variant (`openrouter/openrouter/auto#medium`; see
+  `005-auto-router-agents`). It clarifies requirements with the maintainer, writes
+  `spec.md`, and reviews existing specs to record the relationships that the final
+  `summary.md` will consolidate.
+- **R3 (Dev Lead)**: `dev-lead` is a `primary` agent using a high-reasoning Auto
+  Router variant (`openrouter/openrouter/auto#high`; see
+  `005-auto-router-agents`). It reviews the spec and code, clarifies technical
+  decisions with the maintainer, writes `plan.md` and `tasks.md` with
+  self-contained and parallelizable tasks, and for each task launches a `dev` then
+  a `qa` subagent, choosing the model per task to optimize cost.
 - **R4 (Dev)**: `dev` is a `subagent` using a cost/intelligence-compromise model
-  (`openrouter/openai/gpt-6-luna#medium`, overridable by the lead). It implements
+  (`openrouter/openrouter/auto#medium`, overridable by the lead). It implements
   exactly one assigned task and does not validate its own work.
 - **R5 (QA)**: `qa` is a `subagent` using a comparable model
-  (`openrouter/openai/gpt-6-luna#medium`). It receives a completed dev task,
+  (`openrouter/openrouter/auto#medium`). It receives a completed dev task,
   writes and runs the quality tests (unit, SEO, accessibility) required by the
   constitution, and records evidence.
 - **R6 (Handoff)**: The `spec-refiner` → `dev-lead` handoff is documented as a
@@ -77,6 +78,13 @@ specs explicit so changes can be traced across features.
       document the workflow and the `Related specs` section (R8–R9).
 - [x] AC7: A unit test validates the agent frontmatter and its consistency with
       `AGENTS.md` and the constitution.
+
+The maintainer later moved the four agents from pinned `gpt-6-luna` models to the
+OpenRouter Auto Router with per-role reasoning variants (`#high` / `#medium`); see
+`005-auto-router-agents`. The agent files are the source of truth for that
+approved selection, and R2–R5 plus the frontmatter test are re-anchored there.
+That change introduces OpenRouter router configuration and a named per-role model
+variant; it does not alter agent roles, modes, or permissions.
 
 ## Verification
 

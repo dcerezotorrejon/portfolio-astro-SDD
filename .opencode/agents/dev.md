@@ -1,7 +1,7 @@
 ---
 description: Implements exactly one task assigned by the Dev Lead, following the spec and plan. Never validates its own work.
 mode: subagent
-model: openrouter/openai/gpt-6-luna#medium
+model: openrouter/openrouter/auto#medium
 color: "#3FB950"
 permissions:
   - action: edit
@@ -44,3 +44,8 @@ Lead, following the spec and the plan. You do **not** validate your own work.
 
 Report: files changed, a short description of the change, and anything the QA
 needs to know (edge cases, how to exercise it).
+
+## Model intent
+
+Routed through the Auto Router with medium reasoning effort: this role needs a
+cost-efficient general-purpose coding model.
