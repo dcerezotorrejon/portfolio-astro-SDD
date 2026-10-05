@@ -17,8 +17,8 @@
   records evidence.
 - `docs/constitution.md` — `1.1.0` → `1.2.0`; §4.1 `summary.md` adds `Related
 specs`; new §4.2 `Spec relationships`.
-- `specs/003-agent-workflow/{spec,plan,tasks,summary}.md` — updated primary-agent
-  model assignments to Luna per maintainer decision; T10 test verification pending.
+- `specs/003-agent-workflow/{spec,plan,tasks,summary}.md` — re-anchored all four
+  model preferences to OpenRouter Auto Router variants owned by spec 005.
 - `AGENTS.md` — new `Agent workflow` section (the four agents, manual handoff,
   model tiers, portable format).
 - `specs/README.md` — `summary.md` describes `Related specs`; new section on
@@ -44,9 +44,9 @@ specs`; new §4.2 `Spec relationships`.
   re-anchors `tests/unit/agents.test.ts`; no agent role, mode, or permission
   changed.
 - `004-portfolio-home` — the applied React-policy clarification (1.2.1) and
-  global-design reference (1.3.0) amend the constitution. The maintainer also
-  selected Luna for the primary agents; R2/R3 and the model consistency test are
-  re-anchored to current agent configuration. No agent role or permission changed.
+  global-design reference (1.3.0) amend the constitution; this spec establishes
+  the workflow used by 004. Agent router configuration is owned by spec 005. No
+  agent role or permission changed.
 - `001-sdd-baseline` — this spec amends `docs/constitution.md` and the `summary.md`
   convention that spec established.
 - `002-front-extra-dependencies` — earlier constitution amendment; shares the

@@ -30,11 +30,11 @@
     `specs/002-front-extra-dependencies/summary.md`.
 - [x] T9: Add `tests/unit/agents.test.ts` (frontmatter + consistency).
   - Evidence: `pnpm test:run` -> 6 files, 25 tests passed.
-- [ ] T10: Re-anchor the primary-agent model preferences to the maintainer's
-      current Luna assignments in the living spec and frontmatter test.
-  - Evidence: spec/plan/summary updated; QA updated `tests/unit/agents.test.ts`.
-    Targeted test passed, 19 tests. Full-suite verification remains pending
-    because `companyIcon` collection content is currently failing in integration.
+- [x] T10: Re-anchor all agent model references to OpenRouter Auto Router and
+      reasoning variants defined by spec 005.
+  - Evidence: `005-auto-router-agents` records the approved variants and reports
+    `pnpm test:run` passing with model/variant frontmatter assertions. `spec.md`,
+    `plan.md`, and `summary.md` now point to the current router configuration.
 
 ## Gate summary
 
@@ -47,5 +47,6 @@
     markup. The existing accessibility gate still runs green.
 - SEO: **not applicable** — no page, route, or rendered markup is added (stated
   explicitly per Constitution §5).
-- Follow-up T10 is in progress; historical gate evidence above does not verify the
-  updated model assignments or current repository-wide suite.
+- T10's routing and variant evidence is maintained in
+  `specs/005-auto-router-agents`; unrelated integration gates for spec 004 are not
+  evidence against this agent-configuration task.
