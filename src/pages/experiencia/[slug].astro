@@ -2,6 +2,8 @@
 import { getCollection, getEntry, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import TechnologyBadges from "../../components/TechnologyBadges.astro";
+import Button from "../../components/molecules/Button.astro";
+import Heading from "../../components/molecules/Heading.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import {
   assertUniqueExperienceSlugs,
@@ -44,7 +46,9 @@ const companyIcon = resolveCompanyIcon(experience);
       style={`view-transition-name: experience-${slug}`}
     >
       <header class="experience-detail-header">
-        <h1>{role}</h1>
+        <Heading level={1} variant="display">
+          {role}
+        </Heading>
         <p class="company-identity">
           <img
             class="company-icon"
@@ -63,9 +67,9 @@ const companyIcon = resolveCompanyIcon(experience);
           <Content />
         </div>
         <p class="provisional-notice">{profile.notice}</p>
-        <a class="button-link" href="/#trayectoria">
+        <Button variant="primary" href="/#trayectoria">
           {profile.backLabel}
-        </a>
+        </Button>
       </div>
     </article>
   </main>

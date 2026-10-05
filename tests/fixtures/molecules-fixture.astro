@@ -1,0 +1,65 @@
+---
+// Test-only fixture: renders the Button and Heading molecules with visible
+// labels/children. The Astro Container `render(component, props)` helper cannot
+// pass slots, so slot-only coverage (visible labels, axe accessible names) lives
+// here. It uses generic test strings and intentionally contains no portfolio
+// content.
+import Button from "../../src/components/molecules/Button.astro";
+import Heading from "../../src/components/molecules/Heading.astro";
+---
+
+<div class="molecules-fixture">
+  <Heading
+    level={1}
+    variant="display"
+    id="fixture-heading-1"
+    class="fixture-extra"
+    data-track="heading"
+  >
+    Display heading level one
+  </Heading>
+  <Heading level={2} variant="section" id="fixture-heading-2">
+    Section heading level two
+  </Heading>
+  <Heading level={3} variant="card" id="fixture-heading-3">
+    Card heading level three
+  </Heading>
+  <Heading level={4} variant="card" id="fixture-heading-4">
+    Card heading level four
+  </Heading>
+  <Heading level={5} variant="section" id="fixture-heading-5">
+    Section heading level five
+  </Heading>
+  <Heading level={6} variant="display" id="fixture-heading-6">
+    Display heading level six
+  </Heading>
+
+  <Button
+    variant="primary"
+    href="/"
+    id="fixture-primary-link"
+    class="fixture-extra"
+    data-track="link"
+  >
+    Primary link
+  </Button>
+  <Button
+    variant="secondary"
+    href="https://example.com/"
+    id="fixture-secondary-link"
+    aria-label="Secondary link"
+    rel="noopener"
+    target="_blank"
+  >
+    Secondary link
+  </Button>
+  <Button variant="primary" id="fixture-primary-button">
+    Primary button
+  </Button>
+  <Button variant="primary" id="fixture-submit-button" type="submit" disabled>
+    Disabled submit
+  </Button>
+  <Button variant="secondary" id="fixture-secondary-button">
+    Secondary button
+  </Button>
+</div>

@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Level = 1 | 2 | 3 | 4 | 5 | 6;
+
+type Props = {
+  level: Level;
+  variant: "display" | "section" | "card";
+  class?: string;
+} & Omit<HTMLAttributes<"h2">, "class">;
+
+const { level, variant, class: className, ...rest } = Astro.props;
+
+const Tag = `h${level}` as `h${Level}`;
+---
+
+<Tag
+  data-molecule="heading"
+  data-variant={variant}
+  data-level={level}
+  class:list={[className]}
+  {...rest}
+>
+  <slot />
+</Tag>

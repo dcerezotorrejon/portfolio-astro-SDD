@@ -1,5 +1,7 @@
 ---
 import type { ProfileData } from "../lib/content-schema";
+import Heading from "./molecules/Heading.astro";
+import Button from "./molecules/Button.astro";
 
 interface Props {
   profile: ProfileData;
@@ -17,12 +19,14 @@ const { profile } = Astro.props;
     height="240"
   />
   <div class="profile-details">
-    <h1 id="profile-name">{profile.name}</h1>
+    <Heading level={1} variant="display" id="profile-name">
+      {profile.name}
+    </Heading>
     <p>{profile.headline}</p>
     <ul class="technology-list social-links" aria-label="Redes sociales">
       {profile.socials.map(({ platform, label, url }) => (
         <li>
-          <a class="button-link" href={url}>
+          <Button variant="primary" href={url}>
             <svg
               aria-hidden="true"
               focusable="false"
@@ -43,7 +47,7 @@ const { profile } = Astro.props;
               )}
             </svg>
             <span>{label}</span>
-          </a>
+          </Button>
         </li>
       ))}
     </ul>

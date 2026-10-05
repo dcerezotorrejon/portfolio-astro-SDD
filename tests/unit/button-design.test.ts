@@ -12,6 +12,9 @@ import { render } from "../helpers/render";
 const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
 
+/** Public hook for the primary variant, replacing the removed `.button-link`. */
+const PRIMARY_BUTTON = '[data-molecule="button"][data-variant="primary"]';
+
 function cssRule(selector: string): string {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const rule = css.match(
@@ -66,10 +69,10 @@ describe("T9 primary-button color tokens", () => {
   it("maps white foreground and each component state background to a distinct token chain", () => {
     // The button consumes component tokens; each must resolve through the
     // semantic layer to the approved primitive hex values.
-    expect(cssRule(".button-link")).toMatch(
+    expect(cssRule(PRIMARY_BUTTON)).toMatch(
       /background:\s*var\(--button-background\)/,
     );
-    expect(cssRule(".button-link")).toMatch(/color:\s*var\(--button-label\)/);
+    expect(cssRule(PRIMARY_BUTTON)).toMatch(/color:\s*var\(--button-label\)/);
     expect(resolveToken("--button-background", tokens)).toBe("#0c7abf");
     expect(resolveToken("--button-background-hover", tokens)).toBe("#096aa7");
     expect(resolveToken("--button-background-active", tokens)).toBe("#075985");
@@ -77,15 +80,18 @@ describe("T9 primary-button color tokens", () => {
     // The component tokens stay aliased to the semantic roles, not hard-coded.
     expect(tokens.base.get("--button-background")).toBe("var(--color-button)");
     expect(tokens.base.get("--button-label")).toBe("var(--color-surface)");
-    expect(cssRule(".button-link")).not.toMatch(/--color-ink/);
-    expect(cssRule(".button-link:hover")).toMatch(
+    expect(cssRule(PRIMARY_BUTTON)).not.toMatch(/--color-ink/);
+    expect(cssRule(`${PRIMARY_BUTTON}:hover`)).toMatch(
       /background:\s*var\(--button-background-hover\)/,
     );
-    expect(cssRule(".button-link:active")).toMatch(
+    expect(cssRule(`${PRIMARY_BUTTON}:active`)).toMatch(
       /background:\s*var\(--button-background-active\)/,
     );
     // Hover/active must not reintroduce a dark label on the darker blue.
-    for (const state of [".button-link:hover", ".button-link:active"]) {
+    for (const state of [
+      `${PRIMARY_BUTTON}:hover`,
+      `${PRIMARY_BUTTON}:active`,
+    ]) {
       expect(cssRule(state)).not.toMatch(/color:/);
     }
     expect(token("--color-surface")).toBe("#ffffff");
@@ -172,7 +178,7 @@ describe("T9 rendered primary actions", () => {
     const { document } = new JSDOM(html).window;
     const links = Array.from(
       document.querySelectorAll<HTMLAnchorElement>(
-        ".social-links .button-link",
+        '.social-links [data-molecule="button"]',
       ),
     );
 
@@ -191,10 +197,12 @@ describe("T9 rendered primary actions", () => {
     expect(links.every((link) => !link.hasAttribute("style"))).toBe(true);
   });
 
-  it("uses the same button class across home actions and detail return links", async () => {
+  it("uses the same button molecule across home actions and detail return links", async () => {
     const homeHtml = await render(Home);
     const homeLinks = Array.from(
-      new JSDOM(homeHtml).window.document.querySelectorAll(".button-link"),
+      new JSDOM(homeHtml).window.document.querySelectorAll(
+        '[data-molecule="button"]',
+      ),
     );
 
     expect(homeLinks.length).toBeGreaterThanOrEqual(3);
@@ -211,7 +219,9 @@ describe("T9 rendered primary actions", () => {
       });
       const { document } = new JSDOM(html).window;
       const returnLinks = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>(".button-link"),
+        document.querySelectorAll<HTMLAnchorElement>(
+          '[data-molecule="button"]',
+        ),
       );
 
       expect(returnLinks).toHaveLength(1);

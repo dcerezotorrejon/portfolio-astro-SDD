@@ -84,8 +84,26 @@ Later assignments used the current Auto Router medium default without model
 reference overrides; the router's chosen concrete model is not inferred when
 unreported. Evidence files record model claims and exact command results.
 
+## Later changes
+
+- **2026-10-05 — `006-common-molecules`:** the button and heading styling was
+  extracted into the reusable `Button.astro` / `Heading.astro` molecules and the
+  three consumers were migrated (`ProfileIntroduction.astro`,
+  `ExperienceHistory.astro`, `pages/experiencia/[slug].astro`), while the retained
+  `.detail-content h2, .detail-content h3` selector keeps the Markdown section
+  style token-driven. **No 004 requirement changed** — R16 (section-heading
+  emphasis, 24/32 px, weight 700, line-height 1.25, dark ink, 24 px gap) is
+  preserved through the shared `--heading-section-*` tokens, and routes, content,
+  SEO, heading levels and the single-`h1` rule are untouched. The single
+  intentional visual normalization is the detail-page `h1`, previously the
+  user-agent default, now using the `display` variant. See
+  [`006-common-molecules/summary.md`](../006-common-molecules/summary.md).
+
 ## Related specs
 
+- `006-common-molecules` — modified by: extracts the button/heading molecules and
+  migrates this feature's consumers; R16 preserved, with the detail-`h1`
+  normalization recorded there.
 - `001-sdd-baseline` — modified: replaces the starter homepage and its smoke
   expectations; preserves the test/build/SEO/accessibility stack and site origin.
 - `002-front-extra-dependencies` — depends on: uses Tailwind v4 and React only for

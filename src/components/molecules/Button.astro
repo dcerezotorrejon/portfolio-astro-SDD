@@ -1,0 +1,34 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = {
+  variant: "primary" | "secondary";
+  href?: string;
+  class?: string;
+  disabled?: boolean;
+} & Omit<HTMLAttributes<"a">, "class">;
+
+const {
+  variant,
+  href,
+  class: className,
+  type = "button",
+  disabled,
+  ...rest
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+const isButton = Tag === "button";
+---
+
+<Tag
+  data-molecule="button"
+  data-variant={variant}
+  class:list={[className]}
+  href={href}
+  type={isButton ? type : undefined}
+  disabled={isButton ? disabled : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>

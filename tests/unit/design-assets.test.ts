@@ -160,10 +160,18 @@ describe("T2/T10 global style contracts", () => {
       resolveDeclaration(cssRule(".floating-nav-link"), "min-height", tokens),
     ).toBe("44px");
     expect(
-      resolveDeclaration(cssRule(".button-link"), "min-width", tokens),
+      resolveDeclaration(
+        cssRule('[data-molecule="button"]'),
+        "min-width",
+        tokens,
+      ),
     ).toBe("44px");
     expect(
-      resolveDeclaration(cssRule(".button-link"), "min-height", tokens),
+      resolveDeclaration(
+        cssRule('[data-molecule="button"]'),
+        "min-height",
+        tokens,
+      ),
     ).toBe("44px");
     expect(
       cssRule('.floating-nav[data-active-index="0"] .floating-nav-indicator'),

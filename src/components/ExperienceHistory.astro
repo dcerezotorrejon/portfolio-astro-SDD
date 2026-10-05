@@ -2,6 +2,8 @@
 import type { ExperienceData, ProfileData } from "../lib/content-schema";
 import { formatDateRange, resolveCompanyIcon } from "../lib/content";
 import TechnologyBadges from "./TechnologyBadges.astro";
+import Heading from "./molecules/Heading.astro";
+import Button from "./molecules/Button.astro";
 
 interface ExperienceRecord {
   data: ExperienceData;
@@ -16,9 +18,9 @@ const { experiences, profile } = Astro.props;
 ---
 
 <section id="trayectoria" aria-labelledby="history-heading">
-  <h2 id="history-heading" class="section-heading">
+  <Heading level={2} variant="section" id="history-heading">
     {profile.historyHeading}
-  </h2>
+  </Heading>
   <div class="experience-list">
     {experiences.map((experience) => {
       const { role, company, startDate, endDate, summary, technologies, slug } =
@@ -31,7 +33,9 @@ const { experiences, profile } = Astro.props;
           class="experience-card"
           style={`view-transition-name: experience-${slug}`}
         >
-          <h3>{role}</h3>
+          <Heading level={3} variant="card">
+            {role}
+          </Heading>
           <p class="company-identity">
             <img
               class="company-icon"
@@ -45,13 +49,13 @@ const { experiences, profile } = Astro.props;
           <p>{formatDateRange(startDate, endDate)}</p>
           <p>{summary}</p>
           <TechnologyBadges technologies={technologies} />
-          <a
-            class="button-link"
+          <Button
+            variant="primary"
             href={`/experiencia/${slug}/`}
             aria-label={`${profile.moreInfoLabel} sobre ${role} en ${company} (${startYear})`}
           >
             {profile.moreInfoLabel}
-          </a>
+          </Button>
         </article>
       );
     })}

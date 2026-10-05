@@ -17,6 +17,20 @@ import { render } from "../helpers/render";
 const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
 
+// Public molecule hooks replacing the removed `.section-heading` and
+// `.experience-card h3` class selectors. Compiled Markdown keeps its own rule.
+const SECTION_RULE = '[data-molecule="heading"][data-variant="section"]';
+const CARD_RULE = '[data-molecule="heading"][data-variant="card"]';
+const DISPLAY_RULE = '[data-molecule="heading"][data-variant="display"]';
+const MARKDOWN_RULE = ".detail-content h2";
+const SHARED_HEADING_TOKENS = [
+  "--heading-section-gap",
+  "--heading-section-ink",
+  "--heading-section-size",
+  "--heading-section-weight",
+  "--heading-section-leading",
+] as const;
+
 /** Captures the declaration block of the first rule starting with `selector`. */
 function ruleBodyAfter(selector: string): string {
   const index = css.indexOf(selector);
@@ -49,40 +63,53 @@ describe("T12 shared section-heading hierarchy", () => {
     // Below the breakpoint the base token stays 24px (already asserted above).
   });
 
-  it("applies one token-driven rule to the history heading and Markdown h2/h3, but not card titles", () => {
-    const sharedRule = ruleBodyAfter(".section-heading");
+  it("applies one token-driven style to the section variant and Markdown h2/h3, but not card titles", () => {
+    const sectionRule = ruleBodyAfter(SECTION_RULE);
+    const markdownRule = ruleBodyAfter(MARKDOWN_RULE);
 
-    expect(resolveDeclaration(sharedRule, "margin-block-end", tokens)).toBe(
-      "24px",
-    );
-    expect(resolveDeclaration(sharedRule, "color", tokens)).toBe("#0f1419");
-    expect(resolveDeclaration(sharedRule, "font-size", tokens)).toBe("24px");
-    expect(resolveDeclaration(sharedRule, "font-weight", tokens)).toBe("700");
-    expect(resolveDeclaration(sharedRule, "line-height", tokens)).toBe("1.25");
+    for (const rule of [sectionRule, markdownRule]) {
+      expect(resolveDeclaration(rule, "margin-block-end", tokens)).toBe("24px");
+      expect(resolveDeclaration(rule, "color", tokens)).toBe("#0f1419");
+      expect(resolveDeclaration(rule, "font-size", tokens)).toBe("24px");
+      expect(resolveDeclaration(rule, "font-weight", tokens)).toBe("700");
+      expect(resolveDeclaration(rule, "line-height", tokens)).toBe("1.25");
+    }
 
-    // The grouped selector covers the shared class and compiled Markdown
-    // headings, and deliberately omits employment card titles.
-    const selectorList = css.slice(
-      css.indexOf(".section-heading"),
-      css.indexOf("{", css.indexOf(".section-heading")),
+    // Both the component section variant and the retained Markdown rule consume
+    // the exact same --heading-section-* component tokens, so they cannot drift.
+    for (const name of SHARED_HEADING_TOKENS) {
+      expect(sectionRule).toContain(`var(${name})`);
+      expect(markdownRule).toContain(`var(${name})`);
+    }
+
+    // The retained grouped selector covers compiled Markdown headings and
+    // deliberately omits employment card titles.
+    const markdownSelectorList = css.slice(
+      css.indexOf(MARKDOWN_RULE),
+      css.indexOf("{", css.indexOf(MARKDOWN_RULE)),
     );
 
-    expect(normalizeSpaces(selectorList)).toContain(
-      ".section-heading, .detail-content h2, .detail-content h3",
+    expect(normalizeSpaces(markdownSelectorList)).toContain(
+      ".detail-content h2, .detail-content h3",
     );
-    expect(selectorList).not.toContain(".experience-card h3");
+    expect(markdownSelectorList).not.toContain(".experience-card h3");
+
+    // A dedicated display heading rule still exists for the h1 normalization.
+    expect(ruleBodyAfter(DISPLAY_RULE)).toMatch(
+      /font-size:\s*var\(--heading-display-size\)/,
+    );
   });
 
   it("keeps employment card titles on their own smaller, distinct style", () => {
-    const cardTitle = ruleBodyAfter(".experience-card h3");
+    const cardTitle = ruleBodyAfter(CARD_RULE);
 
     expect(resolveDeclaration(cardTitle, "margin", tokens)).toBe("0");
     expect(resolveDeclaration(cardTitle, "font-size", tokens)).toBe("1.25rem");
     expect(resolveDeclaration(cardTitle, "font-weight", tokens)).toBe("700");
     expect(resolveDeclaration(cardTitle, "line-height", tokens)).toBe("1.35");
     // 1.25rem (20px) is smaller than the 24px/32px shared heading scale.
-    expect(cardTitle).not.toContain("--section-heading-size");
-    expect(cardTitle).not.toContain("--section-heading-gap");
+    expect(cardTitle).not.toContain("--heading-section-size");
+    expect(cardTitle).not.toContain("--heading-section-gap");
   });
 
   it("renders genuine compiled Markdown h2/h3 inside .detail-content", async () => {
@@ -99,19 +126,20 @@ describe("T12 shared section-heading hierarchy", () => {
     expect(h3?.matches(".detail-content h3")).toBe(true);
   });
 
-  it("marks the rendered history heading as the shared heading and excludes card h3", async () => {
+  it("marks the rendered history heading as the section variant and excludes card h3", async () => {
     const html = await render(Home);
     const { document } = new JSDOM(html).window;
     const historyHeading = document.querySelector("#history-heading");
     const cardHeading = document.querySelector(".experience-card h3");
 
     expect(historyHeading?.tagName).toBe("H2");
-    expect(historyHeading?.classList.contains("section-heading")).toBe(true);
-    expect(historyHeading?.matches(".section-heading")).toBe(true);
+    expect(historyHeading?.getAttribute("data-molecule")).toBe("heading");
+    expect(historyHeading?.getAttribute("data-variant")).toBe("section");
     expect(cardHeading).not.toBeNull();
-    expect(cardHeading?.classList.contains("section-heading")).toBe(false);
-    // Card titles live outside `.detail-content`, so the shared selector does
-    // not reach them even though they are also `h3` elements.
+    expect(cardHeading?.getAttribute("data-molecule")).toBe("heading");
+    expect(cardHeading?.getAttribute("data-variant")).toBe("card");
+    // Card titles live outside `.detail-content`, so the retained shared
+    // selector does not reach them even though they are also `h3` elements.
     expect(cardHeading?.closest(".detail-content")).toBeNull();
     expect(cardHeading?.matches(".detail-content h3")).toBe(false);
   });

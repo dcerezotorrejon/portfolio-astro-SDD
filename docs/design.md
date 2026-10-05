@@ -30,7 +30,10 @@ Global CSS uses three explicit layers, with one source for each reusable value:
 2. **Semantic tokens:** page/background/surface/text/border/focus roles and primary
    button states. These reference primitives rather than duplicating values.
 3. **Component tokens:** container, card, badge and floating-navigation properties
-   that reference the semantic or primitive layers as appropriate.
+   that reference the semantic or primitive layers as appropriate, plus the
+   molecule groups `--button-*` / `--button-secondary-*` and `--heading-*`
+   (`--section-heading-*` is kept as a compatibility alias of
+   `--heading-section-*`).
 
 Keep related declarations grouped and named consistently. Component rules consume
 semantic/component tokens rather than raw reusable literals. Preserve a useful
@@ -75,15 +78,47 @@ not carry meaning alone.
 - Align copy to the left; do not justify paragraphs. Keep expanded descriptions
   at a comfortable reading width within the shared container.
 
-### Section-heading hierarchy
+### Heading styles and variants
 
-Section headings use a shared token-driven style: 24 px below 768 px, 32 px at or
-above 768 px, weight 700, line-height 1.25, dark ink and a 24 px bottom gap. Keep
-normal sentence casing, left alignment and natural wrapping; do not add decorative
-labels or force uppercase. Their visual emphasis must not change semantic heading
-levels: the homepage name remains the sole `h1`, the professional-history heading
-is `h2`, and each employment card title is `h3`. Expanded Markdown section headings
-follow the same visual language without generating extra `h1` elements.
+Heading appearance is decoupled from heading semantics. A heading's tag
+(`h1`–`h6`) selects its outline level and never determines its size, and a visual
+style variant never implies a tag: choose the semantic level and the visual
+variant independently. Three variants exist, driven by the `--heading-*` token
+group:
+
+- **`display`** — the page's hero heading: `clamp(2rem, 5vw, 2.75rem)`, weight
+  700, line-height 1.2, letter-spacing -0.025em and no margin.
+- **`section`** — section headings: 24 px below 768 px and 32 px at or above
+  768 px, weight 700, line-height 1.25, dark ink and a 24 px bottom gap.
+- **`card`** — compact card titles: `1.25rem`, weight 700, line-height 1.35 and
+  no margin.
+
+`section` headings keep normal sentence casing, left alignment and natural
+wrapping; do not add decorative labels or force uppercase. Their visual emphasis
+must not change semantic heading levels: the homepage name remains the sole `h1`,
+the professional-history heading is `h2`, and each employment card title is `h3`.
+Expanded Markdown section headings follow the same visual language without
+generating extra `h1` elements. Because compiled Markdown cannot use a component,
+the retained `.detail-content h2, .detail-content h3` stylesheet rule keeps the
+`section` visual language for Markdown `h2`/`h3` output.
+
+## Buttons
+
+Buttons are the shared pill controls, styled through the `--button-*` and
+`--button-secondary-*` token groups. Both variants keep the pill shape, the base
+padding and the 44 px minimum target, and only differ in their surface treatment.
+No size variants exist; callers customize through a forwarded class.
+
+- **`primary`** — the filled action: `--color-button` background, white label,
+  `--color-button-hover` on hover and `--color-button-active` when pressed, with a
+  200 ms background transition.
+- **`secondary`** — the outline action: a white `--color-surface` surface, a 1 px
+  border and a dark ink label. Hover and pressed also change the surface, so the
+  border is never the only interaction cue.
+
+Both variants keep their label at 4.5:1 contrast or better against every
+background in the normal, hover and pressed states, and both preserve the global
+visible focus outline.
 
 ## Layout and shapes
 

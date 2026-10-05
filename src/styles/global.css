@@ -128,13 +128,30 @@
   --card-radius: var(--radius-card);
   --card-surface: var(--color-surface);
 
-  /* Section heading (professional-history h2 and expanded Markdown headings) */
-  --section-heading-size: var(--type-size-24);
-  --section-heading-size-desktop: var(--type-size-32);
-  --section-heading-weight: var(--type-weight-bold);
-  --section-heading-leading: var(--type-leading-tight);
-  --section-heading-gap: var(--space-24);
-  --section-heading-ink: var(--color-ink);
+  /* Heading (display/section/card variants; semantic level is independent) */
+  --heading-display-size: clamp(2rem, 5vw, 2.75rem);
+  --heading-display-weight: var(--type-weight-bold);
+  --heading-display-leading: 1.2;
+  --heading-display-tracking: -0.025em;
+
+  --heading-section-size: var(--type-size-24);
+  --heading-section-size-desktop: var(--type-size-32);
+  --heading-section-weight: var(--type-weight-bold);
+  --heading-section-leading: var(--type-leading-tight);
+  --heading-section-gap: var(--space-24);
+  --heading-section-ink: var(--color-ink);
+
+  --heading-card-size: 1.25rem;
+  --heading-card-weight: var(--type-weight-bold);
+  --heading-card-leading: 1.35;
+
+  /* Section-heading compatibility aliases (resolving to --heading-section-*) */
+  --section-heading-size: var(--heading-section-size);
+  --section-heading-size-desktop: var(--heading-section-size-desktop);
+  --section-heading-weight: var(--heading-section-weight);
+  --section-heading-leading: var(--heading-section-leading);
+  --section-heading-gap: var(--heading-section-gap);
+  --section-heading-ink: var(--heading-section-ink);
 
   /* Technology badge */
   --badge-padding-y: var(--space-4);
@@ -154,6 +171,13 @@
   --button-background: var(--color-button);
   --button-background-hover: var(--color-button-hover);
   --button-background-active: var(--color-button-active);
+
+  /* Secondary (outline) button */
+  --button-secondary-background: var(--color-surface);
+  --button-secondary-background-hover: var(--color-page);
+  --button-secondary-background-active: var(--color-border);
+  --button-secondary-label: var(--color-ink);
+  --button-secondary-border: var(--color-border);
 
   /* Floating navigator */
   --nav-max-width: 360px;
@@ -276,14 +300,6 @@ svg {
   text-align: left;
 }
 
-.profile-details h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 2.75rem);
-  font-weight: var(--type-weight-bold);
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-}
-
 .profile-details p {
   margin-block: var(--space-12) var(--space-20);
 }
@@ -312,13 +328,6 @@ svg {
   border: var(--card-border);
   border-radius: var(--card-radius);
   background: var(--card-surface);
-}
-
-.experience-card h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: var(--type-weight-bold);
-  line-height: 1.35;
 }
 
 .company-identity {
@@ -357,17 +366,16 @@ svg {
   line-height: 1.5;
 }
 
-.button-link {
+/* Molecule hooks (Button): the components carry data-molecule/data-variant, so
+   the styles below are the single source for both variants. */
+[data-molecule="button"] {
   display: inline-flex;
   min-width: var(--button-min-target);
   min-height: var(--button-min-target);
   align-items: center;
   justify-content: center;
   padding: var(--button-padding-y) var(--button-padding-x);
-  border: var(--button-border);
   border-radius: var(--button-radius);
-  background: var(--button-background);
-  color: var(--button-label);
   font-weight: var(--type-weight-semibold);
   line-height: var(--type-control-leading);
   text-align: center;
@@ -375,26 +383,69 @@ svg {
   transition: background-color var(--control-transition-duration) ease;
 }
 
-.button-link:hover {
-  background: var(--button-background-hover);
-  text-decoration: none;
+[data-molecule="button"][data-variant="primary"] {
+  border: var(--button-border);
+  background: var(--button-background);
+  color: var(--button-label);
 }
 
-.button-link:active {
+[data-molecule="button"][data-variant="primary"]:hover {
+  background: var(--button-background-hover);
+}
+
+[data-molecule="button"][data-variant="primary"]:active {
   background: var(--button-background-active);
 }
 
-/* Shared section-heading style: the professional-history h2 and expanded
-   Markdown section headings on detail pages. Employment card titles keep their
-   smaller .experience-card h3 treatment instead. */
-.section-heading,
+[data-molecule="button"][data-variant="secondary"] {
+  border: 1px solid var(--button-secondary-border);
+  background: var(--button-secondary-background);
+  color: var(--button-secondary-label);
+}
+
+[data-molecule="button"][data-variant="secondary"]:hover {
+  background: var(--button-secondary-background-hover);
+}
+
+[data-molecule="button"][data-variant="secondary"]:active {
+  background: var(--button-secondary-background-active);
+}
+
+/* Molecule hooks (Heading): variant selects the visual style only; the
+   semantic level comes from the component's rendered tag. */
+[data-molecule="heading"][data-variant="display"] {
+  margin: 0;
+  font-size: var(--heading-display-size);
+  font-weight: var(--heading-display-weight);
+  line-height: var(--heading-display-leading);
+  letter-spacing: var(--heading-display-tracking);
+}
+
+[data-molecule="heading"][data-variant="section"] {
+  margin-block-end: var(--heading-section-gap);
+  color: var(--heading-section-ink);
+  font-size: var(--heading-section-size);
+  font-weight: var(--heading-section-weight);
+  line-height: var(--heading-section-leading);
+}
+
+[data-molecule="heading"][data-variant="card"] {
+  margin: 0;
+  font-size: var(--heading-card-size);
+  font-weight: var(--heading-card-weight);
+  line-height: var(--heading-card-leading);
+}
+
+/* Expanded Markdown section headings on detail pages. Compiled Markdown cannot
+   use the Heading component, so this rule is retained and keeps the section
+   style token-driven. */
 .detail-content h2,
 .detail-content h3 {
-  margin-block-end: var(--section-heading-gap);
-  color: var(--section-heading-ink);
-  font-size: var(--section-heading-size);
-  font-weight: var(--section-heading-weight);
-  line-height: var(--section-heading-leading);
+  margin-block-end: var(--heading-section-gap);
+  color: var(--heading-section-ink);
+  font-size: var(--heading-section-size);
+  font-weight: var(--heading-section-weight);
+  line-height: var(--heading-section-leading);
 }
 
 .detail-content {
@@ -493,6 +544,7 @@ svg {
 @media (min-width: 768px) {
   :root {
     --page-gutter: var(--space-32);
+    --heading-section-size: var(--heading-section-size-desktop);
     --section-heading-size: var(--section-heading-size-desktop);
   }
 
@@ -519,7 +571,7 @@ svg {
   }
 
   .floating-nav-indicator,
-  .button-link {
+  [data-molecule="button"] {
     transition: none;
   }
 
