@@ -34,6 +34,9 @@
 
 ## Related specs
 
+- `004-portfolio-home` — constitution versions 1.2.1 and 1.3.0 clarify React
+  islands and reference the global design. Replacement of this spec's starter
+  homepage and corresponding smoke assertions is in progress under spec 004.
 - `003-agent-workflow` — amends `docs/constitution.md`, the constitution and spec
   convention this spec established (§4.1 `summary.md`, new §4.2).
 

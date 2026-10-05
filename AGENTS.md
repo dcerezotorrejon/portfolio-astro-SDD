@@ -10,6 +10,8 @@ A personal **portfolio built with Astro**, styled with **Tailwind CSS v4**. Cont
 through Astro content collections — components render content, they do not hardcode
 it. The site is static by default with zero client JavaScript; React components are used exclusively for interactive islands with explicit `client:*` directives. See [Constitution §2](./docs/constitution.md#2-project-nature).
 
+UI work must follow [the global design](./docs/design.md) and [Constitution §2.1](./docs/constitution.md#21-global-design).
+
 ## Development
 
 Start the dev server in background mode:

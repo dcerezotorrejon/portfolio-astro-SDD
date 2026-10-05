@@ -33,6 +33,10 @@
 
 ## Related specs
 
+- `004-portfolio-home` — constitution version 1.2.1 clarifies the existing React
+  island permission to explicitly cover interactive navigation and stateful
+  indicators; version 1.3.0 references the shared global design. Homepage
+  implementation remains pending; the static-by-default policy is unchanged.
 - `001-sdd-baseline` — this spec amended the constitution it created (§2, §10).
 - `003-agent-workflow` — amends `docs/constitution.md` again (spec relationships,
   version `1.2.0`); shares the constitution amendment lineage.

@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.2.0
+- **Version**: 1.3.0
 - **Last amended**: 2026-10-05
 
 ---
@@ -25,7 +25,24 @@ conventions already present in the codebase, in that order.
 - Components MUST render content they receive; they MUST NOT hardcode portfolio
   content that belongs in Markdown.
 - Static assets live in `public/` (or are imported when they need optimization).
-- **Interactivity policy**: By default, the site is static and sends no client JavaScript. Framework components (such as React components) are reserved exclusively for interactive islands that require real client-side interactivity, and they MUST always be declared with an explicit `client:*` directive. Content and logic that can be resolved at build/Markdown time must remain unhydrated.
+- **Interactivity policy**: By default, the site is static and sends no client
+  JavaScript. React MAY be used for elements that require real client-side
+  interactivity, including interactive navigation and stateful indicators.
+  Framework components are reserved exclusively for those interactive islands
+  and MUST always be declared with an explicit `client:*` directive. Using React
+  for an interactive element does not justify hydrating unrelated static content.
+  Content and logic that can be resolved at build/Markdown time must remain
+  unhydrated.
+
+### 2.1 Global design
+
+- [`docs/design.md`](./design.md) defines the shared visual language for the
+  entire portfolio. Specs, technical plans, and UI implementations MUST reference
+  and follow its applicable criteria.
+- Shared design criteria belong in that document; feature-specific content,
+  placement, and interaction behavior belong in the corresponding spec.
+- The design document is subordinate to this constitution, including the
+  accessibility requirements in §7.
 
 ## 3. Spec-Anchored Development
 
