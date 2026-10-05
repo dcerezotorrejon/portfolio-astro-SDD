@@ -129,6 +129,9 @@ unreported. Evidence files record model claims and exact command results.
   updates governance consistency checks and related-summary bookkeeping.
 - `005-auto-router-agents` — concurrent configuration: owns the current agent
   router/model variant setup. Portfolio work does not change that configuration.
+- `007-workflow-changes` — modifies the shared agent workflow used to maintain
+  this feature, including one shared spec branch and a four-active-task limit; no
+  portfolio page, content, or UI requirement changes.
 
 ## Notes and remaining limits
 
@@ -138,8 +141,9 @@ unreported. Evidence files record model claims and exact command results.
   or deployment decision is included.
 - Unsupported transition behavior was emulated in a supporting Chromium browser;
   physical nonzero safe-area insets were not independently measured.
-- The maintainer explicitly deferred updating the agent-model cost paragraph in
-  `AGENTS.md`; it still describes the original model tiers. Current agent routing
-  is documented by spec 005. This documentation discrepancy remains visible.
+- At the time of the original note, the maintainer had deferred updating the
+  agent-model paragraph in `AGENTS.md`; that historical discrepancy was later
+  resolved by `007-workflow-changes`, which pins the four agents to GPT-6 Luna
+  references.
 - All constitutional gates pass and this spec is closed; changes are not yet
   committed.

@@ -7,12 +7,11 @@
 ## Context
 
 The current agent workflow defines refinement, planning, implementation, and QA,
-but does not require per-spec and per-task branches, prescribe QA handoff on the
-Dev's branch, or restrict the Spec Refiner and Dev Lead from writing outside
-their respective deliverables. Merge ownership and escalation of conflicts or
-technical decisions also need to be explicit. This spec updates that workflow
-and makes its applicable rules binding through an amendment to the
-[project constitution](../../docs/constitution.md).
+but does not prescribe a shared feature branch for concurrent Dev/QA work, a
+maximum number of active tasks, or final commit/push ownership. Escalation of
+conflicts and technical decisions, along with agent writing boundaries, also need
+to be explicit. This spec updates that workflow and makes its applicable rules
+binding through an amendment to the [project constitution](../../docs/constitution.md).
 
 The existing agent roles, verification gates, and spec-anchored development model
 remain in force except where requirements below refine their responsibilities.
@@ -32,20 +31,21 @@ and verified alongside the workflow changes:
 
 ## Goals
 
-- Isolate each feature and each Dev task on named Git branches with an explicit
-  QA handoff and merge lifecycle.
-- Make the Dev Lead the sole owner of integrating validated Dev branches into
-  the feature's spec branch and cleaning up Dev branches.
+- Give each feature one shared spec branch for all Dev and QA work, enabling
+  bounded parallel task execution without per-Dev branches.
+- Make QA approval and recorded evidence prerequisites for final commits and push.
 - Define how conflicts and unresolved technical decisions are escalated.
 - Restrict the Spec Refiner and Dev Lead to their agreed writing responsibilities.
 - Pin the four workflow agents to the model assignments recorded above.
+- Limit the Dev Lead to at most four concurrently active tasks.
 
 ## Non-goals
 
 - Merging the feature's `spec/[NNN]-[slug]` branch into the repository's base
   branch; that merge is outside this workflow change.
-- Changing application behavior, agent roles/modes/permissions, or the existing
-  quality gates.
+- Creating a separate `dev/...` branch for a task or developer.
+- Changing application behavior, agent roles/modes, or the existing quality
+  gates. The scoped permission changes required by R7 are in scope.
 - Changing or removing the Auto Router variant configuration in `opencode.json`;
   this spec changes the workflow agents' model references only.
 - Introducing Git hosting, pull-request, or CI automation.
@@ -53,28 +53,30 @@ and verified alongside the workflow changes:
 ## Requirements
 
 - **R1 — Feature branch:** After the spec is agreed and the Dev Lead begins
-  planning, the Dev Lead creates a feature branch from the repository's base
-  branch. Its name MUST be `spec/[NNN]-[slug]`, using the complete spec directory
-  name (for example, `spec/007-workflow-changes`). This branch is the integration
-  target for all task branches. This workflow does not merge or delete the
-  feature branch.
-- **R2 — Dev task branch:** Each Dev task MUST be implemented on its own branch
-  created from that feature's spec branch. Its name MUST be
-  `dev/[NNN]-[slug]/[task-id]`, where `[task-id]` is the task identifier from
-  `tasks.md` (for example, `dev/007-workflow-changes/T1`). The Dev hands this
-  branch to QA for verification.
-- **R3 — QA and rework loop:** QA MUST verify the assigned task on the same Dev
-  branch, may add or update tests and record task evidence there, and MUST NOT
-  change production code or merge branches. QA reports either approval with
-  verification evidence or defects. When defects are found, the same Dev updates
-  that branch and returns it to QA; the task is not eligible for integration
-  until QA approves it.
-- **R4 — Integration and cleanup:** Only the Dev Lead may merge a Dev task branch
-  into its spec branch, and only after QA has approved that task with evidence for
-  all applicable gates. After a successful merge, the Dev Lead deletes that
-  auxiliary branch locally and remotely. QA approval does not authorize QA or
-  Dev to merge. The spec branch remains available for a later, separately
-  managed merge to the repository's base branch.
+  planning, the Dev Lead creates and publishes one feature branch from the
+  repository's base branch. Its name MUST be `spec/[NNN]-[slug]`, using the
+  complete spec directory name (for example, `spec/007-workflow-changes`). This
+  is the only feature-work branch for the spec. Keep it available for a later,
+  separately managed merge to the repository's base branch.
+- **R2 — Shared task branch:** Every Dev and QA working on the feature MUST use
+  the same `spec/[NNN]-[slug]` branch. No `dev/...` task/developer branches may be
+  created. The Dev Lead assigns task ownership and independent file/scope
+  boundaries so compatible tasks can proceed in parallel on that branch. Tasks
+  that would edit overlapping files or depend on unfinished work MUST be
+  scheduled sequentially. QA verifies its assigned task against the shared spec
+  branch and may add/update tests and task evidence there; QA MUST NOT change
+  production code.
+- **R3 — QA and rework loop:** For each task, QA reports either approval with
+  evidence for all applicable gates or specific defects. When defects are found,
+  the same Dev corrects the work directly on the shared spec branch and returns
+  it to QA. The task remains active until QA approves it and records evidence.
+  QA and Dev do not create branches, merge branches, or push feature commits.
+- **R4 — Final commit and push:** No per-task merge or per-task commit/push is
+  performed. After all tasks have QA approval and evidence, the Dev Lead runs the
+  final quality gates, then uses the repository's commit skill to create the
+  feature commit(s) and push the shared `spec/[NNN]-[slug]` branch to `origin`.
+  QA approval does not authorize Dev or QA to commit or push. Merging the spec
+  branch into the repository's base branch remains outside this workflow.
 - **R5 — Conflict escalation:** If an agent encounters a Git or change conflict,
   it MUST stop the affected operation and notify the Dev Lead with the conflicting
   branches/files and the blocking state. It MUST NOT overwrite another agent's
@@ -93,14 +95,17 @@ and verified alongside the workflow changes:
   NOT write or modify `spec.md`, but remains responsible for `plan.md`,
   `tasks.md`, and `summary.md` as defined by the existing workflow. Dev and QA
   retain their existing role restrictions, with QA allowed to update tests and
-  task evidence on the assigned Dev branch as required by R3.
+  task evidence on the shared spec branch as required by R2–R3. For this workflow
+  feature only, Dev may update the explicitly assigned operational guidance files
+  (`docs/constitution.md`, `AGENTS.md`, and `specs/README.md`); Dev MUST NOT write
+  any `spec.md`, other specs/plans/summaries, tests, or production code.
 - **R8 — Documentation and governance:** Update the agent instructions and
   `AGENTS.md` to describe the branch lifecycle, handoffs, escalation rules, and
-  writing boundaries. Update `specs/README.md` to document the feature-branch
-  naming convention. Amend `docs/constitution.md` to make these workflow rules
-  binding, and increment its version and amendment date according to §11 using
-  the version current when implementation occurs. Do not restate or weaken
-  unrelated constitutional rules.
+  writing boundaries, including the four-task concurrency cap. Update
+  `specs/README.md` to document the single feature-branch convention. Amend
+  `docs/constitution.md` to make these workflow rules binding, and increment its
+  version and amendment date according to §11 using the version current when
+  implementation occurs. Do not restate or weaken unrelated constitutional rules.
 - **R9 — Agent model assignments:** The four workflow agent frontmatter model
   values MUST match the included working-tree changes: `dev-lead` uses
   `openrouter/openai/gpt-6-luna#high`; `spec-refiner`, `dev`, and `qa` use
@@ -113,58 +118,72 @@ and verified alongside the workflow changes:
   `summary.md` relationship records are updated in the same change, in accordance
   with Constitution §4.2. Earlier requirements remain as the historical record
   of the behavior agreed for that increment.
+- **R11 — Parallel-task limit:** The Dev Lead MUST NOT have more than four tasks
+  active concurrently. A task becomes active when assigned to a Dev and remains
+  active through QA verification, evidence recording, and any Dev rework. A task
+  closes only when QA approves it and records evidence. The Lead MUST NOT launch
+  a fifth task while four tasks are active. Parallel work is limited to tasks with
+  independent scopes that do not overlap files or unresolved dependencies.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (R1–R2):** The documented workflow creates the feature branch from
-  the project base branch using `spec/[NNN]-[slug]`; each task uses a separate
-  branch from that spec branch with the exact
-  `dev/[NNN]-[slug]/[task-id]` convention.
-- [ ] **AC2 (R3):** QA receives the Dev task branch, performs verification and
-  records tests/evidence on that same branch without changing production code or
-  merging. A failed QA result returns the task to the same Dev for correction and
-  subsequent QA revalidation; only an approved result makes it integration-ready.
-- [ ] **AC3 (R4):** A workflow walkthrough confirms that only the Dev Lead
-  integrates QA-approved Dev branches into the matching spec branch, then deletes
-  each merged Dev branch both locally and remotely. The workflow does not merge
-  or delete the spec branch.
+- [ ] **AC1 (R1–R2):** The workflow creates and publishes exactly one
+      `spec/[NNN]-[slug]` branch for the feature; all Dev and QA work uses that branch,
+      and no `dev/...` task/developer branch is created.
+- [ ] **AC2 (R2–R3):** Dev tasks with independent file scopes can be assigned in
+      parallel on the shared spec branch. QA verifies each assigned task there,
+      records tests/evidence without editing production code, and returns defects to
+      the same Dev for correction on that branch. A task is not closed until QA
+      approves it and records evidence.
+- [ ] **AC3 (R4):** A workflow walkthrough confirms there are no per-task
+      commits/pushes or branch merges. After every task is QA-approved and all final
+      gates pass, only the Dev Lead uses the commit skill to commit and push the spec
+      branch to `origin`. The spec branch is not merged into or deleted with the
+      project base branch as part of this spec.
 - [ ] **AC4 (R5):** Agent instructions and operational documentation require an
-  agent to stop and notify the Lead on a conflict, prohibit guessed overwrites or
-  resolution, and require maintainer escalation when a decision is needed.
+      agent to stop and notify the Lead on a conflict, prohibit guessed overwrites or
+      resolution, and require maintainer escalation when a decision is needed.
 - [ ] **AC5 (R6):** Agent instructions require the Dev Lead to obtain maintainer
-  approval for material technical decisions not resolved by the governing
-  artifacts or conventions, before planning or delegating affected work, and to
-  record the decision.
+      approval for material technical decisions not resolved by the governing
+      artifacts or conventions, before planning or delegating affected work, and to
+      record the decision.
 - [ ] **AC6 (R7):** The Spec Refiner's write permissions and instructions limit
-  writes to the current `spec.md`; the Dev Lead is prevented from writing
-  `spec.md` while retaining responsibility for `plan.md`, `tasks.md`, and
-  `summary.md`. QA's permitted task-evidence and test updates do not grant
-  production-code or merge authority.
+      writes to the current `spec.md`; the Dev Lead is prevented from writing
+      `spec.md` while retaining responsibility for `plan.md`, `tasks.md`, and
+      `summary.md`. QA's permitted task-evidence and test updates do not grant
+      production-code or merge authority.
 - [ ] **AC7 (R8):** `AGENTS.md`, relevant `.opencode/agents/` instructions,
-  `specs/README.md`, and `docs/constitution.md` consistently describe the approved
-  workflow. The constitution version and amendment date comply with §11, and
-  automated agent/documentation consistency checks pass.
+      `specs/README.md`, and `docs/constitution.md` consistently describe the approved
+      workflow. The constitution version and amendment date comply with §11, and
+      automated agent/documentation consistency checks pass.
 - [ ] **AC8 (R9):** Agent frontmatter assigns
-  `openrouter/openai/gpt-6-luna#high` to `dev-lead` and
-  `openrouter/openai/gpt-6-luna#medium` to `spec-refiner`, `dev`, and `qa`;
-  agent consistency tests assert those values. `opencode.json` Auto Router
-  variants are unchanged.
+      `openrouter/openai/gpt-6-luna#high` to `dev-lead` and
+      `openrouter/openai/gpt-6-luna#medium` to `spec-refiner`, `dev`, and `qa`;
+      agent consistency tests assert those values. `opencode.json` Auto Router
+      variants are unchanged.
 - [ ] **AC9 (R10):** No earlier spec's `spec.md` is modified by this increment.
-  Anticipated relationships are recorded in this spec, and each affected earlier
-  spec's `summary.md` is updated with the relationship to `007-workflow-changes`.
-- [ ] **AC10 (R1–R10):** All applicable constitutional verification gates pass and
-  evidence is recorded before this spec is considered complete. SEO and
-  accessibility are explicitly recorded as not applicable because this change
-  adds no page, route, or rendered markup.
+      Anticipated relationships are recorded in this spec, and each affected earlier
+      spec's `summary.md` is updated with the relationship to `007-workflow-changes`.
+- [ ] **AC10 (R11):** The Dev Lead instructions explicitly limit work to four
+      concurrently active tasks, define the active lifecycle through QA approval and
+      evidence (including rework), and prohibit launching a fifth task while four are
+      active. A workflow simulation confirms this cap and confirms that only
+      independent, non-overlapping tasks are run in parallel.
+- [ ] **AC11 (R1–R11):** All applicable constitutional verification gates pass and
+      evidence is recorded before this spec is considered complete. SEO and
+      accessibility are explicitly recorded as not applicable because this change
+      adds no page, route, or rendered markup.
 
 ## Verification
 
-- **AC1–AC3 — Git lifecycle:** Run a documented end-to-end workflow walkthrough
-  in a disposable local Git repository with a bare remote: create the spec and
-  task branches using the required names, hand the task branch through a passing
-  and a failing/rework QA path, integrate only after approval, and verify local
-  and remote Dev-branch deletion. Verify that the spec branch remains and no
-  merge to the project base branch is performed.
+- **AC1–AC3, AC10 — Shared-branch workflow:** Run a documented walkthrough in a
+  disposable Git repository with a bare remote. Create/publish one spec branch;
+  verify Dev and QA use that branch with no `dev/...` branch creation; exercise a
+  passing QA path and a failing/rework path; simulate four active independent
+  tasks and confirm a fifth is not launched; verify conflicting/overlapping tasks
+  are serialized or escalated. Confirm no commits/pushes occur until all task QA
+  evidence and final gates pass, then use the commit skill for final commit/push.
+  Verify the spec branch remains and is not merged into the base branch.
 - **AC4–AC7 — Documentation, permissions, and behavior:** Review the four agent
   definitions and `AGENTS.md`, verify the Spec Refiner and Dev Lead write
   permission boundaries, check the branch/conflict/approval wording against the
@@ -177,7 +196,7 @@ and verified alongside the workflow changes:
 - **AC9 — Incremental spec history:** Review the change list to confirm no earlier
   `spec.md` changed; inspect the updated summaries for `Related specs` entries
   that point to `007-workflow-changes` and correctly describe each relationship.
-- **AC10 — Quality gates:** Run `pnpm lint`, `pnpm format:check`, `pnpm build`,
+- **AC11 — Quality gates:** Run `pnpm lint`, `pnpm format:check`, `pnpm build`,
   `pnpm test:run`, and `pnpm test:a11y` as required by
   [Constitution §6](../../docs/constitution.md#6-quality-gates). Record SEO and
   accessibility as not applicable for this non-rendered workflow change.

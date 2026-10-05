@@ -106,13 +106,21 @@ function allowsSubagent(agent: AgentFile, target: string): boolean {
   );
 }
 
-function deniesEditOf(agent: AgentFile, resource: string): boolean {
-  return agent.permissions.some(
-    (rule) =>
-      rule.action === "edit" &&
-      rule.resource === resource &&
-      rule.effect === "deny",
-  );
+function permissionTuples(agent: AgentFile): Array<[string, string, string]> {
+  return agent.permissions.map((rule) => [
+    rule.action ?? "",
+    rule.resource ?? "",
+    rule.effect ?? "",
+  ]);
+}
+
+function expectPromptFragments(agent: AgentFile, fragments: string[]): void {
+  const prompt = agent.body.replace(/\s+/g, " ").trim();
+  for (const fragment of fragments) {
+    expect(prompt, `${agent.id} prompt should include: ${fragment}`).toContain(
+      fragment.replace(/\s+/g, " ").trim(),
+    );
+  }
 }
 
 const agents = loadAgents();
@@ -138,39 +146,38 @@ describe("custom agent definitions", () => {
     },
   );
 
-  it("uses the expected mode and model for each agent", () => {
+  it("uses the pinned GPT-6 Luna model for each agent", () => {
     expect(agents.get("spec-refiner")).toMatchObject({
       mode: "primary",
-      model: "openrouter/openrouter/auto#medium",
+      model: "openrouter/openai/gpt-6-luna#medium",
     });
     expect(agents.get("dev-lead")).toMatchObject({
       mode: "primary",
-      model: "openrouter/openrouter/auto#high",
+      model: "openrouter/openai/gpt-6-luna#high",
     });
     expect(agents.get("dev")).toMatchObject({
       mode: "subagent",
-      model: "openrouter/openrouter/auto#medium",
+      model: "openrouter/openai/gpt-6-luna#medium",
     });
     expect(agents.get("qa")).toMatchObject({
       mode: "subagent",
-      model: "openrouter/openrouter/auto#medium",
+      model: "openrouter/openai/gpt-6-luna#medium",
     });
   });
 
-  it.each([...agents.values()])(
-    "$id routes through the Auto Router",
-    (agent) => {
-      expect(agent.model).toMatch(/^openrouter\/openrouter\/auto#/);
-    },
-  );
-
-  it.each([...agents.values()])(
-    "$id documents its reasoning intent",
-    (agent) => {
-      expect(agent.body).toContain("## Model intent");
-      expect(agent.body).toMatch(/reasoning effort/i);
-    },
-  );
+  it.each([
+    ["spec-refiner", "openrouter/openai/gpt-6-luna#medium", "medium"],
+    ["dev-lead", "openrouter/openai/gpt-6-luna#high", "high"],
+    ["dev", "openrouter/openai/gpt-6-luna#medium", "medium"],
+    ["qa", "openrouter/openai/gpt-6-luna#medium", "medium"],
+  ])("%s records intent matching its pinned model", (id, model, effort) => {
+    const agent = agents.get(id)!;
+    expect(agent.body).toContain("## Model intent");
+    expectPromptFragments(agent, [
+      `Pinned to GPT-6 Luna (\`${model}\`)`,
+      `${effort} reasoning effort`,
+    ]);
+  });
 
   it("lets the dev lead launch dev and qa, and no one else launch subagents", () => {
     const lead = agents.get("dev-lead")!;
@@ -185,10 +192,172 @@ describe("custom agent definitions", () => {
     }
   });
 
-  it("restricts edits by role", () => {
-    // Dev owns src, not tests; QA owns tests, not src.
-    expect(deniesEditOf(agents.get("dev")!, "tests/**")).toBe(true);
-    expect(deniesEditOf(agents.get("qa")!, "src/**")).toBe(true);
+  it("keeps ordered edit exceptions limited to each role's assigned scope", () => {
+    expect(permissionTuples(agents.get("spec-refiner")!)).toEqual([
+      ["edit", "**", "deny"],
+      ["edit", "specs/*/spec.md", "allow"],
+      ["subagent", "*", "deny"],
+    ]);
+    expect(permissionTuples(agents.get("dev-lead")!)).toEqual([
+      ["edit", "**", "deny"],
+      ["edit", "specs/*/plan.md", "allow"],
+      ["edit", "specs/*/tasks.md", "allow"],
+      ["edit", "specs/*/summary.md", "allow"],
+      ["edit", "specs/**/spec.md", "deny"],
+      ["subagent", "*", "deny"],
+      ["subagent", "dev", "allow"],
+      ["subagent", "qa", "allow"],
+    ]);
+
+    const dev = agents.get("dev")!;
+    expect(permissionTuples(dev)).toEqual([
+      ["edit", "**", "deny"],
+      ["edit", ".opencode/agents/spec-refiner.md", "allow"],
+      ["edit", ".opencode/agents/dev-lead.md", "allow"],
+      ["edit", ".opencode/agents/dev.md", "allow"],
+      ["edit", ".opencode/agents/qa.md", "allow"],
+      ["edit", "docs/constitution.md", "allow"],
+      ["edit", "AGENTS.md", "allow"],
+      ["edit", "specs/README.md", "allow"],
+      ["edit", "specs/**/spec.md", "deny"],
+      ["shell", "git branch *", "deny"],
+      ["shell", "git branch --show-current", "allow"],
+      ["shell", "git checkout *", "deny"],
+      ["shell", "git switch *", "deny"],
+      ["shell", "git merge *", "deny"],
+      ["shell", "git commit *", "deny"],
+      ["shell", "git push *", "deny"],
+      ["subagent", "*", "deny"],
+    ]);
+    expect(
+      dev.permissions.filter((rule) => rule.action === "edit"),
+    ).not.toContain(
+      expect.objectContaining({ effect: "allow", resource: "tests/**" }),
+    );
+    expect(
+      dev.permissions.filter((rule) => rule.action === "edit"),
+    ).not.toContain(
+      expect.objectContaining({ effect: "allow", resource: "src/**" }),
+    );
+
+    expect(permissionTuples(agents.get("qa")!)).toEqual([
+      ["edit", "**", "deny"],
+      ["edit", "tests/**", "allow"],
+      ["edit", "specs/007-workflow-changes/tasks.md", "allow"],
+      ["edit", "specs/**/spec.md", "deny"],
+      ["shell", "git branch *", "deny"],
+      ["shell", "git branch --show-current", "allow"],
+      ["shell", "git checkout *", "deny"],
+      ["shell", "git switch *", "deny"],
+      ["shell", "git merge *", "deny"],
+      ["shell", "git commit *", "deny"],
+      ["shell", "git push *", "deny"],
+      ["subagent", "*", "deny"],
+    ]);
+    expect(agents.get("qa")!.permissions).not.toContain(
+      expect.objectContaining({
+        action: "edit",
+        effect: "allow",
+        resource: "src/**",
+      }),
+    );
+    expect(agents.get("qa")!.permissions).not.toContain(
+      expect.objectContaining({
+        action: "edit",
+        effect: "allow",
+        resource: ".opencode/agents/**",
+      }),
+    );
+  });
+
+  it("documents each role's assignment boundaries", () => {
+    expectPromptFragments(agents.get("spec-refiner")!, [
+      "Write only the assigned current `spec.md`",
+      "does not authorize edits to any spec other than the explicitly assigned current file",
+    ]);
+    expectPromptFragments(agents.get("dev-lead")!, [
+      "Never write or modify any `spec.md`.",
+      "Limit actual edits to the current feature's named `plan.md`, `tasks.md`, and `summary.md`",
+    ]);
+    expectPromptFragments(agents.get("dev")!, [
+      "implement exactly one task",
+      "T1 owns only `.opencode/agents/{spec-refiner,dev-lead,dev,qa}.md`; T2 owns only `docs/constitution.md`, `AGENTS.md`, and `specs/README.md`.",
+      "These exceptions do not authorize other docs, specs, plans, summaries, tests, or production code.",
+      "Permission-family globs and the available permission exceptions are broader than the assigned task.",
+    ]);
+    expectPromptFragments(agents.get("qa")!, [
+      "Edit only assigned tests and this spec's assigned task evidence.",
+      "constrain actual edits to named test files.",
+      "The exact `tasks.md` exception authorizes only the assigned task's evidence",
+      "Never edit production files",
+    ]);
+  });
+
+  it("documents shared-branch work, capped task lifecycle, and QA rework", () => {
+    expectPromptFragments(agents.get("spec-refiner")!, [
+      "All subsequent Dev and QA work uses that shared branch",
+      "without task/developer branches or per-task commits/pushes.",
+    ]);
+    expectPromptFragments(agents.get("dev-lead")!, [
+      "All Dev and QA sessions must use this same branch",
+      "Orchestrate at most four active tasks.",
+      "remains active through QA verification, evidence recording, and any Dev rework.",
+      "Never launch a fifth task while four are active.",
+      "only independent tasks with non-overlapping files and no unresolved dependencies",
+      "Serialize QA sessions when their tests or evidence files overlap.",
+      "Return defects to the same Dev for correction on the same branch",
+      "After every task has QA approval and recorded evidence",
+      "use the repository's commit skill",
+    ]);
+    expectPromptFragments(agents.get("dev")!, [
+      "Work directly on the Lead's shared `spec/[NNN]-[slug]` branch.",
+      "if it differs, stop and notify the Lead rather than switching branches.",
+      "Implement the smallest correct change that satisfies the task within the explicitly assigned file/scope ownership.",
+      "the same Dev corrects them there and returns the task to QA.",
+      "Do not create, switch, or use task/developer branches (`dev/...`); do not merge, commit, or push.",
+      "There are no per-task commits/pushes.",
+      "Do not write or modify tests",
+    ]);
+    expectPromptFragments(agents.get("qa")!, [
+      "Verify directly on the Lead's shared `spec/[NNN]-[slug]` branch.",
+      "if it differs, stop and notify the Lead instead of switching.",
+      "The Lead returns defects to the same Dev for correction on the shared branch",
+      "task remains active through verification, evidence recording, and rework",
+      "Do not create, switch, or use task/developer branches (`dev/...`); do not merge, commit, or push.",
+      "QA approval never authorizes Dev or QA to commit/push; only the Lead uses the commit skill",
+    ]);
+  });
+
+  it("requires conflict escalation, maintainer approval, and Lead-owned final commit/push", () => {
+    for (const id of ["spec-refiner", "dev-lead", "dev", "qa"]) {
+      const body = agents.get(id)!.body;
+      expect(body).toMatch(/conflict/i);
+      expect(body).toMatch(/stop the affected operation/i);
+      expect(body).toMatch(
+        /Never overwrite|MUST NOT overwrite|Do not overwrite/i,
+      );
+    }
+    for (const id of ["spec-refiner", "dev", "qa"]) {
+      expectPromptFragments(agents.get(id)!, ["notify the Dev Lead"]);
+    }
+    expectPromptFragments(agents.get("dev-lead")!, [
+      "Notify the maintainer when resolution requires a decision",
+    ]);
+
+    expectPromptFragments(agents.get("dev-lead")!, [
+      "wait for maintainer approval before planning or delegating affected implementation.",
+      "Record the approved decision in the relevant planning artifact.",
+      "Only when all pass, use the repository's commit skill",
+      "No per-task commit/push is allowed.",
+    ]);
+    expectPromptFragments(agents.get("dev")!, [
+      "Only the Lead uses the commit skill for final feature commit/push",
+      "the Lead escalates decisions to the maintainer.",
+    ]);
+    expectPromptFragments(agents.get("qa")!, [
+      "only the Lead uses the commit skill after all tasks have approval/evidence and all final gates pass.",
+      "the Lead escalates decisions to the maintainer.",
+    ]);
   });
 });
 
@@ -206,10 +375,46 @@ describe("agent workflow documentation", () => {
     },
   );
 
-  it("amends the constitution with spec relationships and version 1.3.0", () => {
-    expect(constitution).toContain("**Version**: 1.3.0");
+  it("amends the constitution with spec relationships and version 1.4.0", () => {
+    expect(constitution).toContain("**Version**: 1.4.0");
     expect(constitution).toContain("### 4.2 Spec relationships");
     expect(constitution).toContain("Related specs");
+  });
+
+  it("records the approved shared-branch workflow amendment consistently", () => {
+    const guide = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
+    const specsReadme = readFileSync(
+      join(repoRoot, "specs", "README.md"),
+      "utf8",
+    );
+
+    expect(constitution).toContain("**Last amended**: 2026-10-05");
+    expect(constitution).toContain("### 5.1 Shared feature-branch workflow");
+    expect(constitution).toContain(
+      "No more than four tasks may be active at once.",
+    );
+    expect(constitution).toContain("the same Dev corrects them on that branch");
+    expect(constitution).toContain(
+      "MUST NOT create branches, merge branches, or commit or push task work.",
+    );
+    expect(constitution).toContain(
+      "only the Dev Lead uses the repository's commit skill",
+    );
+    expect(constitution).toContain(
+      "Historical `spec.md` files MUST NOT be rewritten",
+    );
+
+    for (const guidance of [guide, specsReadme]) {
+      expect(guidance).toContain("spec/[NNN]-[slug]");
+    }
+    expect(guide).toContain("up to four active tasks");
+    expect(guide).toContain("overlapping or dependent tasks are serialized");
+    expect(guide).toContain("reworks them on that branch");
+    expect(guide).toContain("Lead alone uses the commit skill");
+    expect(specsReadme).toContain("task/developer branches are not created");
+    expect(specsReadme).toContain(
+      "preserve earlier, historical `spec.md` files unchanged",
+    );
   });
 
   it("establishes the global design document under constitutional precedence", () => {

@@ -40,6 +40,9 @@
 - `001-sdd-baseline` — this spec amended the constitution it created (§2, §10).
 - `003-agent-workflow` — amends `docs/constitution.md` again (spec relationships,
   version `1.2.0`); shares the constitution amendment lineage.
+- `007-workflow-changes` — later constitution amendment (`1.4.0`) and operational
+  workflow update; the frontend, dependency, and interactivity requirements of
+  this spec remain unchanged.
 
 ## Notes
 

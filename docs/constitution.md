@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.3.0
+- **Version**: 1.4.0
 - **Last amended**: 2026-10-05
 
 ---
@@ -111,6 +111,11 @@ others, and specs must keep those links visible.
 - Relationships are **bidirectional in maintenance**: when a later change
   touches a feature, the `summary.md` of the affected spec is updated in the
   same change, refreshing its date.
+- Historical `spec.md` files MUST NOT be rewritten by later incremental specs.
+  A new spec records anticipated relationships in its own `spec.md`; when an
+  earlier feature is affected, update only that feature's `summary.md` relationship
+  record in the same change. The current feature's spec remains a living artifact
+  under §3.
 
 ## 5. Task lifecycle and verification gates
 
@@ -121,6 +126,39 @@ others, and specs must keep those links visible.
   note) is recorded next to the task.
 - If a gate does not apply to a task, that must be stated explicitly rather than
   skipped silently.
+
+### 5.1 Shared feature-branch workflow
+
+- After a spec is agreed and planning begins, the Dev Lead MUST create and publish
+  exactly one feature-work branch named `spec/[NNN]-[slug]`, using the complete
+  spec directory name. This is the shared branch for every Dev and QA working on
+  that feature. Task/developer branches (including `dev/...`) MUST NOT be created.
+- The Dev Lead MAY run independent tasks in parallel only when their file scopes
+  do not overlap and they have no unfinished dependencies. Overlapping tasks and
+  tasks with dependencies MUST be serialized.
+- No more than four tasks may be active at once. A task becomes active when
+  assigned to a Dev and remains active through QA verification, evidence
+  recording, and any rework. It closes only when QA approves it and records
+  evidence; a fifth task MUST NOT be assigned while four tasks are active.
+- QA verifies the task on the shared feature branch, may update tests and task
+  evidence there, and MUST NOT edit production code or commit or push. If QA finds
+  defects, the same Dev corrects them on that branch and returns the task to QA.
+  Dev and QA MUST NOT create branches, merge branches, or commit or push task work.
+- If an agent encounters a Git or change conflict, it MUST stop the affected
+  operation and notify the Dev Lead with the conflicting branches/files and
+  blocking state. Agents MUST NOT overwrite another agent's work or guess at a
+  resolution. The Lead escalates decisions requiring judgment to the maintainer;
+  work resumes only after an agreed resolution.
+- Before planning or delegating implementation affected by a material technical
+  decision not settled by the spec, constitution, or established conventions, the
+  Dev Lead MUST present the decision and options to the maintainer and receive
+  approval. The Lead records the approved decision in the relevant planning
+  artifact.
+- After every task has QA approval and evidence, and the final quality gates in
+  §6 pass, only the Dev Lead uses the repository's commit skill for the final
+  feature commit(s) and push of the shared branch. This workflow does not merge
+  the feature branch into the repository's base branch or delete the feature
+  branch; base-branch integration is separately managed.
 
 ## 6. Quality gates
 

@@ -58,14 +58,45 @@ Development is split across four specialized agents defined under
 
 - The `spec-refiner` → `dev-lead` handoff is **manual**: switch the primary agent
   once the spec is agreed.
-- The `dev-lead` launches `dev` and `qa` as subagents and picks the model per
-  task, favoring cost-efficiency. `spec-refiner`/`dev-lead` use a medium-cost,
-  medium/high-reasoning model; `dev`/`qa` use a lower-cost model that the lead may
-  escalate for harder tasks.
+- The workflow agents use pinned model references: `dev-lead` uses
+  `openrouter/openai/gpt-6-luna#high`; `spec-refiner`, `dev`, and `qa` use
+  `openrouter/openai/gpt-6-luna#medium`. The Auto Router variants in
+  `opencode.json` remain unchanged.
 - Agents are defined as Markdown + YAML frontmatter, the format shared by OpenCode
   and other agent tools (for example Claude Code reads `.claude/agents/`). See
   [`docs/constitution.md` §4](./docs/constitution.md#42-spec-relationships) for
   how specs record their relationships.
+
+### Shared feature branch and task handoffs
+
+- Once a spec is agreed and planning begins, the Dev Lead creates and publishes
+  exactly one `spec/[NNN]-[slug]` branch, named from the complete spec directory.
+  All Dev and QA work for the feature uses this branch; task/developer branches
+  such as `dev/...` are not used.
+- The Lead may assign up to four active tasks at a time. A task remains active
+  from assignment through QA approval and evidence, including any rework. Only
+  independent tasks with disjoint file scopes and no unfinished dependencies run
+  in parallel; overlapping or dependent tasks are serialized.
+- Dev implements only the assigned task scope and does not commit or push. QA
+  verifies on the shared branch, may update tests and task evidence, and does not
+  edit production code or commit/push. QA returns defects to the same Dev, who
+  reworks them on that branch; the task closes only after QA approval and recorded
+  evidence.
+- On a Git or change conflict, stop the affected operation and notify the Lead
+  with the conflicting branches/files and blocking state. Do not overwrite work
+  or guess at a resolution. The Lead escalates decisions to the maintainer when
+  needed; resume only after an agreed resolution.
+- The Lead gets maintainer approval for material technical decisions before
+  planning or delegating the affected implementation, and records the decision
+  in the relevant planning artifact.
+- After all task QA approvals and evidence are recorded and final gates pass, the
+  Lead alone uses the commit skill for final feature commit(s) and push. This
+  workflow does not merge the feature branch into the base branch or delete it;
+  base-branch integration is separately managed.
+- Writing boundaries: the Spec Refiner writes only the current `spec.md`; the
+  Lead does not write `spec.md` and owns planning/task/summary artifacts. Dev and
+  QA stay within their assigned task responsibilities; QA's test/evidence work
+  does not grant production-code authority.
 
 ## Verification gates
 

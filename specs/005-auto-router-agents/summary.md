@@ -40,6 +40,11 @@
   and `summary.md` conventions it established.
 - `004-portfolio-home` — no direct relationship; both amend agent/tooling
   configuration but touch different areas.
+- `007-workflow-changes` — supersedes this spec's assignment of the four agents to
+  Auto Router models by pinning them to GPT-6 Luna (`#high` for `dev-lead`,
+  `#medium` for the others). The Auto Router model/variant configuration in
+  `opencode.json` remains unchanged; this summary records the later relationship
+  without editing the historical `spec.md`.
 
 ## Notes
 

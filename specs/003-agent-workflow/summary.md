@@ -7,10 +7,12 @@
 
 - `.opencode/agents/spec-refiner.md` — new `primary` agent: clarifies and writes
   `spec.md`, records spec relationships; model now
-  `openrouter/openrouter/auto#medium` (`005-auto-router-agents`).
+  `openrouter/openai/gpt-6-luna#medium` (`007-workflow-changes` supersedes the
+  Auto Router assignment from `005-auto-router-agents`).
 - `.opencode/agents/dev-lead.md` — new `primary` agent: writes `plan.md`/`tasks.md`
-  and orchestrates `dev` then `qa`, choosing the model per task; model now
-  `openrouter/openrouter/auto#high` (`005-auto-router-agents`).
+  and orchestrates `dev` then `qa`; now uses
+  `openrouter/openai/gpt-6-luna#high` (`007-workflow-changes` supersedes the Auto
+  Router assignment from `005-auto-router-agents`).
 - `.opencode/agents/dev.md` — new `subagent`: implements one task, never
   self-validates.
 - `.opencode/agents/qa.md` — new `subagent`: writes and runs the quality tests and
@@ -51,6 +53,11 @@ specs`; new §4.2 `Spec relationships`.
   convention that spec established.
 - `002-front-extra-dependencies` — earlier constitution amendment; shares the
   amendment lineage and had its summary's `Related specs` backfilled.
+- `007-workflow-changes` — modifies the operational agent workflow: all agents
+  use the shared feature branch, up to four independent tasks may be active, and
+  QA/rework/evidence gate the final commit and push. The pinned GPT-6 Luna models
+  supersede the Auto Router agent assignments; the Auto Router configuration
+  remains unchanged. This summary is updated; the historical `spec.md` is not.
 
 ## Notes
 
@@ -59,6 +66,7 @@ specs`; new §4.2 `Spec relationships`.
   uses `.claude/agents/`).
 - The `spec-refiner` → `dev-lead` handoff is manual: OpenCode V2 has no direct
   primary-to-primary delegation. Only `dev-lead` may launch `dev`/`qa`.
-- Model tiers: the agents route through the OpenRouter Auto Router; the
-  `#high` (primary planning) and `#medium` (others) variants set the reasoning
-  effort, escalable by the lead per task (`005-auto-router-agents`).
+- Models: the agents currently use pinned GPT-6 Luna references with `#high` for
+  the Dev Lead and `#medium` for the other roles (`007-workflow-changes`). The
+  Auto Router variants configured by `005-auto-router-agents` remain available in
+  `opencode.json` but are no longer assigned to these agents.

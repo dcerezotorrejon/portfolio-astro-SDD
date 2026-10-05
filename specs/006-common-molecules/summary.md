@@ -109,6 +109,9 @@
   refinement → plan → implementation → QA workflow; no agent definitions changed.
 - `005-auto-router-agents` — **depends on**: work ran through the Auto Router
   (`#medium`) variant configured by that spec; `005` is not modified.
+- `007-workflow-changes` — **depends on**: future maintenance follows the shared
+  spec-branch workflow with a maximum of four active, independently scoped tasks;
+  no molecule or portfolio requirement changes.
 
 ## Notes and remaining limits
 

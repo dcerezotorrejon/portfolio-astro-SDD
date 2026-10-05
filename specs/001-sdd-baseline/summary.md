@@ -39,6 +39,10 @@
   homepage and corresponding smoke assertions is in progress under spec 004.
 - `003-agent-workflow` — amends `docs/constitution.md`, the constitution and spec
   convention this spec established (§4.1 `summary.md`, new §4.2).
+- `007-workflow-changes` — amends the constitution with the shared feature-branch
+  workflow, four-task concurrency limit, QA lifecycle, and historical `spec.md`
+  immutability rule; this summary records the relationship without changing this
+  spec's historical requirements.
 
 ## Notes
 
