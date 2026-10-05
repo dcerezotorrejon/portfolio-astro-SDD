@@ -32,6 +32,11 @@
   is fused with the initial repo scaffolding (Astro starter + tooling), so it
   predates the `spec-<NNN>` scope convention and is not scoped to `spec-001`.
 
+## Related specs
+
+- `003-agent-workflow` — amends `docs/constitution.md`, the constitution and spec
+  convention this spec established (§4.1 `summary.md`, new §4.2).
+
 ## Notes
 
 - The `site` constant is a placeholder (`https://example.com`); replace it before

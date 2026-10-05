@@ -31,6 +31,12 @@
 
 - `2c0e4d1` — `feat(spec-002): add tailwind and react integration to the stack`.
 
+## Related specs
+
+- `001-sdd-baseline` — this spec amended the constitution it created (§2, §10).
+- `003-agent-workflow` — amends `docs/constitution.md` again (spec relationships,
+  version `1.2.0`); shares the constitution amendment lineage.
+
 ## Notes
 
 - **`eslint-plugin-react` is intentionally not installed**: its latest stable (7.37.5) calls the removed `context.getFilename()` API and crashes under ESLint 10. `eslint-plugin-react-hooks` (declares ESLint 10 support) and `eslint-plugin-jsx-a11y` (works at runtime) cover hooks and accessibility linting.

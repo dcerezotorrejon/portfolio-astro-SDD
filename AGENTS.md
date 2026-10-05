@@ -42,6 +42,29 @@ reused when the same behavior is modified. All spec files are in English. Read
 [`specs/README.md`](./specs/README.md) for the full convention, and start from
 `specs/_template/` for new specs.
 
+## Agent workflow
+
+Development is split across four specialized agents defined under
+`.opencode/agents/`:
+
+| Agent          | Mode       | Role                                                                       |
+| -------------- | ---------- | -------------------------------------------------------------------------- |
+| `spec-refiner` | `primary`  | Clarifies the feature with you and writes `spec.md`.                       |
+| `dev-lead`     | `primary`  | Turns the spec into `plan.md`/`tasks.md` and orchestrates `dev` then `qa`. |
+| `dev`          | `subagent` | Implements one task. Does not validate its own work.                       |
+| `qa`           | `subagent` | Tests a finished task against the quality gates and records evidence.      |
+
+- The `spec-refiner` → `dev-lead` handoff is **manual**: switch the primary agent
+  once the spec is agreed.
+- The `dev-lead` launches `dev` and `qa` as subagents and picks the model per
+  task, favoring cost-efficiency. `spec-refiner`/`dev-lead` use a medium-cost,
+  medium/high-reasoning model; `dev`/`qa` use a lower-cost model that the lead may
+  escalate for harder tasks.
+- Agents are defined as Markdown + YAML frontmatter, the format shared by OpenCode
+  and other agent tools (for example Claude Code reads `.claude/agents/`). See
+  [`docs/constitution.md` §4](./docs/constitution.md#42-spec-relationships) for
+  how specs record their relationships.
+
 ## Verification gates
 
 No task is complete without evidence, and every task is verified against unit

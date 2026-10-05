@@ -16,7 +16,7 @@ specs/[NNN]-[feature-slug]/
 ├── spec.md      # requirements + acceptance criteria
 ├── plan.md      # technical approach
 ├── tasks.md     # checklist of tasks with verification evidence
-└── summary.md   # files/functions changed + date
+└── summary.md   # files/functions changed + related specs + date
 ```
 
 - `[NNN]`: zero-padded sequential number, starting at `001`.
@@ -40,7 +40,16 @@ specs/[NNN]-[feature-slug]/
 - **`plan.md`** — the technical approach: files to touch, decisions, trade-offs.
 - **`tasks.md`** — checklist. A task is only marked `[x]` with evidence from the
   unit test, SEO, and accessibility gates.
-- **`summary.md`** — date, files changed, and functions/components changed.
+- **`summary.md`** — date, files changed, functions/components changed, and the
+  **Related specs** section (§4.2).
+
+## Related specs
+
+Features rarely change alone. Every `summary.md` includes a **Related specs**
+section listing the specs this one affects or is affected by, with a short note
+on each relationship. When a later change touches a feature, update the affected
+spec's `summary.md` too. See
+[Constitution §4.2](../docs/constitution.md#42-spec-relationships).
 
 ## Conflict resolution
 

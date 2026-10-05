@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.1.0
+- **Version**: 1.2.0
 - **Last amended**: 2026-10-05
 
 ---
@@ -73,9 +73,27 @@ Every spec MUST include a `summary.md` that records, at minimum:
 - **Date** of the latest update.
 - **Files changed** (paths relative to the repo root).
 - **Functions / components changed** and a short description of what changed.
+- **Related specs** — the specs this one affects or is affected by, with the
+  direction of each relationship (§4.2). State "None." when there are none.
 
 It is created when the spec is completed and **updated on every later change**
 that touches the feature, refreshing the date.
+
+### 4.2 Spec relationships
+
+Features do not exist in isolation: changing one behavior usually touches
+others, and specs must keep those links visible.
+
+- While a spec is being written, its **anticipated relationships** are recorded
+  in `spec.md`: which existing specs it is likely to affect, depend on, or
+  modify.
+- When the spec is completed, `summary.md` MUST resolve them in its
+  **`Related specs`** section, listing every spec that was added, modified, or
+  otherwise impacted, with a short note describing the relationship. If there
+  are none, state "None." explicitly.
+- Relationships are **bidirectional in maintenance**: when a later change
+  touches a feature, the `summary.md` of the affected spec is updated in the
+  same change, refreshing its date.
 
 ## 5. Task lifecycle and verification gates
 
