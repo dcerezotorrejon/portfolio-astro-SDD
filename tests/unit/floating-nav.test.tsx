@@ -4,7 +4,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import { JSDOM } from "jsdom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import FloatingNav from "../../src/components/FloatingNav";
+import FloatingNav from "../../src/components/FloatingNav/FloatingNav";
 import { getContainer } from "../helpers/render";
 
 const initialSections = [

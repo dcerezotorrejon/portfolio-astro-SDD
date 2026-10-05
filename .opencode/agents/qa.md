@@ -11,7 +11,7 @@ permissions:
     resource: "tests/**"
     effect: allow
   - action: edit
-    resource: "specs/007-workflow-changes/tasks.md"
+    resource: "specs/*/tasks.md"
     effect: allow
   - action: edit
     resource: "specs/**/spec.md"

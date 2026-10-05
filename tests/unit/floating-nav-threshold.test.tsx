@@ -9,7 +9,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import FloatingNav from "../../src/components/FloatingNav";
+import FloatingNav from "../../src/components/FloatingNav/FloatingNav";
 
 type FrameCallback = FrameRequestCallback;
 

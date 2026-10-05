@@ -69,7 +69,7 @@ components:
   metadata, and expanded description.
 
 Collections and frontmatter schemas are defined in `src/content.config.ts` and
-`src/lib/content-schema.ts`. Keep slugs unique, use local image assets with
+`src/content/parsers/content-schema.ts`. Keep slugs unique, use local image assets with
 meaningful alternative text, and update the sample content before publishing.
 Components should render the content they receive rather than hardcoding portfolio
 copy.

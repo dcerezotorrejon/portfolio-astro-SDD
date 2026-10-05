@@ -10,7 +10,7 @@ import {
   getActiveSectionIndex,
   prefersReducedMotion,
   scrollToSection,
-} from "../lib/navigation";
+} from "./helpers/navigation";
 
 // `useLayoutEffect` warns during server rendering; the client needs it to
 // pre-paint the active section from the URL fragment, while the server only

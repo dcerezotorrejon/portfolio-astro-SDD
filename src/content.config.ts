@@ -1,6 +1,9 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
-import { experienceSchema, profileSchema } from "./lib/content-schema";
+import {
+  experienceSchema,
+  profileSchema,
+} from "./content/parsers/content-schema";
 
 const profile = defineCollection({
   loader: glob({

@@ -1,7 +1,7 @@
 # Summary — Workflow changes
 
 - **Spec ID**: `007-workflow-changes`
-- **Last updated**: 2026-10-05
+- **Last updated**: 2026-10-06
 
 ## Files changed
 
@@ -11,10 +11,13 @@
   shared spec branch, waits for QA/evidence, handles escalations, and owns final
   commit/push through the commit skill.
 - `.opencode/agents/dev.md` — works on the shared branch without task branches or
-  intermediate commits/pushes; contains the task-scoped operational-document
-  exception for this feature.
+  intermediate commits/pushes; tool edit permission now covers assigned
+  repository paths except `tests/**` and `specs/**` (`008-lib-reorganization`).
+  The task-scoped operational-document exception for this feature remains.
 - `.opencode/agents/qa.md` — verifies and records evidence on the shared branch,
-  returns defects to the same Dev, and cannot change production code or commit/push.
+  returns defects to the same Dev, and cannot change production code or commit/push;
+  tool edit permission now includes any assigned `specs/*/tasks.md` evidence file
+  in addition to tests (`008-lib-reorganization`).
 - `docs/constitution.md` — amended to version `1.4.0` on `2026-10-05` with shared
   branch, four-task concurrency, QA/rework, escalation, final commit/push, and
   incremental-spec history rules.
@@ -23,8 +26,8 @@
 - `specs/README.md` — documents the `spec/[NNN]-[slug]` branch convention and
   immutable historical `spec.md` files.
 - `tests/unit/agents.test.ts` — validates model assignments/intents, agent
-  permissions/prompts, shared-branch workflow, task cap, documentation consistency,
-  and retained Auto Router variants.
+  permission outcomes/prompts, shared-branch workflow, task cap, documentation
+  consistency, and retained Auto Router variants.
 - `specs/001-sdd-baseline/summary.md`,
   `specs/002-front-extra-dependencies/summary.md`,
   `specs/003-agent-workflow/summary.md`,
@@ -62,3 +65,6 @@
   remains unchanged.
 - `006-common-molecules` — affected through its dependency on the existing
   workflow; component requirements remain unchanged.
+- `008-lib-reorganization` — modifies the Dev/QA tool-level edit permissions while
+  preserving their role boundaries and shared-branch/commit restrictions; its
+  portfolio module relocations do not change the workflow requirements here.

@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
-import { assertUniqueExperienceSlugs } from "../../src/lib/content";
+import { assertUniqueExperienceSlugs } from "../../src/content/parsers/content";
 import { render } from "../helpers/render";
 
 const approvedExpandedDescription =

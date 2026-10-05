@@ -114,6 +114,48 @@ function permissionTuples(agent: AgentFile): Array<[string, string, string]> {
   ]);
 }
 
+function matchesPermissionResource(pattern: string, resource: string): boolean {
+  let expression = "^";
+
+  for (let index = 0; index < pattern.length; index += 1) {
+    const character = pattern[index];
+
+    if (character === "*" && pattern[index + 1] === "*") {
+      if (pattern[index + 2] === "/") {
+        expression += "(?:.*/)?";
+        index += 2;
+      } else {
+        expression += ".*";
+        index += 1;
+      }
+    } else if (character === "*") {
+      expression += "[^/]*";
+    } else {
+      expression += character.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+    }
+  }
+
+  return new RegExp(`${expression}$`).test(resource);
+}
+
+function effectivePermission(
+  agent: AgentFile,
+  action: string,
+  resource: string,
+): string | undefined {
+  return agent.permissions.reduce<string | undefined>((effect, rule) => {
+    if (
+      rule.action === action &&
+      rule.resource &&
+      matchesPermissionResource(rule.resource, resource)
+    ) {
+      return rule.effect;
+    }
+
+    return effect;
+  }, undefined);
+}
+
 function expectPromptFragments(agent: AgentFile, fragments: string[]): void {
   const prompt = agent.body.replace(/\s+/g, " ").trim();
   for (const fragment of fragments) {
@@ -192,7 +234,7 @@ describe("custom agent definitions", () => {
     }
   });
 
-  it("keeps ordered edit exceptions limited to each role's assigned scope", () => {
+  it("applies ordered Dev and QA edit policies without widening role authority", () => {
     expect(permissionTuples(agents.get("spec-refiner")!)).toEqual([
       ["edit", "**", "deny"],
       ["edit", "specs/*/spec.md", "allow"],
@@ -219,7 +261,10 @@ describe("custom agent definitions", () => {
       ["edit", "docs/constitution.md", "allow"],
       ["edit", "AGENTS.md", "allow"],
       ["edit", "specs/README.md", "allow"],
+      ["edit", "**", "allow"],
       ["edit", "specs/**/spec.md", "deny"],
+      ["edit", "tests/**", "deny"],
+      ["edit", "specs/**", "deny"],
       ["shell", "git branch *", "deny"],
       ["shell", "git branch --show-current", "allow"],
       ["shell", "git checkout *", "deny"],
@@ -229,21 +274,28 @@ describe("custom agent definitions", () => {
       ["shell", "git push *", "deny"],
       ["subagent", "*", "deny"],
     ]);
-    expect(
-      dev.permissions.filter((rule) => rule.action === "edit"),
-    ).not.toContain(
-      expect.objectContaining({ effect: "allow", resource: "tests/**" }),
-    );
-    expect(
-      dev.permissions.filter((rule) => rule.action === "edit"),
-    ).not.toContain(
-      expect.objectContaining({ effect: "allow", resource: "src/**" }),
-    );
+
+    for (const resource of [
+      "src/components/FloatingNav.tsx",
+      "README.md",
+      "docs/design.md",
+    ]) {
+      expect(effectivePermission(dev, "edit", resource), resource).toBe(
+        "allow",
+      );
+    }
+    for (const resource of [
+      "tests/unit/agents.test.ts",
+      "specs/008-lib-reorganization/tasks.md",
+      "specs/008-lib-reorganization/spec.md",
+    ]) {
+      expect(effectivePermission(dev, "edit", resource), resource).toBe("deny");
+    }
 
     expect(permissionTuples(agents.get("qa")!)).toEqual([
       ["edit", "**", "deny"],
       ["edit", "tests/**", "allow"],
-      ["edit", "specs/007-workflow-changes/tasks.md", "allow"],
+      ["edit", "specs/*/tasks.md", "allow"],
       ["edit", "specs/**/spec.md", "deny"],
       ["shell", "git branch *", "deny"],
       ["shell", "git branch --show-current", "allow"],
@@ -254,20 +306,71 @@ describe("custom agent definitions", () => {
       ["shell", "git push *", "deny"],
       ["subagent", "*", "deny"],
     ]);
-    expect(agents.get("qa")!.permissions).not.toContain(
-      expect.objectContaining({
-        action: "edit",
+
+    const qa = agents.get("qa")!;
+    for (const resource of [
+      "tests/unit/agents.test.ts",
+      "tests/a11y/floating-nav.test.ts",
+      "specs/008-lib-reorganization/tasks.md",
+    ]) {
+      expect(effectivePermission(qa, "edit", resource), resource).toBe("allow");
+    }
+    for (const resource of [
+      "src/lib/navigation.ts",
+      "docs/design.md",
+      "specs/008-lib-reorganization/spec.md",
+      "specs/008-lib-reorganization/plan.md",
+      "specs/008-lib-reorganization/summary.md",
+    ]) {
+      expect(effectivePermission(qa, "edit", resource), resource).toBe("deny");
+    }
+
+    for (const agent of [dev, qa]) {
+      expect(
+        effectivePermission(agent, "shell", "git branch --show-current"),
+      ).toBe("allow");
+      for (const command of [
+        "git branch feature-example",
+        "git checkout other-branch",
+        "git switch other-branch",
+        "git merge other-branch",
+        "git commit -m message",
+        "git push origin feature-example",
+      ]) {
+        expect(effectivePermission(agent, "shell", command), command).toBe(
+          "deny",
+        );
+      }
+
+      expect(agent.permissions).toContainEqual({
+        action: "shell",
+        resource: "git branch *",
+        effect: "deny",
+      });
+      expect(agent.permissions).toContainEqual({
+        action: "shell",
+        resource: "git branch --show-current",
         effect: "allow",
-        resource: "src/**",
-      }),
-    );
-    expect(agents.get("qa")!.permissions).not.toContain(
-      expect.objectContaining({
-        action: "edit",
-        effect: "allow",
-        resource: ".opencode/agents/**",
-      }),
-    );
+      });
+      for (const command of [
+        "git checkout *",
+        "git switch *",
+        "git merge *",
+        "git commit *",
+        "git push *",
+      ]) {
+        expect(agent.permissions).toContainEqual({
+          action: "shell",
+          resource: command,
+          effect: "deny",
+        });
+      }
+      expect(agent.permissions).toContainEqual({
+        action: "subagent",
+        resource: "*",
+        effect: "deny",
+      });
+    }
   });
 
   it("documents each role's assignment boundaries", () => {

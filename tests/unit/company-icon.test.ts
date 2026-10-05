@@ -6,8 +6,8 @@ import { describe, expect, it } from "vitest";
 import ExperienceHistory from "../../src/components/ExperienceHistory.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import Home from "../../src/pages/index.astro";
-import { resolveCompanyIcon } from "../../src/lib/content";
-import { experienceSchema } from "../../src/lib/content-schema";
+import { resolveCompanyIcon } from "../../src/content/parsers/content";
+import { experienceSchema } from "../../src/content/parsers/content-schema";
 import { render } from "../helpers/render";
 import {
   readStylesheetTokens,

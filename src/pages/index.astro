@@ -1,10 +1,13 @@
 ---
 import { getCollection, getEntry } from "astro:content";
-import FloatingNav from "../components/FloatingNav";
+import FloatingNav from "../components/FloatingNav/FloatingNav";
 import ExperienceHistory from "../components/ExperienceHistory.astro";
 import ProfileIntroduction from "../components/ProfileIntroduction.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { assertUniqueExperienceSlugs, sortExperiences } from "../lib/content";
+import {
+  assertUniqueExperienceSlugs,
+  sortExperiences,
+} from "../content/parsers/content";
 
 const profileEntry = await getEntry("profile", "profile");
 if (!profileEntry)

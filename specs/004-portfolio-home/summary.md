@@ -2,7 +2,7 @@
 
 - **Spec ID**: `004-portfolio-home`
 - **Status**: done
-- **Last updated**: 2026-10-05
+- **Last updated**: 2026-10-06
 
 ## Files changed
 
@@ -114,6 +114,14 @@ unreported. Evidence files record model claims and exact command results.
   intentional visual normalization is the detail-page `h1`, previously the
   user-agent default, now using the `display` variant. See
   [`006-common-molecules/summary.md`](../006-common-molecules/summary.md).
+- **2026-10-06 — `008-lib-reorganization`:** relocated the floating navigator to
+  `src/components/FloatingNav/FloatingNav.tsx` and its helper to
+  `src/components/FloatingNav/helpers/navigation.ts`; relocated content utilities
+  and schemas to `src/content/parsers/content.ts` and
+  `src/content/parsers/content-schema.ts`. Application/test imports were updated.
+  The navigator retains `client:load`, and all component/content behavior,
+  schemas, routes, rendered metadata, and accessibility semantics remain
+  unchanged. See [`008-lib-reorganization/summary.md`](../008-lib-reorganization/summary.md).
 
 ## Related specs
 
@@ -132,6 +140,9 @@ unreported. Evidence files record model claims and exact command results.
 - `007-workflow-changes` — modifies the shared agent workflow used to maintain
   this feature, including one shared spec branch and a four-active-task limit; no
   portfolio page, content, or UI requirement changes.
+- `008-lib-reorganization` — modifies the locations of this feature's content
+  schema/utilities and floating navigator/helper, with imports updated and no
+  004 behavior or requirements changed.
 
 ## Notes and remaining limits
 

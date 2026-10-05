@@ -29,7 +29,16 @@ permissions:
     resource: "specs/README.md"
     effect: allow
   - action: edit
+    resource: "**"
+    effect: allow
+  - action: edit
     resource: "specs/**/spec.md"
+    effect: deny
+  - action: edit
+    resource: "tests/**"
+    effect: deny
+  - action: edit
+    resource: "specs/**"
     effect: deny
   - action: shell
     resource: "git branch *"

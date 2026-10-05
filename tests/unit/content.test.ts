@@ -4,12 +4,12 @@ import {
   experienceSchema,
   profileSchema,
   type ExperienceData,
-} from "../../src/lib/content-schema";
+} from "../../src/content/parsers/content-schema";
 import {
   assertUniqueExperienceSlugs,
   formatDateRange,
   sortExperiences,
-} from "../../src/lib/content";
+} from "../../src/content/parsers/content";
 
 const approvedProfile = {
   name: "Nombre Apellidos",
