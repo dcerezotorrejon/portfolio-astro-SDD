@@ -107,7 +107,12 @@
     The Lead reran final gates after summary updates: lint, format, build (3 pages;
     sitemap generated), unit tests (21 files, 149 tests), accessibility (4 files,
     5 tests), and `git diff --check` all passed. SEO remains not applicable and no
-    rendered markup changed.
+    rendered markup changed. After QA approval, the Lead used the commit skill to
+    create `3fac60b feat(spec-007): adopt shared-branch workflow` and pushed it to
+    `origin/spec/007-workflow-changes`. Verified the published branch contains the
+    approved agent, test, guidance, summary, and planning changes. Deleted the
+    superseded local and remote `dev/007-workflow-changes/T1` branch without
+    merging it; retained `spec/007-workflow-changes` and did not merge it to base.
   - **Depends on:** T1 and T2.
 
 ## Gate summary

@@ -42,6 +42,10 @@
 - `parseAgent()` / `loadAgents()` in `tests/unit/agents.test.ts` remain test helpers;
   their assertions were re-anchored to current agent configuration and workflow.
 
+## Commits
+
+- `3fac60b` — `feat(spec-007): adopt shared-branch workflow`.
+
 ## Related specs
 
 - `001-sdd-baseline` — affected: established the constitution amended by this
