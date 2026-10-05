@@ -5,21 +5,28 @@ import Home from "../../src/pages/index.astro";
 import { render } from "../helpers/render";
 
 describe("home page SEO", () => {
-  it("has a non-empty title and meta description", async () => {
+  it("uses the approved Spanish title and meta description", async () => {
     const html = await render(Home);
     const { document } = new JSDOM(html).window;
 
-    expect(document.title.trim()).not.toBe("");
+    expect(document.documentElement.lang).toBe("es");
+    expect(document.title).toBe("Nombre Apellidos | Portfolio profesional");
 
     const description = document.querySelector('meta[name="description"]');
-    expect(description?.getAttribute("content")?.trim()).not.toBe("");
+    expect(description?.getAttribute("content")).toBe(
+      "Presentación y trayectoria profesional de Nombre Apellidos. Contenido provisional de ejemplo",
+    );
+    expect(document.querySelectorAll('meta[name="description"]')).toHaveLength(
+      1,
+    );
   });
 
-  it("declares an absolute canonical URL", async () => {
+  it("declares the unique absolute canonical URL for the home route", async () => {
     const html = await render(Home);
     const { document } = new JSDOM(html).window;
 
-    const canonical = document.querySelector('link[rel="canonical"]');
-    expect(canonical?.getAttribute("href")).toMatch(/^https?:\/\//);
+    const canonicals = document.querySelectorAll('link[rel="canonical"]');
+    expect(canonicals).toHaveLength(1);
+    expect(canonicals[0]?.getAttribute("href")).toBe("https://example.com/");
   });
 });

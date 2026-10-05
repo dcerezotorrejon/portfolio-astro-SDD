@@ -1,0 +1,11 @@
+---
+// Test-only fixture: compiles a small Markdown document and places it in the
+// same `.detail-content` wrapper the real employment detail page uses, so the
+// shared section-heading selector is exercised against genuine compiled
+// Markdown `h2`/`h3` output. It intentionally contains no employment data.
+import HeadingFixture from "./heading-fixture.md";
+---
+
+<div class="detail-content">
+  <HeadingFixture />
+</div>
