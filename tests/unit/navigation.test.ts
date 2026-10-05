@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+// @vitest-environment jsdom
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getActiveSectionIndex } from "../../src/lib/navigation";
+import {
+  getActiveSectionIndex,
+  prefersReducedMotion,
+  scrollToSection,
+} from "../../src/lib/navigation";
 
 describe("getActiveSectionIndex (section-start activation)", () => {
   const sections = [
@@ -104,5 +109,102 @@ describe("getActiveSectionIndex (section-start activation)", () => {
     expect(getActiveSectionIndex(list, 100, 1)).toBe(1);
     expect(getActiveSectionIndex(list, 120)).toBe(1);
     expect(getActiveSectionIndex(list, 120, 5)).toBe(2);
+  });
+});
+
+describe("prefersReducedMotion", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("reflects the reduce media query in both directions", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: true })),
+    );
+    expect(prefersReducedMotion()).toBe(true);
+
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false })),
+    );
+    expect(prefersReducedMotion()).toBe(false);
+    expect(window.matchMedia).toHaveBeenCalledWith(
+      "(prefers-reduced-motion: reduce)",
+    );
+  });
+
+  it("returns false when matchMedia is unavailable", () => {
+    vi.stubGlobal("matchMedia", undefined);
+    expect(prefersReducedMotion()).toBe(false);
+  });
+});
+
+describe("scrollToSection", () => {
+  afterEach(() => {
+    document.getElementById("target")?.remove();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  function makeTarget(): HTMLElement {
+    const target = document.createElement("section");
+    target.id = "target";
+    document.body.append(target);
+    return target;
+  }
+
+  it("returns false for a missing target without scrolling", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false })),
+    );
+    expect(scrollToSection("missing")).toBe(false);
+  });
+
+  it("smooth-scrolls an existing target to the block start", () => {
+    const target = makeTarget();
+    const scrollIntoView = vi.fn();
+    target.scrollIntoView = scrollIntoView;
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false })),
+    );
+
+    expect(scrollToSection("target")).toBe(true);
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      block: "start",
+      behavior: "smooth",
+    });
+  });
+
+  it("scrolls immediately under reduced motion", () => {
+    const target = makeTarget();
+    const scrollIntoView = vi.fn();
+    target.scrollIntoView = scrollIntoView;
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: true })),
+    );
+
+    expect(scrollToSection("target")).toBe(true);
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      block: "start",
+      behavior: "auto",
+    });
+  });
+
+  it("returns false when the target cannot scroll into view", () => {
+    const target = makeTarget();
+    Object.defineProperty(target, "scrollIntoView", {
+      configurable: true,
+      value: undefined,
+    });
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false })),
+    );
+
+    expect(scrollToSection("target")).toBe(false);
   });
 });

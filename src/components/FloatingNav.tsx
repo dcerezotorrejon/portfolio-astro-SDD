@@ -1,6 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 
-import { getActiveSectionIndex } from "../lib/navigation";
+import {
+  getActiveSectionIndex,
+  prefersReducedMotion,
+  scrollToSection,
+} from "../lib/navigation";
+
+// `useLayoutEffect` warns during server rendering; the client needs it to
+// pre-paint the active section from the URL fragment, while the server only
+// needs a no-op.
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export interface FloatingNavSection {
   id: string;
@@ -18,12 +34,36 @@ export default function FloatingNav({
 }: FloatingNavProps) {
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id ?? "");
   const [isFocusObscured, setIsFocusObscured] = useState(false);
+  const [isPositioned, setIsPositioned] = useState(false);
   const activeSectionIdRef = useRef(activeSectionId);
   const navRef = useRef<HTMLElement>(null);
   const activeIndex = Math.max(
     0,
     sections.findIndex(({ id }) => id === activeSectionId),
   );
+
+  // On a direct fragment load (e.g. returning from a detail page to
+  // "/#trayectoria") the browser has already jumped to the section before
+  // hydration. Reflect that fragment in the active state before paint so the
+  // indicator starts on the right link instead of flipping to it afterwards.
+  useIsomorphicLayoutEffect(() => {
+    const hash = window.location.hash.slice(1);
+
+    if (hash && sections.some(({ id }) => id === hash)) {
+      activeSectionIdRef.current = hash;
+      setActiveSectionId(hash);
+    }
+  }, [sections]);
+
+  // Only after the first paint is it safe to animate indicator moves; the CSS
+  // suppresses the transition until `data-positioned` flips to "true".
+  useEffect(() => {
+    const animationFrame = window.requestAnimationFrame(() => {
+      setIsPositioned(true);
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, []);
 
   useEffect(() => {
     let animationFrame: number | null = null;
@@ -164,11 +204,40 @@ export default function FloatingNav({
     };
   }, []);
 
+  // Activate an in-page anchor with a smooth scroll without triggering the
+  // browser's native instant fragment jump. Modified/new-tab/middle clicks and
+  // reduced-motion users fall through to the native link behavior.
+  const handleLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    id: string,
+  ) => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    if (prefersReducedMotion() || !document.getElementById(id)) {
+      return;
+    }
+
+    event.preventDefault();
+    window.history.pushState(null, "", `#${id}`);
+    scrollToSection(id);
+    activeSectionIdRef.current = id;
+    setActiveSectionId(id);
+  };
+
   return (
     <nav
       className="floating-nav"
       aria-label={ariaLabel}
       data-active-index={activeIndex}
+      data-positioned={isPositioned ? "true" : "false"}
       data-focus-obscured={isFocusObscured ? "true" : undefined}
       ref={navRef}
     >
@@ -179,6 +248,7 @@ export default function FloatingNav({
             className="floating-nav-link"
             href={`#${id}`}
             aria-current={activeSectionId === id ? "location" : undefined}
+            onClick={(event) => handleLinkClick(event, id)}
             key={id}
           >
             {label}

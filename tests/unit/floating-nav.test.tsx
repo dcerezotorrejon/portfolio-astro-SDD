@@ -109,6 +109,9 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  // Fragment navigation and the component's pushState leave `location.hash`
+  // set; reset it so the next test starts without a stale fragment.
+  window.history.replaceState(null, "", window.location.pathname);
   document.getElementById("inicio")?.remove();
   document.getElementById("trayectoria")?.remove();
   if (originalFontsDescriptor) {
@@ -150,19 +153,23 @@ describe("FloatingNav", () => {
     expect(nav?.querySelector("[aria-hidden='true']")).toBeTruthy();
   });
 
-  it("selects from measured section tops at mount, not from the URL hash, and only once the start inset is reached", () => {
+  it("pre-selects from the URL fragment before paint, then lets measured geometry govern", () => {
     window.history.replaceState(null, "", "#trayectoria");
     setTop("inicio", 0);
     // 17.5 px misses the 16 px inset + 1 px tolerance threshold.
     setTop("trayectoria", 17.5);
     render(<FloatingNav sections={initialSections} />);
 
-    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
-    expect(frameRequest).toHaveBeenCalledTimes(1);
+    // The layout effect reads the fragment and selects the hashed section
+    // before the first paint, so the indicator never flashes "Inicio".
+    expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Inicio")).not.toHaveAttribute("aria-current");
+    // The isPositioned rAF and the measurement scheduler each queue a frame.
+    expect(frameRequest).toHaveBeenCalledTimes(2);
     flushFrame();
 
-    // Geometry, not the fragment, drives selection: the hashed section has
-    // not reached the start inset yet, so "inicio" stays current.
+    // Geometry still governs: the hashed section has not reached the start
+    // inset yet, so measurement restores "inicio".
     expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
     expect(document.querySelector(".floating-nav")).toHaveAttribute(
       "data-active-index",
@@ -179,6 +186,27 @@ describe("FloatingNav", () => {
       "1",
     );
     expect(navLink("Inicio")).not.toHaveAttribute("aria-current");
+  });
+
+  it("measures at mount and ignores an unknown or absent fragment", () => {
+    // No fragment: measurement selects by geometry once frames run.
+    setTop("inicio", 200);
+    setTop("trayectoria", 16);
+    const { unmount } = render(<FloatingNav sections={initialSections} />);
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    flushFrame();
+    expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
+    unmount();
+
+    // A fragment that is not one of the sections must not select anything.
+    window.history.replaceState(null, "", "#desconocida");
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    render(<FloatingNav sections={initialSections} />);
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Trayectoria")).not.toHaveAttribute("aria-current");
   });
 
   it("crosses downward at the start inset, reverses upward, resolves a tie toward the later section, and coalesces scroll bursts", () => {
@@ -309,8 +337,9 @@ describe("FloatingNav", () => {
     const addFontListener = vi.spyOn(fontEvents, "addEventListener");
     const removeFontListener = vi.spyOn(fontEvents, "removeEventListener");
     const { unmount } = render(<FloatingNav sections={initialSections} />);
-    // Only the measurement scheduler queues a frame at mount.
-    expect(frames.size).toBe(1);
+    // At mount two effects queue a frame: the one-shot `data-positioned`
+    // scheduler and the section measurement scheduler.
+    expect(frames.size).toBe(2);
     flushFrame();
     expect(addFontListener).toHaveBeenCalledWith(
       "loadingdone",
@@ -337,8 +366,9 @@ describe("FloatingNav", () => {
       "loadingdone",
       addFontListener.mock.calls[0]?.[1],
     );
-    // Both effect schedulers cancel their pending frame on unmount.
-    expect(frameCancel).toHaveBeenCalledTimes(2);
+    // Three effects own a frame handle and cancel it on unmount: the one-shot
+    // `data-positioned` scheduler, section measurement, and focus protection.
+    expect(frameCancel).toHaveBeenCalledTimes(3);
     expect(frames.size).toBe(0);
     expect(observerInstances).toHaveLength(0);
     const requestsBeforeDispatch = frameRequest.mock.calls.length;

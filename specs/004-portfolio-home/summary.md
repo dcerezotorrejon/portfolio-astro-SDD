@@ -86,6 +86,22 @@ unreported. Evidence files record model claims and exact command results.
 
 ## Later changes
 
+- **2026-10-05 — fragment-load flicker fix (F1/F2):** returning to
+  `/#trayectoria` from a detail page animated the scroll and briefly flashed the
+  floating-nav indicator from "Inicio" to "Trayectoria". `html.home-page` no
+  longer sets `scroll-behavior: smooth` (it leaked into cross-document fragment
+  navigation); `.floating-nav:not([data-positioned="true"]) .floating-nav-indicator`
+  suppresses the indicator transition until after the first measure;
+  `FloatingNav.tsx` now pre-selects the active section from `location.hash` in a
+  layout effect (before paint), exposes `data-positioned`, and intercepts plain
+  left clicks to scroll with `scrollIntoView({ block: "start", behavior: "smooth" })`
+  - `history.pushState` while leaving reduced-motion/modified/new-tab/middle
+    clicks native; `prefersReducedMotion()` and `scrollToSection()` were added to
+    `src/lib/navigation.ts`. **No 004 requirement changed** — R10/R11 and AC11/AC12
+    are preserved and the wording is being re-anchored by the Dev Lead in `spec.md`.
+    QA re-anchored the four affected/related test files and verified the fix in a
+    browser; see [`evidence-f2.md`](./evidence-f2.md). All five constitutional gates
+    pass again (21 files / 149 unit tests; 4 files / 5 a11y tests).
 - **2026-10-05 — `006-common-molecules`:** the button and heading styling was
   extracted into the reusable `Button.astro` / `Heading.astro` molecules and the
   three consumers were migrated (`ProfileIntroduction.astro`,

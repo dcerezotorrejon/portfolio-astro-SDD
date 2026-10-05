@@ -166,6 +166,16 @@ update affected summaries as required by Constitution §4.2.
   activation scrolls to the section start. Use vertical proximity snap at section
   starts, not mandatory one-screen paging: users can freely read tall sections.
   Smooth anchor scrolling and the indicator animation respect reduced motion.
+  A direct or cross-document navigation to a section fragment (for example the
+  detail-page return link to `/#trayectoria`) MUST land on the section without an
+  animated scroll: the page must not paint at the top and then scroll down. Smooth
+  scrolling applies only to in-page anchor activation and MAY be implemented with
+  script as a progressive enhancement; the anchors still work without JavaScript.
+  Before the first paint after a fragment load, the navigator MUST already show
+  the fragment's section as active (the section-start threshold rule reconciles it
+  afterwards), so the indicator never flashes from one section to another; the
+  navigator exposes its positioned state so the indicator transition is suppressed
+  until it is positioned.
   Respect device safe areas and reserve enough page-end space that the floating
   bar does not obscure the last content or focused controls. If the fixed bar would
   overlap a keyboard-focused control in main content, temporarily hide or
@@ -342,6 +352,11 @@ decisions, subject to R3.
       content and keyboard-focused controls are not covered by the navigator; if
       necessary, the floating bar moves or hides while focus is on overlapping main
       content. Reduced motion produces immediate scrolling and indicator changes.
+      A direct or cross-document fragment load (including the detail return link
+      to `/#trayectoria`) lands at the section instantly — the page never paints at
+      the top and then animates — and the navigator shows that section active from
+      the first paint, with no indicator flash; in-page anchor activation still
+      scrolls smoothly.
 - [x] **AC13 (R7, R12):** Computed styles and browser inspection confirm the tokens,
       dimensions, control states, and motion in `docs/design.md`. Open Sans loads
       from same-origin assets, including Spanish glyphs; blocking those assets

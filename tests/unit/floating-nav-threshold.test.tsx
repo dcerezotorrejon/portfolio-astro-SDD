@@ -107,6 +107,9 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  // `pushState` from a previous test would otherwise leave `location.hash`
+  // set and pre-select a section on the next mount.
+  window.history.replaceState(null, "", window.location.pathname);
   domOrderSections.forEach(({ id }) => document.getElementById(id)?.remove());
   if (originalFontsDescriptor) {
     Object.defineProperty(document, "fonts", originalFontsDescriptor);
@@ -241,7 +244,7 @@ describe("FloatingNav section-start threshold", () => {
     expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
   });
 
-  it("does not change selection from a link click; only geometry drives it", () => {
+  it("smooth-scrolls and selects on a plain link click, but leaves reduced-motion and modified/new-tab clicks to the browser", () => {
     setTop("inicio", 0);
     setTop("trayectoria", 300);
     setTop("contacto", 600);
@@ -249,10 +252,49 @@ describe("FloatingNav section-start threshold", () => {
     flushFrame();
     expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
 
+    const scrollIntoView = vi.fn();
+    const contacto = document.getElementById("contacto") as HTMLElement;
+    contacto.scrollIntoView = scrollIntoView;
+    const pushState = vi.spyOn(window.history, "pushState");
+    const matchMedia = vi.fn(() => ({ matches: false }));
+    vi.stubGlobal("matchMedia", matchMedia);
+
+    // Plain left click: intercept, push the fragment and scroll smoothly.
     fireEvent.click(navLink("Contacto"));
-    expect(frames.size).toBe(0);
-    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
-    expect(navLink("Contacto")).not.toHaveAttribute("aria-current");
+    expect(pushState).toHaveBeenCalledWith(null, "", "#contacto");
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      block: "start",
+      behavior: "smooth",
+    });
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Inicio")).not.toHaveAttribute("aria-current");
+
+    // Reduced motion: fall through to the native anchor, no interception.
+    matchMedia.mockReturnValue({ matches: true });
+    pushState.mockClear();
+    scrollIntoView.mockClear();
+    fireEvent.click(navLink("Inicio"));
+    expect(pushState).not.toHaveBeenCalled();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    // Selection is unchanged until geometry changes.
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+
+    // Modified / new-tab / middle clicks also keep native behavior.
+    matchMedia.mockReturnValue({ matches: false });
+    pushState.mockClear();
+    scrollIntoView.mockClear();
+    for (const modifier of [
+      { ctrlKey: true },
+      { metaKey: true },
+      { shiftKey: true },
+      { altKey: true },
+      { button: 1 },
+    ]) {
+      fireEvent.click(navLink("Trayectoria"), modifier);
+    }
+    expect(pushState).not.toHaveBeenCalled();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
   });
 
   it("remounts with fresh measurements and cancels pending frames on unmount", () => {

@@ -211,7 +211,6 @@ html {
 }
 
 html.home-page {
-  scroll-behavior: smooth;
   scroll-snap-type: y proximity;
 }
 
@@ -533,6 +532,12 @@ svg {
   transition: transform var(--control-transition-duration) ease;
 }
 
+/* Until the navigator has measured the active section after hydration, the
+   indicator must not animate from its default position to the selected one. */
+.floating-nav:not([data-positioned="true"]) .floating-nav-indicator {
+  transition: none;
+}
+
 .floating-nav[data-active-index="0"] .floating-nav-indicator {
   transform: translateX(0);
 }
@@ -564,10 +569,6 @@ svg {
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;
-  }
-
-  html.home-page {
-    scroll-behavior: auto;
   }
 
   .floating-nav-indicator,

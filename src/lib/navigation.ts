@@ -1,3 +1,33 @@
+/** Whether the user has requested reduced motion in the current environment. */
+export function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/**
+ * Scroll the section with `id` to the viewport start inset, animating unless
+ * the user prefers reduced motion. Returns `false` when the target is missing
+ * or `scrollIntoView` is unavailable, so callers can keep the native anchor
+ * behavior as a fallback.
+ */
+export function scrollToSection(id: string): boolean {
+  const target = document.getElementById(id);
+
+  if (!target || typeof target.scrollIntoView !== "function") {
+    return false;
+  }
+
+  target.scrollIntoView({
+    block: "start",
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+  });
+
+  return true;
+}
+
 export interface SectionStart {
   id: string;
   /** Section top in viewport coordinates (`getBoundingClientRect().top`). */

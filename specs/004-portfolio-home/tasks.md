@@ -70,6 +70,26 @@ medium variant without reference overrides.
   - Evidence: this checklist, `summary.md`, `evidence-final2.md` and the per-task
     evidence files.
 
+## Later fix
+
+- [x] F1/F2: Eliminate the `/#trayectoria` return flicker and re-anchor the
+      affected tests (R10, R11; AC11, AC12).
+  - F1 (dev): removed `scroll-behavior: smooth` from `html.home-page`, added the
+    pre-position indicator transition suppression
+    (`.floating-nav:not([data-positioned="true"]) .floating-nav-indicator`),
+    pre-selects the active section from `location.hash` in `FloatingNav.tsx`
+    before paint, exposes `data-positioned`, intercepts plain clicks to smooth
+    scroll with `scrollIntoView` + `history.pushState`, and adds
+    `prefersReducedMotion()` / `scrollToSection()` in `src/lib/navigation.ts`.
+    F1 reported the 5 expected test failures for re-anchoring.
+  - F2 (QA): re-anchored `tests/unit/design-assets.test.ts`,
+    `floating-nav.test.tsx` and `floating-nav-threshold.test.tsx`, and added
+    `prefersReducedMotion()` / `scrollToSection()` tests to
+    `tests/unit/navigation.test.ts` (net +228/−19 lines). Real browser evidence
+    (instant fragment landing with a single `scrollY` value, intercepted smooth
+    click, reduced-motion immediate jump, cross-document transition
+    `activation: true`) is recorded in [`evidence-f2.md`](./evidence-f2.md).
+
 ## Final gates
 
 - [x] `pnpm lint`.
@@ -79,6 +99,13 @@ medium variant without reference overrides.
 - [x] `pnpm test:a11y`: 4 files / 5 tests.
 - [x] Browser responsive/font/transition/snap/indicator/motion evidence; MCP axe
       0 violations on all three routes.
+- [x] F2 re-verification on the current source (2026-10-05): `pnpm lint`,
+      `pnpm format:check`, `pnpm build` (3 routes + sitemap), `pnpm test:run`
+      (21 files / 149 tests) and `pnpm test:a11y` (4 files / 5 tests) all pass.
+      Browser fragment-flicker, click interception, reduced-motion and
+      cross-document transition checks are recorded in
+      [`evidence-f2.md`](./evidence-f2.md). F1/F2 change no rendered markup, so
+      the MCP axe result is cited from T11/T12 while `pnpm test:a11y` was re-run.
 
 ## Known remaining limits
 
@@ -88,3 +115,11 @@ medium variant without reference overrides.
 - Unsupported transition behavior was emulated in a supporting Chromium browser;
   a physical nonzero safe-area inset was not independently measured.
 - `https://example.com` remains the configured site origin.
+- F2: the MCP browser exposed no paint-timing entries, so the ~12 ms window
+  between the server-rendered default `Inicio` active state and the hydration
+  correction to `Trayectoria` could not be confirmed as painted or not. The
+  animated flicker is gone (single `scrollY` value; indicator transition
+  suppressed), but a one-frame label-color harden (suppress the active label
+  until `[data-positioned="true"]`) remains a possible follow-up production
+  change. Reduced motion was JS-emulated, not an OS/CDP media override. See
+  [`evidence-f2.md`](./evidence-f2.md).

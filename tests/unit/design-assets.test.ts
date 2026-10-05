@@ -184,15 +184,42 @@ describe("T2/T10 global style contracts", () => {
     );
   });
 
+  it("keeps homepage fragment navigation instant and suppresses the pre-position indicator transition", () => {
+    const homePage = cssRule("html.home-page");
+
+    // Regression guard: `scroll-behavior: smooth` on `html.home-page` leaked
+    // into cross-document fragment navigation (e.g. returning from a detail
+    // page to "/#trayectoria") and produced a visible load-time scroll
+    // animation. The homepage rule must not declare `scroll-behavior` at all;
+    // proximity snap is retained separately.
+    expect(homePage).toMatch(/scroll-snap-type:\s*y proximity/);
+    expect(homePage).not.toMatch(/scroll-behavior/);
+    expect(css).not.toMatch(
+      /html\.home-page[\s\S]{0,120}?scroll-behavior:\s*smooth/,
+    );
+
+    // The indicator must not animate before the navigator has measured and
+    // painted the active section: `data-positioned` flips to "true" after the
+    // first frame, and the transition is suppressed until then.
+    expect(
+      cssRule(
+        '.floating-nav:not([data-positioned="true"]) .floating-nav-indicator',
+      ),
+    ).toMatch(/transition:\s*none/);
+  });
+
   it("preserves the scroll inset, reduced-motion overrides and un-themed decorations", () => {
     expect(
       resolveDeclaration(cssRule("html"), "scroll-padding-block-start", tokens),
     ).toBe("16px");
-    expect(css).toMatch(
-      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?scroll-behavior:\s*auto/,
-    );
+    // Reduced motion still removes the indicator and button transitions and
+    // disables view-transition animation; only the obsolete homepage
+    // `scroll-behavior: auto` override was removed in the flicker fix.
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.floating-nav-indicator,[\s\S]*?transition:\s*none/,
+    );
+    expect(css).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?@view-transition[\s\S]*?navigation:\s*none/,
     );
     // The one-off decorative ink tint is intentionally kept literal in both
     // refactors, so its value stays pinned here.
