@@ -1,7 +1,7 @@
 ---
 description: Implements exactly one assigned task on the shared spec branch, without self-validation, task branches, commits, or pushes.
 mode: subagent
-model: openrouter/openai/gpt-6-luna
+model: openai/gpt-6-luna
 color: "#3FB950"
 permissions:
   - action: edit
