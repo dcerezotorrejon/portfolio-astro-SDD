@@ -281,17 +281,17 @@ exception does not apply. Integration applies (page rendering, routing, client
 behavior, integration suite/tooling). All results below are the latest and
 supplied to QA for final evidence recording while the increment is active.
 
-| Gate | Command | Result |
-| --- | --- | --- |
-| Lint | `pnpm lint` | PASS |
-| Format | `pnpm format:check` | PASS — all matched files use Prettier code style |
-| Build | `pnpm build` | PASS — 3 pages built, `dist/sitemap-index.xml` generated |
-| Unit tests | `pnpm test:run` | PASS — 24 files, 149 tests |
-| Accessibility | `pnpm test:a11y` | PASS — 4 files, 5 tests |
-| Integration | `pnpm test:integration` | PASS — 5 Chromium tests, 2 workers, managed preview cleanup confirmed |
-| SEO | `pnpm exec vitest run tests/seo` | PASS — 2 files, 5 tests |
-| Sitemap | `pnpm build` output | PASS — `dist/sitemap-index.xml` contains `/` and both content-derived experience routes |
-| Ignored outputs | `git check-ignore` | PASS — `playwright-report/` and `test-results/` ignored |
+| Gate            | Command                          | Result                                                                                  |
+| --------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+| Lint            | `pnpm lint`                      | PASS                                                                                    |
+| Format          | `pnpm format:check`              | PASS — all matched files use Prettier code style                                        |
+| Build           | `pnpm build`                     | PASS — 3 pages built, `dist/sitemap-index.xml` generated                                |
+| Unit tests      | `pnpm test:run`                  | PASS — 24 files, 149 tests                                                              |
+| Accessibility   | `pnpm test:a11y`                 | PASS — 4 files, 5 tests                                                                 |
+| Integration     | `pnpm test:integration`          | PASS — 5 Chromium tests, 2 workers, managed preview cleanup confirmed                   |
+| SEO             | `pnpm exec vitest run tests/seo` | PASS — 2 files, 5 tests                                                                 |
+| Sitemap         | `pnpm build` output              | PASS — `dist/sitemap-index.xml` contains `/` and both content-derived experience routes |
+| Ignored outputs | `git check-ignore`               | PASS — `playwright-report/` and `test-results/` ignored                                 |
 
 **Latest final-gate QA report:** Pending QA recording. Before closure, QA records
 this final passing report, finishes the remaining evidence-backed criterion
