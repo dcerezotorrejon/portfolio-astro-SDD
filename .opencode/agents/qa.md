@@ -63,15 +63,22 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    - **SEO** checks over rendered HTML (title, meta, canonical) when pages are
      involved.
    - **Accessibility** checks (axe-core) when markup is involved.
-3. Run the gates: `pnpm lint`, `pnpm format:check`, `pnpm build`,
-   `pnpm test:run`, and `pnpm test:a11y` as required by Constitution §6.
+3. Determine the applicable task gates using the complete changed-file set owned
+   by the assigned task. If every changed file is a `.md` file outside
+   `src/content/**`, run only `pnpm lint` and `pnpm format:check`; record build,
+   unit, SEO, and accessibility gates as not run under the Constitution §§5–6
+   exception. If any changed file is non-Markdown or is under `src/content/**`,
+   run all five gates required by Constitution §6: `pnpm lint`,
+   `pnpm format:check`, `pnpm build`, `pnpm test:run`, and `pnpm test:a11y`.
 4. Record the latest QA report for the assigned task in this spec's `tasks.md` on
    the same branch. Replace the previous report on every re-verification,
    including a failing run; do not append run history or create a separate
    per-run evidence file. State the task/scope, shared-branch revision, applicable
    commands and their latest results, and current defects or approval. Keep only
    the latest final-gate report as well. If a gate does not apply, say so
-   explicitly rather than skipping it silently.
+   explicitly rather than skipping it silently. When recording the final-gate
+   report, use the latest results supplied by the Dev Lead, who runs final
+   feature gates under the applicable Constitution §6 rules.
 5. After verifying an acceptance criterion and recording its supporting evidence
    in the assigned task entry, change only that criterion's checkbox from `[ ]`
    to `[x]` in the assigned current `spec.md`. Do not change any other spec text

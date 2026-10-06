@@ -79,5 +79,6 @@
   relocations do not change the workflow requirements here.
 - `009-workflow-governance` — further amends shared and agent-specific workflow
   guidance, permits the Dev Lead to merge only after explicit maintainer approval,
-  and replaces QA's accumulated run history with current evidence. This summary
-  records the later change; this spec's historical `spec.md` remains unchanged.
+  replaces QA's accumulated run history with current evidence, and defines
+  Markdown-only task and final gate selection. This summary records the later
+  change; this spec's historical `spec.md` remains unchanged.

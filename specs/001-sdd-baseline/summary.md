@@ -47,9 +47,9 @@
   policy with a post-push maintainer merge request; the baseline spec remains
   unchanged.
 - `009-workflow-governance` — further amends the constitution and agent workflow,
-  including role-neutral safeguards, current-source precedence, and a Dev Lead
-  merge permitted only after explicit maintainer approval; this baseline
-  `spec.md` remains unchanged.
+  including role-neutral safeguards, current-source precedence, a Dev Lead merge
+  permitted only after explicit maintainer approval, and the Markdown-only
+  quality-gate exception; this baseline `spec.md` remains unchanged.
 
 ## Notes
 

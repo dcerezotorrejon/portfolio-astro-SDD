@@ -203,3 +203,69 @@ markup are unchanged.
   constitution. Final gates are re-run after all tasks. SEO and changes to
   rendered accessibility are not applicable because no routes or markup change;
   record that explicitly while running the applicable automated gates.
+
+## Approved Markdown-only gate-policy amendment
+
+The maintainer approved R15–R19 as a follow-up amendment to this living spec.
+Constitution §§5–6 will define a role-neutral exception for a task, and separately
+for final feature closure, only when the complete changed-file set at that scope
+consists exclusively of `.md` files outside `src/content/**`. The applicable
+commands for eligible scopes are `pnpm lint` and `pnpm format:check`; any
+non-Markdown file or any file under `src/content/**` requires all five gates.
+Agent-specific execution belongs in the QA and Dev Lead prompts, while `AGENTS.md`
+points to constitutional applicability without duplicating role procedures.
+
+The maintainer approved incrementing the constitution from `1.6.0` to `1.6.1`.
+The amendment date and the corresponding test expectation use the actual date of
+implementation. The only permitted edit to `tests/unit/agents.test.ts` is updating
+its constitutional-version and amendment-date expectations; no other assertions
+or test files change, and no new test is added. Since this follow-up includes a
+`.ts` test-file change, neither task QA nor final closure uses the Markdown-only
+exception: all five gates are required at both verification points.
+
+Implement and verify one cohesive, serialized follow-up task, **T5 — Markdown-only
+gate policy**. The Dev Lead amends the Constitution, the QA and Dev Lead prompts,
+and `AGENTS.md`; updates the current summary and affected earlier summaries for
+specs 001, 003, 007, and 008; and uses the task-scoped R14 governance Markdown
+authority only for those named files. QA updates only the two authorized
+constitutional-version/date literals in `tests/unit/agents.test.ts`, verifies
+AC13–AC16, and runs all five task gates. After QA approval, the Dev Lead runs all
+five final gates; QA records the latest Lead-run final-gate report, replacing the
+previous report. Earlier `spec.md` files remain untouched. Spec 004 is not newly
+affected by this follow-up; its existing relationship from the earlier 009 work
+remains recorded.
+
+### Follow-up file scope
+
+- T5 Dev Lead: `docs/constitution.md`, `AGENTS.md`,
+  `.opencode/agents/qa.md`, `.opencode/agents/dev-lead.md`,
+  `specs/009-workflow-governance/summary.md`, and
+  `specs/{001-sdd-baseline,003-agent-workflow,007-workflow-changes,008-lib-reorganization}/summary.md`.
+- T5 QA: only the constitutional-version and amendment-date expectations in
+  `tests/unit/agents.test.ts`, T5 evidence in
+  `specs/009-workflow-governance/tasks.md`, and the evidence-backed AC13–AC16
+  checkboxes in `specs/009-workflow-governance/spec.md`. QA records final-gate
+  results supplied by the Dev Lead and does not own final feature gate execution.
+
+T5 uses the existing shared `spec/009-workflow-governance` branch. All files
+needed for the relationship resolution and evidence are assigned to T5, so QA
+verifies the complete change as one scope and there is no dependent follow-up task.
+No application source, content, routes, rendered markup, earlier `spec.md`, or
+unrelated test is changed.
+
+### Follow-up risks and verification
+
+- The Markdown-only eligibility check must use the complete file set at the
+  relevant task scope or the complete feature increment against its base
+  revision; it must not classify a mixed change by looking only at its Markdown
+  files.
+- The test update is deliberately limited to version/date literals. Preserve all
+  other existing assertions and keep the QA prompt text fragments they inspect.
+- T5 QA runs and reports `pnpm lint`, `pnpm format:check`, `pnpm build`,
+  `pnpm test:run`, and `pnpm test:a11y`. After QA approval, the Dev Lead reruns
+  and reports all five final gates. SEO and rendered
+  accessibility are not applicable because this change affects no route or
+  markup; the automated accessibility command still runs and must pass.
+- Dev Lead formats each assigned governance/summary file with Prettier before QA
+  handoff. QA runs the repository `pnpm format:check` gate; Markdown review adds
+  no editorial/style review.

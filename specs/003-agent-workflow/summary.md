@@ -72,9 +72,10 @@
   the maintainer. It also authorizes QA to mark only verified acceptance
   checkboxes in its assigned current spec.
 - `009-workflow-governance` — further amends role-specific agent procedures,
-  constitution precedence, merge authorization, QA's latest-only evidence, and
-  task-scoped Dev Lead governance/configuration authority; this summary records
-  the relationship without changing this spec's historical requirements.
+  constitution precedence, merge authorization, QA's latest-only evidence and
+  Markdown-only task-gate selection, Dev Lead final-gate selection, and task-scoped
+  governance/configuration authority; this summary records the relationship
+  without changing this spec's historical requirements.
 
 ## Notes
 

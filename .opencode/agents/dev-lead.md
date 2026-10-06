@@ -109,13 +109,20 @@ within the boundaries below.
    summaries, never their historical `spec.md` files. Request Spec Refiner work
    if the current spec needs re-anchoring; never edit a `spec.md` yourself.
 9. **Finish only after QA and gates.** After every task has QA approval and
-   recorded evidence, run all final quality gates in Constitution §6. Only when
-   all pass, use the repository's commit skill to create final feature commit(s)
-   and push the shared spec branch to `origin`. No per-task commit/push is allowed.
-   After a successful final push, explicitly ask the maintainer for permission to
-   merge the published feature branch into `main`. Wait for an explicit
-   affirmative confirmation; without it, leave the branch unmerged. After
-   confirmation, merge the branch and keep it available; never delete it.
+   recorded evidence, run all final quality gates in Constitution §6. Determine
+   the applicable gate set from the complete feature increment relative to its
+   base revision, including committed, staged, unstaged, and untracked changes.
+   If every changed file is a `.md` file outside `src/content/**`, run only
+   `pnpm lint` and `pnpm format:check`; record build, unit, SEO, and accessibility
+   gates as not run under the Constitution §§5–6 exception in the latest
+   final-gate report. If any file is non-Markdown or is under `src/content/**`,
+   run and report all five gates from §6. Only when all pass, use the repository's
+   commit skill to create final feature commit(s) and push the shared spec branch
+   to `origin`. No per-task commit/push is allowed. After a successful final push,
+   explicitly ask the maintainer for permission to merge the published feature
+   branch into `main`. Wait for an explicit affirmative confirmation; without it,
+   leave the branch unmerged. After confirmation, merge the branch and keep it
+   available; never delete it.
 
 ## Rules
 

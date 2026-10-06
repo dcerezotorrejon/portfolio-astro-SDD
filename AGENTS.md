@@ -91,8 +91,9 @@ maintained in the corresponding agent prompts and are not duplicated here.
 
 ## Verification gates
 
-No task is complete without evidence, and every task is verified against unit
-tests, SEO, and accessibility. Before closing a spec, all gates must pass:
+No task is complete without evidence. Tasks and final spec closure must pass the
+quality gates applicable under [Constitution §§5–6](./docs/constitution.md#5-task-lifecycle-and-verification-gates),
+including its Markdown-only exception:
 
 | Gate          | Command             |
 | ------------- | ------------------- |
@@ -102,7 +103,8 @@ tests, SEO, and accessibility. Before closing a spec, all gates must pass:
 | Unit tests    | `pnpm test:run`     |
 | Accessibility | `pnpm test:a11y`    |
 
-See [Constitution §5–§8](./docs/constitution.md) for verification and quality rules.
+See [Constitution §§5–8](./docs/constitution.md) for verification and quality
+rules and the conditions under which gates apply.
 
 ## Language policy
 

@@ -5,22 +5,24 @@
 
 ## Files changed
 
-- `docs/constitution.md` — amended §5.1 to state shared role-neutral workflow
-  safeguards, establish current-source precedence, and increment the constitution
-  to `1.6.0`.
-- `AGENTS.md` — removed duplicated role-specific workflow procedures and points
-  readers to the applicable agent prompts.
+- `docs/constitution.md` — amended §§5–6 with the role-neutral Markdown-only
+  verification-gate exception; retained shared workflow safeguards and
+  current-source precedence; incremented the constitution from `1.6.0` to `1.6.1`.
+- `AGENTS.md` — points to constitution-defined gate applicability, including the
+  Markdown-only exception, without duplicating agent-specific procedures.
 - `.opencode/agents/spec-refiner.md` — requires ambiguity, acceptance/verification,
   and implementation-feasibility checks against current authority.
 - `.opencode/agents/dev-lead.md` — adds task-scoped governance/configuration edit
-  authority and explicit-approval-gated merge permission; preserves the no-delete
-  boundary.
+  authority and explicit-approval-gated merge permission; selects final gates
+  based on the complete feature change set and preserves the no-delete boundary.
 - `.opencode/agents/dev.md` — requires Prettier on every task-modified file and a
   command/file/result handoff report.
-- `.opencode/agents/qa.md` — requires latest-only evidence and formatting-only
-  Markdown review; the temporary 004 evidence permission was revoked after T2.
+- `.opencode/agents/qa.md` — requires latest-only evidence, formatting-only
+  Markdown review, and the Markdown-only task-gate exception; the temporary 004
+  evidence permission was revoked after T2.
 - `tests/unit/agents.test.ts` — verifies current agent permissions, prompts,
-  shared guidance, and workflow boundaries.
+  shared guidance, and workflow boundaries; its constitutional version/date
+  expectations were updated to `1.6.1` and the actual amendment date.
 - `specs/004-portfolio-home/tasks.md` — consolidates latest QA evidence; removed
   20 standalone `evidence*.md` files.
 - `specs/{001-sdd-baseline,003-agent-workflow,004-portfolio-home,007-workflow-changes,008-lib-reorganization}/summary.md`
@@ -36,12 +38,14 @@
 ## Related specs
 
 - `001-sdd-baseline` — affected: its constitution is further amended; its
-  historical `spec.md` remains unchanged.
+  quality-gate policy now includes the Markdown-only exception; its historical
+  `spec.md` remains unchanged.
 - `003-agent-workflow` — modified: agent procedures and shared workflow safeguards
-  are further clarified and updated.
+  are further clarified and updated, including task and final gate selection.
 - `004-portfolio-home` — modified: its latest QA evidence is consolidated in
   `tasks.md`; product requirements and task statuses remain unchanged.
 - `007-workflow-changes` — modified: the merge, evidence-retention, and agent
-  permission rules are further refined.
+  permission rules are further refined, including the Markdown-only gate exception.
 - `008-lib-reorganization` — modified: the current agent workflow further
-  supersedes the earlier merge restriction and updates Dev Lead authority.
+  supersedes the earlier merge restriction, updates Dev Lead authority, and
+  adopts the Markdown-only gate-selection policy.

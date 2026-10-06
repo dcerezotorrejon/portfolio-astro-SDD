@@ -213,6 +213,96 @@ tests/unit/agents.test.ts` PASS (1 file / 17 tests).
     accessibility are N/A because T4 changes no routes or markup; the required
     automated accessibility gate was run and passed. Current T4 status: APPROVED.
 
+- [x] T5: Implement the Markdown-only QA gate exception, align the constitutional
+      and agent guidance, update the approved constitutional version/date test
+      expectations, resolve affected summary relationships, and verify the full
+      increment.
+  - **Dependencies**: T1–T4 are complete and QA-approved. This follow-up scope is
+    maintainer-approved; the existing published `spec/009-workflow-governance`
+    branch is the shared branch. The constitution amendment version `1.6.1` is
+    approved; use the actual amendment date when editing the Constitution and its
+    corresponding test expectation.
+  - **File ownership**:
+    - Dev Lead: `docs/constitution.md`, `AGENTS.md`,
+      `.opencode/agents/qa.md`, `.opencode/agents/dev-lead.md`,
+      `specs/009-workflow-governance/plan.md`, the T5 definition in
+      `specs/009-workflow-governance/tasks.md`,
+      `specs/009-workflow-governance/summary.md`, and
+      `specs/{001-sdd-baseline,003-agent-workflow,007-workflow-changes,008-lib-reorganization}/summary.md`.
+      Update only the affected summaries' relationship records and dates; do not
+      rewrite any earlier `spec.md`. `specs/004-portfolio-home` is not newly
+      affected by this follow-up and is not in scope.
+    - QA: only the constitutional-version and amendment-date expectations in
+      `tests/unit/agents.test.ts`; the T5 evidence entry in
+      `specs/009-workflow-governance/tasks.md`; and the evidence-backed AC13–AC16
+      checkboxes in `specs/009-workflow-governance/spec.md`. Do not change any
+      other test assertion or add tests.
+  - **Model**: Dev Lead uses its configured
+    `openrouter/openai/gpt-6-luna#high` model for the governance and relationship
+    updates. QA uses its configured `openrouter/openai/gpt-6-luna#medium` model
+    for the two test-literal updates and verification.
+  - **QA gates**: This change set includes `tests/unit/agents.test.ts`, so it is
+    ineligible for the Markdown-only exception. QA must run `pnpm lint`,
+    `pnpm format:check`, `pnpm build`, `pnpm test:run`, and `pnpm test:a11y` and
+    record each result. SEO and rendered accessibility are N/A because no page,
+    route, or markup changes; the automated accessibility gate still runs.
+  - **Final gates**: After T5 QA approval, the Dev Lead reruns all five commands
+    on the complete feature increment. QA records the Lead's latest final-gate
+    results here, replacing the prior final-gate report. The `.ts` change means
+    the feature increment is not eligible for the Markdown-only exception.
+  - **Evidence (latest only)**: QA re-verification and approval on the shared
+    branch `spec/009-workflow-governance`, revision
+    `a24033484fdde177763a04c93b323442cb90aa97` plus uncommitted task changes.
+    Scope: T5's Constitution, `AGENTS.md`, QA and Dev Lead prompts, current plan
+    and summary, relationship records in summaries 001/003/007/008, QA-owned test
+    expectation in `tests/unit/agents.test.ts`, this T5 evidence entry, and AC13–
+    AC16. Constitution version `1.6.1` and amendment date `2026-10-06` match the
+    approved increment and actual date under §11. The exact test diff changes only
+    the version expectation from `1.6.0` to `1.6.1`; the existing date expectation
+    `2026-10-06` is correct and unchanged. No other test assertion or test file
+    changed. The full unit suite passes, including every existing prompt-fragment
+    assertion.
+
+    Eligibility review passes: an assigned-task set consisting only of `.md`
+    files outside `src/content/**` requires only lint and format, with build, unit,
+    SEO, and accessibility recorded as not run under the exception. Any non-
+    Markdown file or any `src/content/**` file requires all five gates. The final
+    closure rule uses the complete feature increment against its base revision,
+    including committed, staged, unstaged, and untracked changes. T5 includes
+    `tests/unit/agents.test.ts`, so its complete changed-file set is ineligible
+    and all five task gates were run. SEO and rendered accessibility are N/A
+    because no page, route, or markup changed; the automated accessibility gate
+    still ran.
+
+    Constitution §§5–6 state the role-neutral task and final-closure exceptions.
+    `.opencode/agents/qa.md` applies task-level classification, retains content
+    verification and Markdown-formatting-only review, and records Lead-supplied
+    final-gate results rather than owning their execution. The corrected
+    `.opencode/agents/dev-lead.md` classifies the complete feature increment and
+    retains the exact tested phrase “Only when all pass, use the repository's
+    commit skill.” `AGENTS.md` points to constitutional applicability without
+    unconditional gate claims or duplicated role procedures. The updated current
+    summary and affected summaries 001/003/007/008 accurately record the gate-policy
+    relationship; no earlier `spec.md` changed. Dev Lead Prettier handoff for the
+    corrected prompt (`pnpm exec prettier --write .opencode/agents/dev-lead.md`)
+    passed with the file unchanged; handoff `git diff --check` passed.
+
+    Latest task gates: `pnpm lint` PASS; `pnpm format:check` PASS;
+    `pnpm build` PASS (3 pages + sitemap); `pnpm test:run` PASS (21 files / 137
+    tests); `pnpm test:a11y` PASS (4 files / 5 tests). T5 is **APPROVED**.
+
+    Latest final feature gates, supplied by the Dev Lead: branch
+    `spec/009-workflow-governance`, revision
+    `a24033484fdde177763a04c93b323442cb90aa97` plus the complete uncommitted T5
+    increment. The complete feature change set includes
+    `tests/unit/agents.test.ts`, so all five gates apply. `pnpm lint` PASS
+    (`eslint .`); `pnpm format:check` PASS (all matched files); `pnpm build` PASS
+    (3 pages and sitemap); `pnpm test:run` PASS (21 files / 137 tests);
+    `pnpm test:a11y` PASS (4 files / 5 tests). SEO and rendered accessibility
+    are N/A because no pages, routes, or markup changed; automated a11y ran and
+    passed. `git diff --check` PASS. Latest final-gate status: **PASS**. No
+    commit or push was made.
+
 ## Gate summary
 
 - [x] Lint (`pnpm lint`)
@@ -223,4 +313,6 @@ tests/unit/agents.test.ts` PASS (1 file / 17 tests).
 
 SEO and rendered accessibility are not applicable to this workflow/documentation
 change because it changes no page, route, or rendered markup. The repository's
-automated accessibility gate remains part of the required verification.
+automated accessibility gate remains part of the required verification. The
+checked gate summary reflects the latest Dev Lead final-gate report recorded in
+the T5 evidence above.

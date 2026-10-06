@@ -108,4 +108,5 @@
 - `009-workflow-governance` — further amends the constitutional and agent workflow:
   the Dev Lead may merge after explicit affirmative maintainer approval, while QA
   retains current-only evidence and the Dev Lead receives task-scoped governance
-  and configuration edit authority. The historical `spec.md` remains unchanged.
+  and configuration edit authority. It also establishes the Markdown-only QA and
+  final feature gate exception. The historical `spec.md` remains unchanged.

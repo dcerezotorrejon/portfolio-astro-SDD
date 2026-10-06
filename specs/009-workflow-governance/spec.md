@@ -6,14 +6,15 @@
 
 ## Context
 
-Constitution §5.1 currently combines project-wide workflow safeguards with
-responsibilities assigned to specific agents. The agent prompts also prohibit the
-Dev Lead from merging a feature branch, although the maintainer now wants the Lead
-to perform that merge after receiving explicit approval. QA evidence has also been
-kept in multiple standalone files and iterations rather than as one current report
-in each task entry. The workflow guidance, agent prompts, consistency tests, and
-the existing `004-portfolio-home` task evidence need to reflect the maintainer's
-decisions without changing application behavior.
+Constitution §§5–6 currently require the normal verification gates before a task
+or spec can close, and the QA prompt directs QA to run the applicable gates. Its
+Markdown-specific review boundary limits editorial review to formatting but does
+not exempt Markdown-only tasks from those gates. The maintainer has now approved a
+narrow exception: when the complete changed-file set consists only of `.md` files
+outside `src/content/**`, QA runs only lint and format for task verification, and
+the Dev Lead uses the same exception for final feature closure. The constitutional
+gate requirements, shared guide, and applicable agent procedures must be aligned
+with this exception; no application behavior changes.
 
 This is an amendment to the [project constitution](../../docs/constitution.md).
 Its applicable rules remain subordinate to that constitution; the amendment must
@@ -43,6 +44,10 @@ follow its governance and versioning requirements.
   the amended constitution and agent prompts.
 - Require Dev to format every file changed in the assigned task with Prettier
   before handoff, and limit QA's Markdown-specific file check to formatting.
+- Allow QA to use only lint and format gates for eligible Markdown-only task
+  verification, and the Dev Lead to use the same exception for final feature
+  closure, when the relevant changed-file set consists exclusively of Markdown
+  files outside `src/content/**`.
 
 ## Non-goals
 
@@ -53,12 +58,15 @@ follow its governance and versioning requirements.
 - Allowing the Dev Lead to merge without a per-merge explicit maintainer approval,
   or to delete the feature branch.
 - Changing the shared feature-branch, QA approval, commit/push, or quality-gate
-  requirements except where this spec explicitly updates the merge authorization
-  and QA evidence-retention behavior.
+  requirements except where this spec explicitly updates the merge authorization,
+  QA evidence-retention behavior, and Markdown-only gate exception.
 - Rewriting any earlier `spec.md`, including `specs/004-portfolio-home/spec.md`.
 - Changing historical acceptance criteria or task completion status in
   `004-portfolio-home` as part of evidence consolidation.
 - Creating separate QA evidence documents for future verification runs.
+- Changing application behavior or Markdown content under `src/content/**`.
+- Rewriting historical `spec.md` files or changing tests beyond the narrowly
+  assigned constitutional version/date assertion described in R19.
 
 ## Requirements
 
@@ -185,6 +193,48 @@ follow its governance and versioning requirements.
   `tests/unit/agents.test.ts` to verify effective permission outcomes for
   representative governance Markdown and configuration paths and the Lead's
   task-scoped file boundary, without weakening the existing role permissions.
+- **R15 — Markdown-only gate exception:** Amend Constitution §§5 and 6, following
+  §11, to define that the only applicable gates for a task are `pnpm lint` and
+  `pnpm format:check` when every file changed by that task is a `.md` file outside
+  `src/content/**`. Apply the same exception to final feature closure only when
+  every file changed by the entire feature increment relative to its base revision
+  is a `.md` file outside `src/content/**`. If either set contains a non-Markdown
+  file or a file under `src/content/**`, all five gates in Constitution §6 apply.
+  For an eligible Markdown-only task or feature closure, explicitly record build,
+  unit, and accessibility gates as not run under this exception; SEO/rendered
+  accessibility checks are not applicable to the Markdown-only change. Keep the
+  constitutional policy role-neutral; agent-specific execution procedures belong
+  in the corresponding prompts. For this amendment, increment Constitution
+  version `1.6.0` to `1.6.1` as approved by the maintainer, and set its amendment
+  date to the actual amendment date.
+- **R16 — QA task-verification rule:** Update `.opencode/agents/qa.md` as the
+  single source of truth for QA's role-specific procedure. QA determines
+  eligibility using the complete changed-file set for the assigned task. For an
+  eligible set, QA runs only `pnpm lint` and `pnpm format:check` and records the
+  omitted gates and the applicable reason in the latest task evidence. For any
+  ineligible set, QA runs and records all five Constitution §6 gates. Any final-
+  gate report QA records reflects the gate results supplied by the Dev Lead under
+  R17; QA does not take ownership of final feature gate execution.
+- **R17 — Final feature gates:** Update `.opencode/agents/dev-lead.md` so the Dev
+  Lead determines final-gate eligibility from the complete feature increment
+  against its base revision. For an eligible set, the Lead runs only
+  `pnpm lint` and `pnpm format:check` and records the omitted gates and reason in
+  the latest final-gate evidence. For any ineligible set, the Lead runs and
+  records all five Constitution §6 gates.
+- **R18 — Shared-guide consistency:** Update `AGENTS.md` so its shared quality-
+  gate summary accurately points to the Constitution for gate applicability,
+  including the Markdown-only exception, without duplicating QA's role-specific
+  procedure. It must not state that every task unconditionally requires unit,
+  SEO, and accessibility checks or that every spec unconditionally requires all
+  five gates.
+- **R19 — Existing assertion and implementation-scope verification:** Update
+  only the version and amendment-date expectations in
+  `tests/unit/agents.test.ts` to expect constitutional version `1.6.1` and the
+  actual amendment date. Do not otherwise change existing tests or add tests. Because this
+  increment changes a `.ts` test file, it is not eligible for the Markdown-only
+  exception; QA and final feature closure must run all five gates. Preserve the
+  existing QA prompt fragments asserted by the unit tests for content
+  verification, Markdown formatting-only review, and applicable tests/gates.
 
 ## Acceptance criteria
 
@@ -252,6 +302,26 @@ follow its governance and versioning requirements.
       treat any broader path-family permission as authority to edit unassigned files.
       Application implementation, tests, content, and feature `spec.md` files remain
       outside this capability; existing plan/task/summary ownership remains unchanged.
+- [x] **AC13 (R15):** Constitution §§5 and 6 define the task-level and final-
+      closure exception with the exact `.md`/`src/content/**` eligibility rule.
+      Eligible Markdown-only sets require only `pnpm lint` and
+      `pnpm format:check`, with omitted gates recorded; any non-Markdown file or
+      content Markdown requires all five gates. The constitution version is
+      `1.6.1` and the amendment date complies with §11.
+- [x] **AC14 (R16–R17):** QA applies the task-level eligibility rule, while the
+      Dev Lead applies the final feature change-set rule. Each records only the
+      appropriate commands and omitted-gate reasons, and runs all five gates for
+      ineligible sets. QA's existing content-review, Markdown-formatting, and
+      applicable-gate instructions remain intact; QA does not own final-gate
+      execution.
+- [x] **AC15 (R18):** `AGENTS.md` points to constitutional gate applicability
+      without duplicating role-specific procedures or making unconditional
+      task- or spec-level gate claims.
+- [x] **AC16 (R19):** Only the existing test expectations for constitutional
+      version (`1.6.1`) and amendment date are updated; no other existing test is
+      changed and no new test is added. The increment is treated as ineligible
+      for the Markdown-only exception because its changed-file set includes a
+      `.ts` file. QA evidence records results for all five required gates.
 
 ## Verification
 
@@ -324,6 +394,33 @@ follow its governance and versioning requirements.
   `src/components/FloatingNav.tsx` does not.
   Run the expanded Dev Lead permission/unit tests and preserve its existing
   plan/task/summary and current-spec write boundaries.
+- **AC13 — Constitutional gate exception:** Review Constitution §§5 and 6 and
+  confirm the exception is limited to sets containing only `.md` files outside
+  `src/content/**`, separately classifies assigned-task changes and the full
+  feature increment against its base revision, and requires only
+  `pnpm lint`/`pnpm format:check` for eligible sets. Check that omitted gates are
+  explicitly reported and that any non-Markdown or content Markdown file restores
+  all five gates. Verify the version is incremented from `1.6.0` to `1.6.1` and
+  the amendment date reflects the actual amendment date under §11.
+- **AC14 — QA and final-gate procedures:** Inspect `.opencode/agents/qa.md` and
+  `.opencode/agents/dev-lead.md`. Walk through an eligible Markdown-only task, an
+  eligible final feature change set, an ineligible set containing a non-Markdown
+  file, and a set containing `src/content/**`. Confirm QA selects task gates and
+  the Lead selects final gates, with applicable commands and omitted-gate reasons
+  recorded by the responsible role. Confirm QA retains its existing content and
+  file-format review responsibilities but does not take ownership of final gates.
+- **AC15 — Shared-guide consistency:** Inspect `AGENTS.md` and confirm it points
+  to constitutional gate applicability without duplicating role-specific
+  procedures or claiming unit/SEO/accessibility checks for every task or all five
+  gates for every spec unconditionally.
+- **AC16 — Existing tests and applicable gates:** Compare
+  `tests/unit/agents.test.ts` with the base revision and confirm the only changes
+  are its constitution-version expectation (`1.6.1`) and amendment-date
+  expectation. Confirm no new test was added.
+  Because this increment includes a `.ts` file, run and report `pnpm lint`,
+  `pnpm format:check`, `pnpm build`, `pnpm test:run`, and `pnpm test:a11y` for
+  task verification and final closure; the Markdown-only exception does not
+  apply to this increment.
 
 ## Anticipated spec relationships
 
@@ -333,20 +430,23 @@ affected earlier summaries in the same change. Earlier `spec.md` files must
 remain unchanged.
 
 - [001-sdd-baseline](../001-sdd-baseline/spec.md): **affected** because this
-  increment further amends the constitution established by the baseline. Update
-  only its `summary.md` relationship record.
+  increment further amends the constitution established by the baseline,
+  including the scope of required quality gates. Update only its `summary.md`
+  relationship record.
 - [003-agent-workflow](../003-agent-workflow/spec.md): **modified** because this
-  increment changes the operational responsibilities and reporting rules of the
-  established workflow agents. Update only its `summary.md` relationship record.
+  increment changes the QA and Dev Lead gate-selection procedures and their
+  constitutional basis. Update only its `summary.md` relationship record.
 - [004-portfolio-home](../004-portfolio-home/spec.md): **modified** because its
   existing task evidence is consolidated under the latest-only reporting rule.
   Update `tasks.md` and `summary.md`; do not rewrite its historical `spec.md`.
 - [007-workflow-changes](../007-workflow-changes/spec.md): **modified** because
   its agent workflow's maintainer-only merge handoff is superseded by a Dev Lead
   merge permitted after explicit maintainer approval, and its QA evidence policy
-  is refined. Update only its `summary.md` relationship record.
+  and task/final gate-selection policies are refined. Update only its `summary.md`
+  relationship record.
 - [008-lib-reorganization](../008-lib-reorganization/spec.md): **modified** because
   its handoff currently prohibits the Dev Lead from merging and makes base-branch
   integration maintainer-managed; this increment supersedes that restriction
-  while preserving explicit maintainer confirmation and the no-delete rule.
-  Update only its `summary.md` relationship record.
+  while preserving explicit maintainer confirmation and the no-delete rule. This
+  increment also further changes the shared QA gate policy. Update only its
+  `summary.md` relationship record.

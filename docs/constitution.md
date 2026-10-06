@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.6.0
+- **Version**: 1.6.1
 - **Last amended**: 2026-10-06
 
 ---
@@ -126,6 +126,12 @@ others, and specs must keep those links visible.
   note) is recorded next to the task.
 - If a gate does not apply to a task, that must be stated explicitly rather than
   skipped silently.
+- When a task's complete changed-file set consists exclusively of `.md` files
+  outside `src/content/**`, the only applicable verification gates are lint and
+  format. Build, unit-test, SEO, and accessibility gates are not run under this
+  exception and MUST be recorded as not applicable. If the task includes any
+  non-Markdown file or any file under `src/content/**`, the ordinary applicable
+  gates remain in force.
 
 ### 5.1 Shared feature-branch workflow
 
@@ -163,7 +169,8 @@ others, and specs must keep those links visible.
 
 ## 6. Quality gates
 
-Before a spec or a task is considered done, all of the following MUST pass:
+Before a spec or a task is considered done, all applicable quality gates MUST
+pass:
 
 | Gate          | Command                                        |
 | ------------- | ---------------------------------------------- |
@@ -172,6 +179,16 @@ Before a spec or a task is considered done, all of the following MUST pass:
 | Build         | `pnpm build`                                   |
 | Unit tests    | `pnpm test:run`                                |
 | Accessibility | `pnpm test:a11y` (and/or the `a11y` MCP audit) |
+
+The only applicable gates for a task are lint and format when the task's complete
+changed-file set consists exclusively of `.md` files outside `src/content/**`;
+in that case build, unit tests, SEO, and accessibility are not run under this
+exception and MUST be recorded as not applicable. The same exception applies to
+final spec closure only when the complete changed-file set for the feature
+increment, relative to its base revision, consists exclusively of `.md` files
+outside `src/content/**`. For all other task or feature change sets, the applicable
+gates in the table remain required. If any changed file is non-Markdown or is
+under `src/content/**`, the Markdown-only exception does not apply.
 
 ## 7. Accessibility
 

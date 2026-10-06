@@ -411,7 +411,7 @@ describe("shared and role-specific workflow guidance", () => {
   const normalizedWorkflow = workflow.replace(/\s+/g, " ");
 
   it("amends the constitution with an incremented version and actual amendment date", () => {
-    expect(constitution).toContain("**Version**: 1.6.0");
+    expect(constitution).toContain("**Version**: 1.6.1");
     expect(constitution).toContain("**Last amended**: 2026-10-06");
     expect(constitution).toContain("### 4.2 Spec relationships");
   });
