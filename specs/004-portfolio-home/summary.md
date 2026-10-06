@@ -158,9 +158,11 @@ command results; superseded standalone reports are not retained.
 - `010-svg-icon` — modified: replaces only the introduction's inline GitHub and
   LinkedIn button icons with public SVG `<use>` symbols and the reusable `Icon`
   atom. The icons now default to 1rem and use white in the blue social buttons;
-  the general primary accent is unified with the existing `#0C7ABF` button color.
-  Social destinations, labels, accessible names, routes, content, and SEO remain
-  unchanged. The historical 004 `spec.md` is unchanged.
+  `gap-x-2` separates each icon from its label. The general primary accent is
+  unified with the existing `#0C7ABF` button color. Homepage experience-card
+  company icons now use native lazy loading; social destinations, labels,
+  accessible names, routes, content, company icon data, and SEO remain unchanged.
+  The historical 004 `spec.md` is unchanged.
 
 ## Notes and remaining limits
 

@@ -12,7 +12,9 @@ consumer and makes the artwork harder to share. This feature adds a reusable
 static Astro atom that renders an SVG `<use>` referencing a public SVG symbol,
 then migrates only those two button icons. The atom must remain styleable like a
 direct `<svg>` element and support additional named icons through a TypeScript
-map.
+map. A later maintainer-authored code refinement also adds horizontal spacing
+between each social icon and its label, and native lazy loading to homepage
+experience-card company icons; these current behaviors are included below.
 
 The binding project constraints are in [the constitution](../../docs/constitution.md),
 particularly §§2, 2.1, 5–10. UI styling follows [the global design](../../docs/design.md).
@@ -27,12 +29,15 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
   destinations, labels, button behavior, and accessibility remain unchanged; the
   icons intentionally render at the new 1rem default size (16px instead of the
   current explicit 20px). The global primary accent is updated to the unified
-  `#0C7ABF` value; homepage button text and icon contrast remains unchanged.
+  `#0C7ABF` value; homepage button text and icon contrast remains unchanged. The
+  social buttons use `gap-x-2` between the icon and label. The same code change
+  adds `loading="lazy"` to company icons rendered by `ExperienceHistory.astro`.
 - [006-common-molecules](../006-common-molecules/spec.md): **modified**. This
   increment adds an `atoms` component directory beside the existing molecules.
   The global design documentation and color-token expectations also change. Its
-  historical `spec.md` remains unchanged; its `summary.md` relationship record is
-  updated under Constitution §4.2.
+  `ExperienceHistory.astro` consumer adds native lazy loading to homepage company
+  icons. Its historical `spec.md` remains unchanged; its `summary.md` relationship
+  record is updated under Constitution §4.2.
 - [002-front-extra-dependencies](../002-front-extra-dependencies/spec.md):
   **depends on**. The component uses the existing Astro build-time rendering
   stack and introduces no framework, dependency, or client-side JavaScript.
@@ -52,6 +57,10 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
   classes, with a default 1rem square size.
 - Replace the inline GitHub and LinkedIn SVG markup in the homepage introduction
   social buttons without changing their link behavior or accessible names.
+- Separate each social icon from its visible label with Tailwind's `gap-x-2`
+  utility.
+- Add native lazy loading to company-icon images rendered in homepage experience
+  cards.
 - Unify the general primary accent with the existing primary-button blue,
   `#0C7ABF`, and document the updated global color in `docs/design.md`.
 
@@ -59,12 +68,16 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
 
 - Replacing SVG or image assets outside the GitHub and LinkedIn social buttons in
   the homepage introduction.
-- Changing social button labels, destinations, order, layout, or behavior.
+- Changing social button labels, destinations, order, link behavior, button
+  geometry, or layout beyond the specified icon-to-label gap.
 - Introducing icon libraries, React, client-side JavaScript, or new dependencies.
 - Reorganizing existing molecule components or changing shared visual design
   beyond the explicitly agreed 1rem icon default and primary-accent unification.
 - Adding icons beyond GitHub and LinkedIn in this increment; the map/atom contract
   must allow future entries without changing the atom implementation.
+- Applying lazy loading to the profile placeholder, detail-page company images,
+  or other images; this requirement is limited to homepage company icons rendered
+  by `ExperienceHistory.astro`.
 
 ## Requirements
 
@@ -122,6 +135,16 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
   of the token contract, button-label contrast, or focus behavior. Existing white
   primary-button labels and icons remain white; no other button behavior or visual
   token changes as part of the unification.
+- **R7 — Social icon-label spacing:** Each of the two homepage social buttons
+  passes Tailwind's `gap-x-2` class to its `Button` root. The utility creates a
+  horizontal gap of `0.5rem` (8px at the current root font size) between the icon
+  and visible label. It does not change button padding, minimum target, label,
+  destination, order, or interaction behavior.
+- **R8 — Lazy homepage company icons:** Every company-icon `<img>` rendered by
+  `src/components/ExperienceHistory.astro` for homepage experience cards has
+  the native `loading="lazy"` attribute. The company icon source, alternative
+  text, dimensions, and placement remain unchanged. This requirement does not
+  apply to the profile placeholder or company images on employment detail pages.
 
 ## Acceptance criteria
 
@@ -159,6 +182,15 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
       design document describes the unified color. Re-anchored token and style
       assertions pass, primary-button labels/icons remain white with at least
       4.5:1 contrast in applicable states, and focus indicators remain visible.
+- [x] **AC7 (R7):** Both homepage social-button roots include `gap-x-2`; browser
+      computed style resolves their horizontal column gap to `8px` at the current
+      root font size. Each icon remains separated from its visible label, and the
+      buttons retain their prior padding, minimum target, labels, destinations,
+      order, accessible names, and keyboard behavior.
+- [x] **AC8 (R8):** Every company icon rendered inside a homepage experience card
+      has `loading="lazy"`. The profile placeholder has no newly added lazy
+      attribute, and employment detail-page company icon markup is unchanged.
+      Company icon source, alternative text, and dimensions remain intact.
 
 ## Verification
 
@@ -189,6 +221,15 @@ Per Constitution §4.2, the Dev Lead must resolve actual impacts in the final
   the former distinct `#1D9BF0` accent is absent from active design guidance.
   Re-run token/style tests updated for this contract and use computed-style and
   contrast checks for button normal, hover, pressed, and focus states.
+- **AC7:** Render the homepage buttons and assert the `gap-x-2` class is on each
+  social button root. Inspect browser-computed `column-gap` for both icon/label
+  pairs at a 16px root font size and confirm the existing button geometry,
+  keyboard states and link behavior are otherwise unchanged.
+- **AC8:** Render the homepage with the existing experience content and assert
+  every company-icon image rendered by `ExperienceHistory.astro` has
+  `loading="lazy"`, while the profile placeholder and employment detail-page
+  company image do not gain the attribute. Verify the existing company image
+  source, alternative text and dimensions remain unchanged.
 - **AC5:** Run `pnpm lint`, `pnpm format:check`, `pnpm build`, `pnpm test:run`,
   and `pnpm test:a11y` as required for this non-Markdown-only change by
   [Constitution §6](../../docs/constitution.md#6-quality-gates). QA records the

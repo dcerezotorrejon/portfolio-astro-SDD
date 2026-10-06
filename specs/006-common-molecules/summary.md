@@ -114,8 +114,10 @@
   no molecule or portfolio requirement changes.
 - `010-svg-icon` — **modified**: adds a static, reusable `Icon` atom beside the
   existing molecules, with a TypeScript name-to-public-symbol map and no client
-  JavaScript or dependency. It also unifies the primary accent/button color and
-  updates the shared design guidance. The historical 006 `spec.md` is unchanged.
+  JavaScript or dependency. It also unifies the primary accent/button color,
+  updates the shared design guidance, and adds native lazy loading to homepage
+  experience-card company icons via `ExperienceHistory.astro`. The historical
+  006 `spec.md` is unchanged.
 
 ## Notes and remaining limits
 

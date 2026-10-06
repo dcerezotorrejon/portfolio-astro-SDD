@@ -18,12 +18,20 @@
   summary relationships.
 - **Wave 3 QA:** T6 (QA) — depends on T5; verifies the relationship records and
   summary-only task evidence.
+- **Wave 4 QA:** T7 (QA) — verifies the maintainer's unreviewed R7/R8 code
+  refinements and adds only assigned tests/evidence.
+- **Wave 5:** T8 (Dev Lead) — depends on T7; refreshes the current and affected
+  summary relationships for the verified refinements.
+- **Wave 5 QA:** T9 (QA) — depends on T8; verifies summaries and the Markdown-only
+  task evidence. The Dev Lead then reruns final gates; QA records that latest
+  final report in T9's assigned evidence scope.
 
 Each implementation/governance task remains active through its named QA task,
 evidence and any rework. T1/T2 and T3/T4 are serialized; T5/T6 start only after
-the preceding wave closes. The maximum active-task count is two. QA sessions do
-not overlap test or evidence files. Execution is pending maintainer approval of
-the plan and task ownership.
+the preceding wave closes. T1–T6 are complete and QA-approved. The uncommitted
+maintainer edits to `ProfileIntroduction.astro` and `ExperienceHistory.astro` are
+pending T7 verification. The maximum active-task count is two. QA sessions do not
+overlap test or evidence files.
 
 ## Checklist
 
@@ -240,24 +248,172 @@ the plan and task ownership.
     gates is recorded in the Gate summary below. No spec checkbox or summary file
     was edited by QA.
 
+- [x] **T7 (QA): Verify the maintainer's R7/R8 refinements.** This task covers
+      only the unreviewed social-button spacing and homepage company-icon lazy
+      loading now present in the working tree.
+  - **Dependencies**: T1–T6 are QA-approved. Verify the exact source changes in
+    `src/components/ProfileIntroduction.astro` and
+    `src/components/ExperienceHistory.astro`; QA must not edit either production
+    file.
+  - **File ownership**: QA owns `tests/unit/home.test.ts`,
+    `tests/unit/experience.test.ts`, this T7 evidence entry, and the evidence-backed
+    AC7/AC8 checkboxes in `specs/010-svg-icon/spec.md` only. Keep changes to those
+    two test files limited to meaningful assertions for the new behavior and its
+    stated invariants.
+  - **Scope**: Assert both social button roots carry `gap-x-2` and that the
+    browser-computed icon-to-label horizontal gap is 8px. Assert every company
+    icon rendered in homepage experience cards has `loading="lazy"`, while the
+    profile placeholder and detail-page company icon are unchanged. Preserve
+    existing button names, destinations, order, decorative semantics, company
+    icon source/alt/dimensions and detail content.
+  - **Model**: QA uses configured `openrouter/openai/gpt-6-luna#medium` (default).
+  - **Gates**: These assigned changes include application `.astro` files and test
+    files. Run all five: `pnpm lint`, `pnpm format:check`, `pnpm build`,
+    `pnpm test:run`, and `pnpm test:a11y`. SEO metadata/routes are unchanged; say
+    so explicitly while existing SEO tests run in the full unit suite.
+  - **Evidence**: QA approved the maintainer's R7/R8 refinements on shared branch
+    `spec/010-svg-icon` at revision `5bec7529a15fd8d2bfc104a3c94319967c2800bf`
+    (HEAD; no commit created). The verified source changes remain uncommitted:
+    `src/components/ProfileIntroduction.astro` adds `class="gap-x-2"` to the two
+    social `Button` roots, and `src/components/ExperienceHistory.astro` adds
+    `loading="lazy"` to its company-icon image. Existing uncommitted feature
+    files and the Dev Lead's current spec/plan/task refinements also remain in the
+    working tree. QA changed only the assigned tests
+    `tests/unit/home.test.ts` and `tests/unit/experience.test.ts`, plus this T7
+    evidence and the AC7/AC8 checkbox markers in the current spec.
+
+    `tests/unit/home.test.ts` retains assertions for the profile placeholder's
+    source, alt, 240×240 dimensions and now confirms it has no `loading`
+    attribute. Its social-link assertions preserve GitHub then LinkedIn visible
+    names, exact destinations, icon references and decorative semantics, absence
+    of `target`/redundant `aria-label`, and now assert both rendered anchor/Button
+    roots have `gap-x-2` immediately around their SVG and label children. For each
+    homepage experience card it asserts `loading="lazy"` and preserves the
+    existing company icon source `/images/companies/astro.svg`, descriptive alt,
+    and 40×40 dimensions. `tests/unit/experience.test.ts` exercises both detail
+    routes and asserts their company image retains the same source, alt and
+    dimensions and has no `loading` attribute; existing detail-content assertions
+    remain in place. The targeted run passed: 2 files, 7 tests.
+
+    Real-browser verification used Chrome DevTools against the built site at
+    `http://127.0.0.1:4321/`. The document root computed to `16px`; both social
+    links rendered as `inline-flex` with `column-gap: 8px`, and each icon-right to
+    label-left bounding-box distance measured 8px. Both retained `10px 20px`
+    padding and 44×44px minimum dimensions, GitHub/LinkedIn accessible names and
+    exact destinations, same-tab links, and their decorative icons; the browser
+    accessibility tree reported links named "GitHub" and "LinkedIn". Tabbing from the
+    focused GitHub link moved to LinkedIn and retained the visible solid 3px
+    outline with 3px offset. Both homepage company images rendered with the lazy
+    attribute and the unchanged `src`, `alt`, width and height; the profile
+    placeholder had no `loading` attribute. The detail route's rendered image
+    retained `class="company-icon"`, the same source and descriptive alt,
+    40×40 dimensions, and no loading attribute.
+
+    Latest task gates all passed: `pnpm lint`; `pnpm format:check` (all matched
+    files formatted); `pnpm build` (3 static pages and sitemap); `pnpm test:run`
+    (22 files, 144 tests passed, including existing SEO suites); and
+    `pnpm test:a11y` (4 files, 5 tests passed). SEO routes and metadata are
+    unchanged; existing SEO tests ran within the full unit suite. After recording
+    this report, `pnpm lint` and `pnpm format:check` were rerun and passed. No
+    defects found; T7 is approved. AC7 and AC8 supporting evidence is recorded
+    here and those two criteria are checked in the current spec.
+
+- [x] **T8 (Dev Lead): Refresh summaries for the verified refinements.** Record
+      actual changes after T7 approval.
+  - **Dependencies**: T7 passes QA.
+  - **File ownership**: Dev Lead owns
+    `specs/010-svg-icon/summary.md`, `specs/004-portfolio-home/summary.md`, and
+    `specs/006-common-molecules/summary.md`. Add the gap and lazy-loading effects
+    to the current summary and to the existing 010 relationship entries in 004
+    and 006; update dates where needed. Preserve unrelated summary content and
+    never edit either historical `spec.md`. Format all three files before QA.
+  - **Model**: Dev Lead uses configured `openrouter/openai/gpt-6-luna#high` for
+    accurate current/bidirectional relationship records.
+  - **Evidence**: Dev Lead refreshed the 010 summary to list both maintainer
+    refinements, the `ExperienceHistory.astro`/`ProfileIntroduction.astro`
+    behaviors, and the additional QA test file. The 004 summary now records the
+    8px social-icon gap and native lazy loading on homepage company icons; the
+    006 summary records the updated `ExperienceHistory` consumer. Their existing
+    `Last updated` dates are already `2026-10-06`; no historical `spec.md` or
+    unrelated summary content was changed. Formatter command:
+    `pnpm exec prettier --write specs/010-svg-icon/summary.md specs/004-portfolio-home/summary.md specs/006-common-molecules/summary.md` — all three files were unchanged after formatting. T8 awaits QA verification in T9.
+
+- [x] **T9 (QA): Verify summary updates and record final gates.** Verify T8's
+      Markdown-only changes, then record the Lead's final integrated gate report.
+  - **Dependencies**: T8 summary handoff. The Dev Lead runs final gates only
+    after all tasks, including T9's summary QA, are approved.
+  - **File ownership**: QA owns only this T9 evidence and the latest gate report
+    in `specs/010-svg-icon/tasks.md`; QA does not edit summaries or spec
+    checkboxes in this task.
+  - **Summary-task gates**: T8/T9's summary-only task change set is Markdown
+    outside `src/content/**`; run only `pnpm lint` and `pnpm format:check`, and
+    record build, unit/SEO and accessibility as not run under Constitution §§5–6.
+  - **Final report**: Once T9 is approved, the Dev Lead runs all five feature
+    gates because the complete increment includes `.astro`, CSS, SVG and test
+    files. QA replaces the stale Gate summary below with those exact results and
+    runs the task's applicable lint/format checks after its evidence update.
+  - **Evidence**: T9 QA verified T8 on shared branch `spec/010-svg-icon` at
+    revision `5bec7529a15fd8d2bfc104a3c94319967c2800bf` (HEAD; all task changes
+    remain uncommitted). T8 scope is exactly
+    `specs/010-svg-icon/summary.md`,
+    `specs/004-portfolio-home/summary.md`, and
+    `specs/006-common-molecules/summary.md`; the T9 report is this evidence entry
+    in `specs/010-svg-icon/tasks.md`. The wider working tree also contains
+    uncommitted T7 implementation/test changes and current feature-spec documents;
+    they are outside T8's Markdown-only change set.
+
+    The 010 summary is dated `2026-10-06` and updates its file inventory and
+    component descriptions for the two verified refinements: `ProfileIntroduction`
+    uses `gap-x-2` for the 8px social-icon/label separation, and
+    `ExperienceHistory` applies native `loading="lazy"` only to homepage
+    experience-card company icons. It includes the assigned `experience.test.ts`
+    QA coverage and describes retained company-image data/detail-page behavior.
+    Its `004-portfolio-home` relationship records both impacts and explicitly
+    preserves destinations, labels, routes, content, company icon data and SEO;
+    its `006-common-molecules` relationship records the new static atom/shared
+    design changes and lazy-loading behavior through `ExperienceHistory`.
+    `specs/004-portfolio-home/summary.md` reciprocally records the 8px gap and
+    homepage-only lazy loading, with destinations, labels, accessible names,
+    routes, content, company icon data and SEO unchanged. The
+    `specs/006-common-molecules/summary.md` relationship also records lazy loading
+    through `ExperienceHistory` without claiming changes to historical 006
+    requirements. Both prior summaries retain the accurate `2026-10-06` update
+    date; unrelated content is preserved.
+
+    `specs/004-portfolio-home/spec.md` and
+    `specs/006-common-molecules/spec.md` are unchanged from base revision
+    `5e1142c34b24a4136680b5bd255a9f3ba7e861de` (the `main` merge base); the
+    comparison against both base blobs is clean. No summary or spec defect found.
+    Latest applicable T9 gates: `pnpm lint` — pass; `pnpm format:check` — pass
+    (all matched files formatted). T8's complete change set consists only of the
+    three Markdown summaries listed above, all outside `src/content/**`. Under
+    Constitution §§5–6 these are the only applicable task gates. `pnpm build` —
+    not run (not applicable under the Markdown-only exception);
+    `pnpm test:run` including unit/SEO — not run (not applicable); and
+    `pnpm test:a11y` — not run (not applicable). T8 is approved. The separate
+    Dev Lead final integrated gate report, supplied after T8's QA review, is
+    recorded in the Gate summary below. QA did not rerun the full feature gates
+    and made no commit/push.
+
 ## Gate summary
 
-**Final integrated report supplied by the Dev Lead:** after all six tasks had QA
-approval, the complete uncommitted feature increment on shared branch
-`spec/010-svg-icon`, HEAD
-`5e1142c34b24a4136680b5bd255a9f3ba7e861de`, passed all five applicable gates:
+**Final integrated report supplied by the Dev Lead:** after T8's QA review, the
+complete uncommitted feature increment on shared branch `spec/010-svg-icon`, HEAD
+`5bec7529a15fd8d2bfc104a3c94319967c2800bf`, passed all five applicable gates.
+The tested increment included the maintainer's `gap-x-2` and `loading="lazy"`
+changes, QA tests/evidence, current spec/plan/tasks, and the 004/006 summary
+updates:
 
 - [x] Lint (`pnpm lint`) — PASS.
 - [x] Format (`pnpm format:check`) — PASS.
-- [x] Build (`pnpm build`) — PASS (3 static pages and sitemap).
-- [x] Unit tests (`pnpm test:run`) — PASS (22 files, 144 tests; includes the
-      existing SEO suites).
-- [x] Accessibility (`pnpm test:a11y`) — PASS (4 files, 5 tests; rendered-HTML
-      accessibility coverage passed).
-- **SEO / rendered-page notes**: The existing SEO suites ran and passed as part
-  of the reported unit-test run. The reported accessibility suite exercises
-  rendered HTML and passed; no separate URL-based MCP audit result was supplied
-  as part of this final-gate report.
-- **Final gate evidence**: Exact latest Dev Lead results recorded above for the
-  complete uncommitted feature increment at the stated branch revision. No gate
-  defects reported; all five final gates pass.
+- [x] Build (`pnpm build`) — PASS (3 static pages + sitemap).
+- [x] Unit tests (`pnpm test:run`) — PASS (22 files, 144 tests, including the
+      existing SEO tests).
+- [x] Accessibility (`pnpm test:a11y`) — PASS (4 files, 5 tests; rendered HTML
+      accessibility gate passed).
+- **SEO / rendered-page notes**: SEO routes and metadata are unchanged; the
+  existing SEO tests passed as part of the reported unit-test run. The rendered
+  HTML accessibility gate passed. No separate MCP audit result was supplied.
+- **Final gate evidence**: Exact latest Dev Lead results for the complete
+  uncommitted feature increment at the stated shared-branch revision. QA records
+  the report without rerunning the five feature gates; no gate defects reported.

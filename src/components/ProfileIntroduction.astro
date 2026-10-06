@@ -27,7 +27,7 @@ const { profile } = Astro.props;
     <ul class="technology-list social-links" aria-label="Redes sociales">
       {profile.socials.map(({ platform, label, url }) => (
         <li>
-          <Button variant="primary" href={url}>
+          <Button variant="primary" class="gap-x-2" href={url}>
             <Icon
               name={platform}
               aria-hidden="true"

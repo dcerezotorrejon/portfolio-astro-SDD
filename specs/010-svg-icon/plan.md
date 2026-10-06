@@ -6,7 +6,9 @@
 ## Approach
 
 Implement the increment in two production steps with a QA verification after
-each, followed by an explicit relationship-summary task:
+each, followed by an explicit relationship-summary task. A maintainer has now
+added two small, uncommitted refinements to the existing code; re-anchor the
+plan to them and verify them before integrating the branch:
 
 1. Add a generic, static Astro `Icon` atom whose required `name` is derived from
    a constant icon map, plus external SVG symbol assets for GitHub and LinkedIn.
@@ -20,6 +22,14 @@ each, followed by an explicit relationship-summary task:
    summary and the `Related specs` records in the affected 004 and 006 summaries.
    QA verifies those Markdown-only relationship changes without touching any
    historical `spec.md`.
+4. T1–T6 are already QA-approved. QA now verifies the maintainer's two pending
+   code refinements: Tailwind `gap-x-2` on the two social buttons, and native
+   `loading="lazy"` on homepage company-card icons. QA owns rendered unit-test
+   assertions and AC7/AC8 evidence; it does not edit either production component.
+5. After T7 approval, the Dev Lead refreshes the actual file/behavior inventory in
+   the 010 summary and updates the 004/006 relationship records. QA verifies that
+   summary-only task. The Dev Lead then reruns all five final gates for the full
+   increment, and QA replaces the now-outdated final-gate report.
 
 The `.icon` rule will be placed in Tailwind's `components` cascade layer, with
 `text-white` supplied from Tailwind's `utilities` layer at the two social-button
@@ -47,7 +57,10 @@ not otherwise changed. The intentional icon-size difference is 20px → 1rem
   `#icon` symbols with the existing path artwork and `currentColor` fill.
 - `src/components/ProfileIntroduction.astro` — replace only the two inline
   social SVGs with named `Icon` instances; pass `aria-hidden`, `focusable`, and
-  Tailwind `text-white`.
+  Tailwind `text-white`; the maintainer's pending change passes `gap-x-2` to the
+  social button root.
+- `src/components/ExperienceHistory.astro` — the maintainer's pending change adds
+  native `loading="lazy"` to homepage experience-card company icons only.
 - `src/styles/global.css` — unify primary/button token resolution; add `.icon`
   size/color styling in Tailwind's `components` layer; leave unrelated styles
   and button states intact.
@@ -58,7 +71,10 @@ not otherwise changed. The intentional icon-size difference is 20px → 1rem
 - `tests/types/icon-name.typecheck.ts` — **new** (QA). Isolated compile-only
   assertion for supported and unsupported map-derived name values.
 - `tests/unit/home.test.ts` — (QA) assert social icons use matching names,
-  decorative attributes, and preserve current visible links.
+  decorative attributes, preserve current visible links, and verify `gap-x-2`
+  on the social buttons plus native lazy loading on homepage company icons.
+- `tests/unit/experience.test.ts` — (QA) assert employment-detail company images
+  remain unchanged and do not acquire lazy loading.
 - `tests/unit/button-design.test.ts` — (QA) re-anchor the global accent
   expectation and assert the `.icon` default and white social override while
   retaining button-state contrast coverage.
@@ -73,7 +89,8 @@ not otherwise changed. The intentional icon-size difference is 20px → 1rem
 - `specs/004-portfolio-home/summary.md` — Dev Lead updates only its date and
   relationship record for the icon migration and unified accent.
 - `specs/006-common-molecules/summary.md` — Dev Lead updates only its date and
-  relationship record for the new atom/global design change.
+  relationship record for the new atom/global design change and the updated
+  `ExperienceHistory` consumer.
 
 No earlier `spec.md` is to be edited. No other page or section SVG is migrated.
 
@@ -102,6 +119,10 @@ No earlier `spec.md` is to be edited. No other page or section SVG is migrated.
 - **Intentional icon size adjustment.** The atom's default is 1rem (16px), so
   only the two migrated icons change from their explicit 20px size. Link names,
   destinations and button geometry remain unchanged.
+- **Maintainer refinements are narrowly scoped.** `gap-x-2` adds only the
+  specified 8px icon-label gap, and `loading="lazy"` applies only to homepage
+  experience-card company icons. Neither changes link semantics, image data,
+  detail-page images, or client-side behavior.
 - **No new dependency or client runtime.** Reuse Astro, Tailwind v4, Vitest,
   existing browser/MCP tools and the installed TypeScript compiler. Keep all
   rendered portfolio content static.
@@ -132,6 +153,10 @@ No earlier `spec.md` is to be edited. No other page or section SVG is migrated.
 - **Summary/spec relationship drift:** Dev Lead updates 004/006 summary records
   only after the actual files are known; QA checks the relationship direction and
   confirms no prior `spec.md` changed.
+- **New edits bypass the prior T4 verification:** The user's two source changes
+  were made after the recorded final-gate run. QA must verify their exact markup
+  effects, then the Lead must rerun the full five-gate set and QA replace the
+  stale final-gate report before any new commit/push.
 
 ## Testing strategy
 
@@ -144,7 +169,10 @@ No earlier `spec.md` is to be edited. No other page or section SVG is migrated.
   suites while preserving their current contrast, button-state and token-contract
   coverage. Run a compile-only type fixture against the map with an isolated
   TypeScript CLI invocation; do not use the currently failing full-project
-  `tsc --noEmit` as evidence.
+  `tsc --noEmit` as evidence. For the maintainer refinements, assert the two
+  social button roots carry `gap-x-2`, assert each homepage experience-card
+  company icon has `loading="lazy"`, and assert detail-page company icons remain
+  unchanged.
 - **SEO checks:** No routes, content, or metadata change. Run the existing SEO
   tests as part of `pnpm test:run`; record that no additional SEO behavior is
   applicable.
@@ -171,3 +199,6 @@ No earlier `spec.md` is to be edited. No other page or section SVG is migrated.
   the standard verification scope.
 - Dev Lead task T5 uses the configured GPT-6 Luna high model for relationship
   resolution and summary accuracy. No model override is planned.
+- QA task T7 uses the configured GPT-6 Luna medium default to verify the
+  maintainer's bounded homepage refinements; Dev Lead T8 uses configured high for
+  summary updates; QA T9 uses configured medium for summary/gate evidence review.
