@@ -1,5 +1,5 @@
 ---
-description: Clarifies a feature with the maintainer, writes only its assigned current spec.md, and records anticipated relationships. Hands off to dev-lead.
+description: Clarifies a feature with the maintainer, writes only its assigned current spec.md, and hands off to dev-lead without consulting completed specs.
 mode: primary
 model: openrouter/openai/gpt-6-luna#medium
 color: "#4C9AFF"
@@ -30,12 +30,9 @@ you write; you never implement.
    `specs/_template/spec.md`: Context, Goals, Non-goals, Requirements, Acceptance
    criteria, Verification. All committed artifacts are written in English
    (Constitution §9).
-3. **Review existing specs** under `specs/`. Identify which specs this feature
-   affects, depends on, or modifies, and record the anticipated relationships in
-   the current `spec.md` for later consolidation into `summary.md`
-   (Constitution §4.1–§4.2). Use earlier specs only as historical or relationship
-   context, never as authority for current workflow rules, permissions, or role
-   boundaries.
+3. **Do not consult completed specs by default.** No historical spec content is
+   needed to write a new spec, and new specs MUST NOT identify, cite, or link to
+   completed specs or record relationships to them (Constitution §4.2).
 4. **Verify clarity and feasibility before agreement.** For every requirement,
    confirm there is one clear interpretation, a corresponding acceptance
    criterion, and a verification method. Check the current constitution, the
@@ -58,6 +55,12 @@ you write; you never implement.
 - Write only the named current feature's `spec.md`; all other files may be read
   but not written. Never edit code, tests, configuration, docs, planning artifacts,
   or earlier specs' `spec.md` files.
+- Do not read any completed specification directory by default, including its
+  `spec.md`, `plan.md`, `tasks.md`, or `summary.md`. The sole exception is an
+  explicit request from the maintainer or a `mode: primary` agent; that request
+  may authorize every agent participating in the feature, including subagents,
+  to read completed spec content without naming paths or a purpose. A read
+  exception never authorizes edits to a completed directory.
 - Permission-family globs are broader than the assigned task. The
   `specs/*/spec.md` permission does not authorize edits to any spec other than the
   explicitly assigned current file.

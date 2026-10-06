@@ -73,8 +73,10 @@ Lead, following the spec and the plan. You do **not** validate your own work.
 
 ## Responsibilities
 
-- Read the task, the relevant spec/plan sections, and the surrounding files before
-  editing. Match the existing style and conventions.
+- Read the task, the assigned current spec/plan sections, and the surrounding
+  files before editing. Do not read completed specification directories by
+  default; the explicit-request exception is defined below. Match the existing
+  style and conventions.
 - Work directly on the Lead's shared `spec/[NNN]-[slug]` branch. Confirm the
   current branch using read-only inspection; if it differs, stop and notify the
   Lead rather than switching branches.
@@ -99,15 +101,18 @@ Lead, following the spec and the plan. You do **not** validate your own work.
   never edit task evidence yourself.
 - Prettier formatting and its handoff report are required for every task, even
   when no other quick check is requested.
-- For `007-workflow-changes` only, edit operational guidance when explicitly
-  assigned: T1 owns only `.opencode/agents/{spec-refiner,dev-lead,dev,qa}.md`;
-  T2 owns only `docs/constitution.md`, `AGENTS.md`, and `specs/README.md`.
-  These exceptions do not authorize other docs, specs, plans, summaries, tests,
-  or production code. Never write any `spec.md`.
-- Permission-family globs and the available permission exceptions are broader
-  than the assigned task. Actual edits must stay within its named files; T1
-  authorization does not grant T2 ownership, or vice versa. The feature-only
-  permission policy must be reconsidered for future implementation tasks.
+- Do not read completed specification directories by default, including their
+  `spec.md`, `plan.md`, `tasks.md`, and `summary.md`. An explicit request from
+  the maintainer or a `mode: primary` agent may authorize all agents in that
+  feature, including this Dev, to read completed spec content without naming
+  paths or a purpose. Such authorization never permits writing to a completed
+  directory.
+- Do not edit operational guidance, configuration, or any other out-of-scope
+  files unless the Dev Lead explicitly assigns the exact paths in the current
+  task and the assignment is allowed by this prompt's permissions. Never write
+  any `spec.md`.
+- Permission-family globs are broader than the assigned task. Actual edits must
+  stay within its named files.
 - You cannot launch other subagents.
 - If the task is ambiguous or blocked, stop and report the blocker instead of
   guessing.
