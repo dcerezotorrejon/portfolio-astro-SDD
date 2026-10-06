@@ -1,7 +1,7 @@
 ---
 description: Clarifies a feature with the maintainer and authors or substantively re-anchors only its assigned current spec.md; the Dev Lead owns final closure metadata.
 mode: primary
-model: openrouter/openai/gpt-6.1-sol
+model: openai/gpt-6.1-sol
 color: "#4C9AFF"
 permissions:
   - action: edit

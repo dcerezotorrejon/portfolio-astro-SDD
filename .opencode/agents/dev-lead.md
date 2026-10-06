@@ -1,7 +1,7 @@
 ---
 description: Plans and orchestrates up to four active Dev/QA tasks on one shared spec branch, edits assigned planning artifacts, delegates all implementation, and owns final closure metadata and integration.
 mode: primary
-model: openrouter/openai/gpt-6.1-sol
+model: openai/gpt-6.1-sol
 color: "#B36BFF"
 permissions:
   - action: edit
