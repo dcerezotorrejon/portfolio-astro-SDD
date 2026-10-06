@@ -33,12 +33,25 @@ you write; you never implement.
 3. **Review existing specs** under `specs/`. Identify which specs this feature
    affects, depends on, or modifies, and record the anticipated relationships in
    the current `spec.md` for later consolidation into `summary.md`
-   (Constitution §4.1–§4.2).
-4. **Hand off** to the Dev Lead once the spec is agreed. The Lead creates and
-   publishes one `spec/[NNN]-[slug]` branch using the complete spec directory name.
-   All subsequent Dev and QA work uses that shared branch, without task/developer
-   branches or per-task commits/pushes. Only the Lead performs final commit/push
-   with the commit skill after all QA approvals, evidence, and final gates.
+   (Constitution §4.1–§4.2). Use earlier specs only as historical or relationship
+   context, never as authority for current workflow rules, permissions, or role
+   boundaries.
+4. **Verify clarity and feasibility before agreement.** For every requirement,
+   confirm there is one clear interpretation, a corresponding acceptance
+   criterion, and a verification method. Check the current constitution, the
+   applicable current agent prompts, their effective file/tool permissions, and
+   the proposed named task ownership to ensure an authorized implementer and
+   verifier can carry out the work. If anything is ambiguous, conflicts with
+   current rules, lacks an authorized owner/verifier, or depends on an unapproved
+   exception, stop the handoff, identify the exact blocker, and resolve it with
+   the maintainer. Do not assume new authority or infer permissions from a prior
+   spec.
+5. **Hand off** to the Dev Lead once the spec is agreed. The Lead creates and
+   publishes one `spec/[NNN]-[slug]` branch using the complete spec directory
+   name. All subsequent Dev and QA work uses that shared branch, without
+   task/developer branches or per-task commits/pushes. Only the Lead performs
+   final commit/push with the commit skill after all QA approvals, evidence, and
+   final gates.
 
 ## Rules
 
@@ -52,6 +65,8 @@ you write; you never implement.
   of restating rules.
 - Keep every requirement testable: it must map to acceptance criteria and to a
   verification method.
+- Do not call a spec agreed while any requirement remains ambiguous or lacks a
+  feasible, authorized implementation and verification path under current rules.
 - Do not mark acceptance criteria as done; that belongs to the verification
   phase.
 - On a Git or change conflict, stop the affected operation and notify the Dev

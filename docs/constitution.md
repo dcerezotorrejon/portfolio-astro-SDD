@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.5.0
+- **Version**: 1.6.0
 - **Last amended**: 2026-10-06
 
 ---
@@ -129,28 +129,37 @@ others, and specs must keep those links visible.
 
 ### 5.1 Shared feature-branch workflow
 
-- After a spec is agreed and planning begins, the Dev Lead MUST create and publish
-  exactly one shared feature branch named `spec/[NNN]-[slug]` from the complete
-  spec directory; no task/developer branches may be created or used. At most four
+- After a spec is agreed and planning begins, exactly one shared feature branch
+  named `spec/[NNN]-[slug]` MUST be created and published from the complete spec
+  directory; task/developer branches MUST NOT be created or used. At most four
   tasks may be active, and parallel work is permitted only for independent tasks
-  with disjoint scopes and no unfinished dependencies. A task stays active from
-  assignment through QA approval, evidence, and any rework. QA MUST verify each
-  task on the shared feature branch and may update tests and task evidence but
-  MUST NOT edit production code; defects return to the same Dev on that branch, and
-  the task closes only after QA approval and recorded evidence. Dev and QA MUST
-  NOT create branches, merge, commit, or push.
-- On a Git or change conflict, agents MUST stop the affected operation and notify
-  the Dev Lead with the conflicting branches/files and blocking state; they MUST
-  NOT overwrite work or guess a resolution. The Lead escalates decisions requiring
-  judgment to the maintainer, and work resumes only after an agreed resolution.
-  Before planning or delegating work affected by a material technical decision
-  not settled by the spec, constitution, or established conventions, the Lead MUST
-  obtain maintainer approval and record it in the relevant planning artifact.
-- Only the Dev Lead may use the repository's commit skill for final feature
-  commit(s) and push, and only after every task has QA approval and evidence and
-  all §6 gates pass. The Lead MUST NOT merge or delete the published feature
-  branch. After a successful final push, the Lead MUST ask the maintainer to merge
-  that branch into `main`; base-branch integration remains maintainer-managed.
+  with disjoint scopes and no unfinished dependencies. A task remains active from
+  assignment through verification approval, evidence, and any rework. It closes
+  only after verification approval and recorded evidence. Verification MUST take
+  place on the shared branch; defects return to the same implementer on that
+  branch. Verification may update assigned tests and task evidence but MUST NOT
+  edit production code.
+- On a Git or change conflict, participants MUST stop the affected operation,
+  record the conflicting branches/files and blocking state, and MUST NOT overwrite
+  work or guess a resolution. Decisions requiring judgment MUST be escalated to
+  the maintainer, and work resumes only after an agreed resolution. Before work
+  affected by a material technical decision not settled by the spec, this
+  constitution, or established conventions is planned or delegated, maintainer
+  approval MUST be obtained and recorded in the relevant planning artifact.
+- Final feature commit(s) and push MUST happen only after every task has
+  verification approval and evidence and all §6 gates pass. No task-level
+  commit/push is permitted. Base-branch integration MUST require explicit
+  affirmative maintainer approval before it occurs; the published feature branch
+  MUST NOT be deleted as part of this workflow. Role-specific procedures are
+  defined in the applicable current agent prompts, subordinate to this
+  constitution.
+- Current workflow rules are defined by this constitution and, where consistent
+  with it, the applicable current agent prompts. This constitution prevails in a
+  conflict. Explicit maintainer decisions may resolve matters not specified here,
+  but do not override this constitution unless adopted through the amendment
+  process in §11. Earlier specs are historical or relationship records only; they
+  MUST NOT establish or override current workflow rules, permissions, or role
+  boundaries.
 
 ## 6. Quality gates
 

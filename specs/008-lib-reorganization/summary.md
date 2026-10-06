@@ -105,3 +105,7 @@
   explicit in the constitutional workflow. Role boundaries, shared-branch rules,
   and commit/push authority remain unchanged; its summary was updated and its
   historical `spec.md` was preserved.
+- `009-workflow-governance` — further amends the constitutional and agent workflow:
+  the Dev Lead may merge after explicit affirmative maintainer approval, while QA
+  retains current-only evidence and the Dev Lead receives task-scoped governance
+  and configuration edit authority. The historical `spec.md` remains unchanged.

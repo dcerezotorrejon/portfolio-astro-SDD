@@ -43,9 +43,13 @@
   workflow, four-task concurrency limit, QA lifecycle, and historical `spec.md`
   immutability rule; this summary records the relationship without changing this
   spec's historical requirements.
-- `008-lib-reorganization` — further amends the constitution's §5.1 workflow
-  policy, including the Dev Lead's required post-push request for the maintainer
-  to merge; the baseline spec remains unchanged.
+- `008-lib-reorganization` — further amended the constitution's §5.1 workflow
+  policy with a post-push maintainer merge request; the baseline spec remains
+  unchanged.
+- `009-workflow-governance` — further amends the constitution and agent workflow,
+  including role-neutral safeguards, current-source precedence, and a Dev Lead
+  merge permitted only after explicit maintainer approval; this baseline
+  `spec.md` remains unchanged.
 
 ## Notes
 

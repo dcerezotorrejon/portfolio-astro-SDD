@@ -1,0 +1,47 @@
+# Summary — Workflow Governance Update
+
+- **Spec ID**: `009-workflow-governance`
+- **Last updated**: 2026-10-06
+
+## Files changed
+
+- `docs/constitution.md` — amended §5.1 to state shared role-neutral workflow
+  safeguards, establish current-source precedence, and increment the constitution
+  to `1.6.0`.
+- `AGENTS.md` — removed duplicated role-specific workflow procedures and points
+  readers to the applicable agent prompts.
+- `.opencode/agents/spec-refiner.md` — requires ambiguity, acceptance/verification,
+  and implementation-feasibility checks against current authority.
+- `.opencode/agents/dev-lead.md` — adds task-scoped governance/configuration edit
+  authority and explicit-approval-gated merge permission; preserves the no-delete
+  boundary.
+- `.opencode/agents/dev.md` — requires Prettier on every task-modified file and a
+  command/file/result handoff report.
+- `.opencode/agents/qa.md` — requires latest-only evidence and formatting-only
+  Markdown review; the temporary 004 evidence permission was revoked after T2.
+- `tests/unit/agents.test.ts` — verifies current agent permissions, prompts,
+  shared guidance, and workflow boundaries.
+- `specs/004-portfolio-home/tasks.md` — consolidates latest QA evidence; removed
+  20 standalone `evidence*.md` files.
+- `specs/{001-sdd-baseline,003-agent-workflow,004-portfolio-home,007-workflow-changes,008-lib-reorganization}/summary.md`
+  — records actual relationships to this change.
+- `specs/009-workflow-governance/{spec,plan,tasks,summary}.md` — current feature
+  requirements, implementation plan, QA evidence, and this summary.
+
+## Functions / components changed
+
+- No application functions, components, content, routes, or rendered markup
+  changed. Agent behavior, governance instructions, and consistency tests changed.
+
+## Related specs
+
+- `001-sdd-baseline` — affected: its constitution is further amended; its
+  historical `spec.md` remains unchanged.
+- `003-agent-workflow` — modified: agent procedures and shared workflow safeguards
+  are further clarified and updated.
+- `004-portfolio-home` — modified: its latest QA evidence is consolidated in
+  `tasks.md`; product requirements and task statuses remain unchanged.
+- `007-workflow-changes` — modified: the merge, evidence-retention, and agent
+  permission rules are further refined.
+- `008-lib-reorganization` — modified: the current agent workflow further
+  supersedes the earlier merge restriction and updates Dev Lead authority.

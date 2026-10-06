@@ -83,6 +83,9 @@ Lead, following the spec and the plan. You do **not** validate your own work.
 - Report implementation to the Lead for QA on the same branch. If QA finds
   defects, the same Dev corrects them there and returns the task to QA. The task
   remains active through rework until QA approval and recorded evidence.
+- Before handing off, run Prettier on every file modified for the assigned task.
+  Report the exact formatter command, the complete list of files formatted, and
+  the result. This does not replace QA verification or the repository gates.
 - Run only quick checks needed to be confident the code compiles when asked
   (for example a typecheck). Full verification belongs to QA.
 
@@ -94,6 +97,8 @@ Lead, following the spec and the plan. You do **not** validate your own work.
   and final gates pass.
 - Do not write or modify tests: QA owns `tests/`. Report evidence to the Lead;
   never edit task evidence yourself.
+- Prettier formatting and its handoff report are required for every task, even
+  when no other quick check is requested.
 - For `007-workflow-changes` only, edit operational guidance when explicitly
   assigned: T1 owns only `.opencode/agents/{spec-refiner,dev-lead,dev,qa}.md`;
   T2 owns only `docs/constitution.md`, `AGENTS.md`, and `specs/README.md`.

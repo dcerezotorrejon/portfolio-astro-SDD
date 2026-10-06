@@ -41,7 +41,9 @@ transitions,button-design,section-headings}.test.ts`,
 - `docs/constitution.md`, `docs/design.md`, `AGENTS.md` — explicit React island
   permission, constitutional global-design reference and shared design document.
 - Related summaries under specs 001–003 — relationship maintenance.
-- `specs/004-portfolio-home/*` — living requirements, plan, tasks and QA evidence.
+- `specs/004-portfolio-home/{spec,plan,tasks}.md` — living requirements, plan,
+  and task evidence; latest QA evidence is consolidated in `tasks.md` and the
+  former standalone evidence reports were removed.
 
 ## Functions / components changed
 
@@ -61,8 +63,9 @@ transitions,button-design,section-headings}.test.ts`,
 
 ## Verification status
 
-- Final integrated QA on the latest source (`evidence-final2.md`): all five
-  constitutional gates pass — lint, format, build (three routes + sitemap),
+- Final integrated QA on the latest source (evidence consolidated in
+  [`tasks.md`](./tasks.md)): all five constitutional gates pass — lint, format,
+  build (three routes + sitemap),
   `pnpm test:run` (19 files / 118 tests) and `pnpm test:a11y` (4 files / 5 tests).
 - Browser: active navigator label white on `#0C7ABF` and inactive dark ink, with
   the indicator settling exactly on the active link in both directions; section
@@ -82,7 +85,8 @@ transitions,button-design,section-headings}.test.ts`,
 Initial implementation/QA tasks used their configured Luna medium defaults.
 Later assignments used the current Auto Router medium default without model
 reference overrides; the router's chosen concrete model is not inferred when
-unreported. Evidence files record model claims and exact command results.
+unreported. `tasks.md` retains the current model claims and available exact
+command results; superseded standalone reports are not retained.
 
 ## Later changes
 
@@ -100,8 +104,9 @@ unreported. Evidence files record model claims and exact command results.
     `src/lib/navigation.ts`. **No 004 requirement changed** — R10/R11 and AC11/AC12
     are preserved and the wording is being re-anchored by the Dev Lead in `spec.md`.
     QA re-anchored the four affected/related test files and verified the fix in a
-    browser; see [`evidence-f2.md`](./evidence-f2.md). All five constitutional gates
-    pass again (21 files / 149 unit tests; 4 files / 5 a11y tests).
+    browser; the supporting report is consolidated into the task evidence in
+    [`tasks.md`](./tasks.md). All five constitutional gates pass again (21 files /
+    149 unit tests; 4 files / 5 a11y tests).
 - **2026-10-05 — `006-common-molecules`:** the button and heading styling was
   extracted into the reusable `Button.astro` / `Heading.astro` molecules and the
   three consumers were migrated (`ProfileIntroduction.astro`,
@@ -146,6 +151,10 @@ unreported. Evidence files record model claims and exact command results.
   guidance to request maintainer integration after the final push and lets QA mark
   only evidence-backed acceptance checkboxes in its assigned current spec;
   portfolio behavior and its requirements remain unchanged.
+- `009-workflow-governance` — modifies the workflow and consolidates the latest
+  QA evidence for this feature in `tasks.md`; standalone evidence files are
+  removed. Portfolio behavior, historical requirements, acceptance criteria, and
+  task statuses remain unchanged.
 
 ## Notes and remaining limits
 

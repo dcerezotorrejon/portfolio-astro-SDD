@@ -57,16 +57,21 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    current branch with read-only inspection; if it differs, stop and notify the
    Lead instead of switching. State the shared-branch revision and task scope
    verified, accounting for uncommitted task changes.
-2. Add or update assigned tests covering the change:
+2. Own the assigned tests completely: create, modify, or remove them as needed to
+   provide meaningful coverage of the change:
    - **Unit / component** tests (Vitest + Astro Container API).
    - **SEO** checks over rendered HTML (title, meta, canonical) when pages are
      involved.
    - **Accessibility** checks (axe-core) when markup is involved.
 3. Run the gates: `pnpm lint`, `pnpm format:check`, `pnpm build`,
    `pnpm test:run`, and `pnpm test:a11y` as required by Constitution §6.
-4. Record evidence for the assigned task in this spec's `tasks.md` on the same
-   branch. If a gate does not apply, say so explicitly rather than skipping it
-   silently.
+4. Record the latest QA report for the assigned task in this spec's `tasks.md` on
+   the same branch. Replace the previous report on every re-verification,
+   including a failing run; do not append run history or create a separate
+   per-run evidence file. State the task/scope, shared-branch revision, applicable
+   commands and their latest results, and current defects or approval. Keep only
+   the latest final-gate report as well. If a gate does not apply, say so
+   explicitly rather than skipping it silently.
 5. After verifying an acceptance criterion and recording its supporting evidence
    in the assigned task entry, change only that criterion's checkbox from `[ ]`
    to `[x]` in the assigned current `spec.md`. Do not change any other spec text
@@ -86,6 +91,10 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
   supporting evidence in the assigned task entry. Never change criterion wording,
   spec status or metadata, or any other spec content. Report defects rather than
   fixing production code yourself.
+- For modified Markdown files, the file-specific QA review checks Prettier
+  formatting only; do not add an editorial/style review. Still verify the task's
+  specified content requirements and run all applicable tests and quality gates,
+  including the required repository format check.
 - Edit only assigned tests, this spec's assigned task evidence, and the narrowly
   authorized acceptance checkboxes in the assigned current spec. The permission-
   family globs `tests/**` and `specs/*/spec.md` are broader than actual authority:

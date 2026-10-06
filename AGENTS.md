@@ -46,18 +46,10 @@ reused when the same behavior is modified. All spec files are in English. Read
 
 ## Agent workflow
 
-Development is split across four specialized agents defined under
-`.opencode/agents/`:
+Four custom agents are defined under `.opencode/agents/`. Their
+role-specific responsibilities, procedures, and permission boundaries are
+maintained in the corresponding agent prompts and are not duplicated here.
 
-| Agent          | Mode       | Role                                                                       |
-| -------------- | ---------- | -------------------------------------------------------------------------- |
-| `spec-refiner` | `primary`  | Clarifies the feature with you and writes `spec.md`.                       |
-| `dev-lead`     | `primary`  | Turns the spec into `plan.md`/`tasks.md` and orchestrates `dev` then `qa`. |
-| `dev`          | `subagent` | Implements one task. Does not validate its own work.                       |
-| `qa`           | `subagent` | Tests, records evidence, marks only evidenced acceptance boxes.            |
-
-- The `spec-refiner` → `dev-lead` handoff is **manual**: switch the primary agent
-  once the spec is agreed.
 - The workflow agents use pinned model references: `dev-lead` uses
   `openrouter/openai/gpt-6-luna#high`; `spec-refiner`, `dev`, and `qa` use
   `openrouter/openai/gpt-6-luna#medium`. The Auto Router variants in
@@ -69,42 +61,33 @@ Development is split across four specialized agents defined under
 
 ### Shared feature branch and task handoffs
 
-- Once a spec is agreed and planning begins, the Dev Lead creates and publishes
-  exactly one `spec/[NNN]-[slug]` branch, named from the complete spec directory.
-  All Dev and QA work for the feature uses this branch; task/developer branches
-  such as `dev/...` are not used.
-- The Lead may assign up to four active tasks at a time. A task remains active
-  from assignment through QA approval and evidence, including any rework. Only
-  independent tasks with disjoint file scopes and no unfinished dependencies run
-  in parallel; overlapping or dependent tasks are serialized.
-- Dev implements only the assigned task scope and does not commit or push. QA
-  verifies on the shared branch and may update assigned tests and task evidence.
-  After verifying an acceptance criterion and recording its evidence in the
-  assigned task entry, QA may change only that criterion's `[ ]` checkbox to
-  `[x]` in the assigned current spec; QA may not edit criterion wording, spec
-  status or metadata, any other spec content, or an unassigned spec. QA does not
-  edit production code or commit/push. QA returns defects to the same Dev, who
-  reworks them on that branch; the task closes only after QA approval and
-  recorded evidence. QA completes verification before the Lead's final commit and
-  push; no post-push QA task is introduced.
-- On a Git or change conflict, stop the affected operation and notify the Lead
-  with the conflicting branches/files and blocking state. Do not overwrite work
-  or guess at a resolution. The Lead escalates decisions to the maintainer when
-  needed; resume only after an agreed resolution.
-- The Lead gets maintainer approval for material technical decisions before
-  planning or delegating the affected implementation, and records the decision
-  in the relevant planning artifact.
-- After all task QA approvals and evidence are recorded and final gates pass, the
-  Lead alone uses the commit skill for final feature commit(s) and push. This
-  workflow does not merge the feature branch into the base branch or delete it.
-  After a successful final push, the Lead explicitly asks the maintainer to merge
-  the published feature branch into `main`; base-branch integration remains
-  maintainer-managed.
-- Writing boundaries: the Spec Refiner owns current `spec.md` wording and
-  status/metadata; QA has only the evidence-backed acceptance-checkbox exception
-  described above. The Lead does not write `spec.md` and owns planning/task/summary
-  artifacts. Dev and QA stay within their assigned task responsibilities; QA's
-  test/evidence work does not grant production-code authority.
+- Once a spec is agreed and planning begins, exactly one
+  `spec/[NNN]-[slug]` branch is created and published, named from the complete
+  spec directory.
+  All feature implementation and verification work uses this branch; task or
+  developer branches are not used.
+- At most four tasks may be active. A task remains active from assignment through
+  verification approval, evidence, and any rework. Parallelize only independent
+  tasks with disjoint file scopes and no unfinished dependencies; serialize
+  overlapping or dependent work.
+- Work stays within the task's named ownership. Verification may update assigned
+  tests and task evidence but not production code. Defects return to the same
+  implementer on the shared branch; a task closes only after verification
+  approval and recorded evidence.
+- On a Git or change conflict, stop the affected operation, identify the
+  conflicting branches/files and blocking state, and do not overwrite work or
+  guess a resolution. Escalate decisions requiring judgment to the maintainer and
+  resume only after an agreed resolution. Obtain and record maintainer approval
+  before planning or delegating work affected by an unsettled material technical
+  decision.
+- Final feature commit(s) and push happen only after every task has verification
+  approval and evidence and all quality gates pass. No per-task commit or push is
+  permitted. Base-branch integration requires explicit affirmative maintainer
+  approval, and the published feature branch is not deleted as part of this
+  workflow.
+- Role-specific procedures and write boundaries are defined in the applicable
+  current agent prompts. The constitution is authoritative; see
+  [Constitution §5.1](./docs/constitution.md#51-shared-feature-branch-workflow).
 
 ## Verification gates
 

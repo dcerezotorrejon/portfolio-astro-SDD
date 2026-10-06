@@ -77,3 +77,7 @@
   spec; further condenses Constitution §5.1 and requires the Lead to request
   maintainer merge after push without executing it. The portfolio module
   relocations do not change the workflow requirements here.
+- `009-workflow-governance` — further amends shared and agent-specific workflow
+  guidance, permits the Dev Lead to merge only after explicit maintainer approval,
+  and replaces QA's accumulated run history with current evidence. This summary
+  records the later change; this spec's historical `spec.md` remains unchanged.
