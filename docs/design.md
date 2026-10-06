@@ -1,7 +1,7 @@
 # Global design
 
 - **Status**: agreed design direction; implementation pending
-- **Last updated**: 2026-10-05
+- **Last updated**: 2026-10-06
 
 ## Scope and references
 
@@ -44,8 +44,8 @@ computed colors, dimensions, typography, responsive behavior or motion.
 
 ## Color tokens
 
-- **Primary accent — `#1D9BF0`:** General blue accents.
-- **Action background — `#0C7ABF`:** Primary buttons and active navigator indicator,
+- **Primary accent / action background — `#0C7ABF`:** One shared palette primitive
+  for general blue accents, primary buttons and the active navigator indicator,
   paired with white labels.
 - **Button label — `#FFFFFF`:** Text and icons inside primary buttons.
 - **Secondary / ink — `#0F1419`:** Main text, headings and inactive navigator labels.
@@ -56,8 +56,10 @@ computed colors, dimensions, typography, responsive behavior or motion.
 - **Link / focus — `#075985`:** Text links, focus indicators, and contrasting
   interaction outlines.
 
-Primary blue is not the default body-text color. Primary buttons use white labels
-and icons on `#0C7ABF` (approximately 4.61:1 contrast). Hover and pressed backgrounds
+Primary blue is not the default body-text color. Icons use the primary accent by
+default; icons inside primary buttons use white to match their labels. Primary
+buttons use white labels and icons on `#0C7ABF` (approximately 4.61:1 contrast).
+Hover and pressed backgrounds
 must remain dark enough to keep white labels at 4.5:1 or better. The floating
 navigator uses a white surface with dark inactive labels and a `#0C7ABF` sliding
 indicator with a white active label. Active styling follows the settled semantic

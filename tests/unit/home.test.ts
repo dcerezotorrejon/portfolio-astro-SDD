@@ -45,9 +45,36 @@ describe("home page", () => {
       ["LinkedIn", "https://www.linkedin.com/"],
     ]);
     expect(
-      links.every((link) => link.querySelector("svg[aria-hidden='true']")),
-    ).toBe(true);
+      links.map((link) => {
+        const icon = link.querySelector<SVGSVGElement>("svg");
+        const use = icon?.querySelector("use");
+
+        return {
+          className: icon?.getAttribute("class"),
+          hidden: icon?.getAttribute("aria-hidden"),
+          focusable: icon?.getAttribute("focusable"),
+          symbol: use?.getAttribute("href"),
+          visibleLabel: link.querySelector("span")?.textContent?.trim(),
+        };
+      }),
+    ).toEqual([
+      {
+        className: "icon text-white",
+        hidden: "true",
+        focusable: "false",
+        symbol: "/icons/github.svg#icon",
+        visibleLabel: "GitHub",
+      },
+      {
+        className: "icon text-white",
+        hidden: "true",
+        focusable: "false",
+        symbol: "/icons/linkedin.svg#icon",
+        visibleLabel: "LinkedIn",
+      },
+    ]);
     expect(links.every((link) => !link.hasAttribute("target"))).toBe(true);
+    expect(links.every((link) => !link.hasAttribute("aria-label"))).toBe(true);
   });
 
   it("renders complete employment cards newest first with their technologies and detail links", async () => {

@@ -155,6 +155,12 @@ command results; superseded standalone reports are not retained.
   QA evidence for this feature in `tasks.md`; standalone evidence files are
   removed. Portfolio behavior, historical requirements, acceptance criteria, and
   task statuses remain unchanged.
+- `010-svg-icon` — modified: replaces only the introduction's inline GitHub and
+  LinkedIn button icons with public SVG `<use>` symbols and the reusable `Icon`
+  atom. The icons now default to 1rem and use white in the blue social buttons;
+  the general primary accent is unified with the existing `#0C7ABF` button color.
+  Social destinations, labels, accessible names, routes, content, and SEO remain
+  unchanged. The historical 004 `spec.md` is unchanged.
 
 ## Notes and remaining limits
 

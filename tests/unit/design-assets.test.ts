@@ -88,7 +88,7 @@ describe("T2/T10 global style contracts", () => {
   // computed-style, contrast, or responsive-layout verification.
   it("resolves the shared color and layout tokens to the approved global design values", () => {
     const expectedTokens = [
-      ["--color-primary", "#1d9bf0"],
+      ["--color-primary", "#0c7abf"],
       ["--color-ink", "#0f1419"],
       ["--color-surface", "#ffffff"],
       ["--color-page", "#eff3f8"],
@@ -102,6 +102,20 @@ describe("T2/T10 global style contracts", () => {
       // (or a cycle) throws instead of returning the raw declaration.
       expect(resolveToken(name, tokens)).toBe(value);
     }
+
+    expect(resolveToken("--color-button", tokens)).toBe("#0c7abf");
+    expect(tokens.base.get("--color-primary")).toBe(
+      "var(--palette-action-blue)",
+    );
+    expect(tokens.base.get("--color-button")).toBe(
+      "var(--palette-action-blue)",
+    );
+    expect(tokens.base.get("--palette-action-blue")).toBe("#0c7abf");
+    expect(tokens.base.has("--palette-primary-blue")).toBe(false);
+    expect(design.toLowerCase()).toContain(
+      "primary accent / action background",
+    );
+    expect(design.toLowerCase()).not.toContain("#1d9bf0");
 
     // Every palette primitive must be referenced by at least one semantic
     // alias, so no primitive silently drifts out of the token system.
