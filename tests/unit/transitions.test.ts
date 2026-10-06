@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
-import ExperienceHistory from "../../src/components/ExperienceHistory.astro";
+import ExperienceHistory from "../../src/components/home/ExperienceHistory.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import {
   readStylesheetTokens,

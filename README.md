@@ -17,6 +17,8 @@ Markdown collections, while the site is statically rendered by default.
   site stays statically rendered.
 - Markdown content validated with schemas.
 - Vitest, Astro's Container API, and axe-core for tests and accessibility checks.
+- Playwright Test with Chromium and browser-based axe checks for integration
+  coverage.
 
 ## Requirements
 
@@ -31,6 +33,45 @@ pnpm dev
 ```
 
 Astro starts the local development server at `http://localhost:4321`.
+
+## Browser integration tests
+
+Install the project dependencies and the Playwright Chromium browser from a fresh
+checkout:
+
+```sh
+pnpm install
+pnpm exec playwright install chromium
+```
+
+On Linux, if Chromium reports missing system libraries, install its required
+operating-system dependencies with:
+
+```sh
+pnpm exec playwright install-deps chromium
+```
+
+Then run the browser suite:
+
+```sh
+pnpm test:integration
+```
+
+This command builds the static site and runs Playwright against a managed local
+preview of that build; no separately started server is needed. The existing
+browser tests cover the homepage and every content-derived experience detail
+page, profile content and links, and the full experience list and detail/return
+flows. Navigation tests cover pointer and keyboard use of the floating navigator,
+including target visibility and active-section state. Browser axe checks cover the
+homepage and every detail page using applicable WCAG A/AA tags through WCAG 2.2.
+Automated axe checks do not establish complete WCAG conformance. Existing Vitest
+unit, SEO, and accessibility tests remain available through their usual commands.
+
+When a browser test fails, inspect Playwright's terminal failure output and the
+generated diagnostics in `test-results/` (including traces/screenshots when
+captured). The HTML report is written to `playwright-report/`; open it with
+`pnpm exec playwright show-report playwright-report`. These generated files are
+local test artifacts, not portfolio content.
 
 ## Commands
 
@@ -78,7 +119,10 @@ copy.
 
 ```text
 src/
-├── components/       # Astro components and the interactive floating navigator
+├── components/       # Shared atoms/molecules and page-grouped components
+│   ├── atoms/         # Shared primitive components
+│   ├── molecules/     # Shared composed components
+│   └── home/          # Profile, experience history, badges, floating navigator
 ├── content/          # Profile and experience Markdown collections
 ├── layouts/          # Shared page layout and metadata
 ├── lib/              # Content helpers, schemas, and navigation logic

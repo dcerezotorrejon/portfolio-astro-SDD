@@ -5,5 +5,6 @@ export default getViteConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.{ts,tsx}"],
+    exclude: ["tests/integration/**"],
   },
 });

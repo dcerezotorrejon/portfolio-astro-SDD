@@ -101,14 +101,19 @@ configuration, to Dev with exact file ownership and independent QA.
    approval and recorded evidence, every acceptance criterion has QA-backed
    completion, all substantive re-anchoring is resolved, and the current plan,
    checklist, summary, and latest final-gate report are finalized while active.
-   Run all final quality gates in Constitution §6. Determine the applicable gate
-   set from the complete feature increment relative to its
-   base revision, including committed, staged, unstaged, and untracked changes.
+   Run all final quality gates in Constitution §§5–6. Determine the applicable
+   gate set from the complete feature increment relative to its base revision,
+   including committed, staged, unstaged, and untracked changes.
    If every changed file is a `.md` file outside `src/content/**`, run only
    `pnpm lint` and `pnpm format:check`; record build, unit, SEO, and accessibility
    gates as not run under the Constitution §§5–6 exception in the latest
    final-gate report. If any file is non-Markdown or is under `src/content/**`,
-   run and report all five gates from §6. Any missing task approval/evidence,
+   run and report `pnpm lint`, `pnpm format:check`, `pnpm build`,
+   `pnpm test:run`, and `pnpm test:a11y`. Also run `pnpm test:integration` when
+   the increment affects page rendering, routing, content, styles, client
+   behavior, browser-complex components, or integration-suite/tooling; otherwise
+   record it as not applicable. Never run integration under the Markdown-only
+   exception. Any missing task approval/evidence,
    incomplete criterion, failed applicable gate, or unresolved substantive
    re-anchoring leaves the increment active; do not close it or hand off a
    status-only edit to Spec Refiner or the maintainer. Once every prerequisite

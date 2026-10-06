@@ -9,3 +9,5 @@ package-lock.json
 yarn.lock
 skills-lock.json
 .agents
+playwright-report
+test-results

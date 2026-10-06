@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.9.0
+- **Version**: 1.10.0
 - **Last amended**: 2026-10-06
 
 ---
@@ -128,6 +128,10 @@ with the rest of the historical snapshot.
   note) is recorded next to the task.
 - If a gate does not apply to a task, that must be stated explicitly rather than
   skipped silently.
+- The integration gate applies to changes that affect page rendering, routing,
+  content, styles, or client behavior; browser-complex components; and the
+  integration suite or its tooling. Other changes MUST explicitly record
+  integration as not applicable.
 - When a task's complete changed-file set consists exclusively of `.md` files
   outside `src/content/**`, the only applicable verification gates are lint and
   format. Build, unit-test, SEO, and accessibility gates are not run under this
@@ -199,13 +203,14 @@ with the rest of the historical snapshot.
 Before a spec or a task is considered done, all applicable quality gates MUST
 pass:
 
-| Gate          | Command                                        |
-| ------------- | ---------------------------------------------- |
-| Lint          | `pnpm lint`                                    |
-| Format        | `pnpm format:check`                            |
-| Build         | `pnpm build`                                   |
-| Unit tests    | `pnpm test:run`                                |
-| Accessibility | `pnpm test:a11y` (and/or the `a11y` MCP audit) |
+| Gate          | Command                                 |
+| ------------- | --------------------------------------- |
+| Lint          | `pnpm lint`                             |
+| Format        | `pnpm format:check`                     |
+| Build         | `pnpm build`                            |
+| Unit tests    | `pnpm test:run`                         |
+| Accessibility | `pnpm test:a11y`                        |
+| Integration   | `pnpm test:integration` when applicable |
 
 The only applicable gates for a task are lint and format when the task's complete
 changed-file set consists exclusively of `.md` files outside `src/content/**`;
@@ -216,6 +221,10 @@ increment, relative to its base revision, consists exclusively of `.md` files
 outside `src/content/**`. For all other task or feature change sets, the applicable
 gates in the table remain required. If any changed file is non-Markdown or is
 under `src/content/**`, the Markdown-only exception does not apply.
+The Markdown-only exception also excludes integration: do not run
+`pnpm test:integration` for a task or final feature change set covered by that
+exception. For all other changes, determine integration applicability from the
+scope rule in §5 and record non-applicability explicitly when it does not apply.
 
 ## 7. Accessibility
 
@@ -258,8 +267,10 @@ The approved verification stack is:
 - **Unit / component tests**: [Vitest](https://vitest.dev/) together with the
   Astro Container API to render components without a browser.
 - **SEO**: `@astrojs/sitemap` for sitemap generation, plus tests over rendered HTML.
-- **Accessibility**: `axe-core` against rendered HTML in tests, plus the `a11y`
-  MCP server configured in `opencode.json` for URL-based audits.
+- **Browser integration and accessibility**: Playwright Test with Chromium for
+  applicable browser integration coverage; `@axe-core/playwright` audits
+  rendered pages against WCAG A/AA criteria through 2.2. Keep Vitest `axe-core`
+  accessibility tests and existing SEO tests over rendered HTML.
 - **Lint / format**: ESLint and Prettier (already configured).
 - **CSS**: Tailwind CSS v4 through the official Vite plugin `@tailwindcss/vite` (global stylesheet at `src/styles/global.css` with `@import "tailwindcss";`). (Note: `@astrojs/tailwind`/Tailwind 3 is legacy and not used.)
 - **Client interactivity**: React through `@astrojs/react`, used only for interactive islands (see §2). The React Compiler is enabled (`react({ compiler: true })`) via the `oxc-transform-react` dev dependency.

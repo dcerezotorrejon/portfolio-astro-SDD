@@ -5,7 +5,7 @@ import {
   getActiveSectionIndex,
   prefersReducedMotion,
   scrollToSection,
-} from "../../src/components/FloatingNav/helpers/navigation";
+} from "../../src/components/home/FloatingNav/helpers/navigation";
 
 describe("getActiveSectionIndex (section-start activation)", () => {
   const sections = [

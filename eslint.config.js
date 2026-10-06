@@ -56,7 +56,13 @@ const reactJsxFilesConfig = {
 export default defineConfig(
   // Archivos que ESLint debe ignorar.
   {
-    ignores: ["dist/", "node_modules/", ".astro/"],
+    ignores: [
+      "dist/",
+      "node_modules/",
+      ".astro/",
+      "playwright-report/",
+      "test-results/",
+    ],
   },
 
   // Reglas base para JavaScript.

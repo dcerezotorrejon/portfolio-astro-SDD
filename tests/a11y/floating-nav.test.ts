@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import FloatingNav from "../../src/components/FloatingNav/FloatingNav";
+import FloatingNav from "../../src/components/home/FloatingNav/FloatingNav";
 import { formatViolations, runAxeOnHtml } from "../helpers/a11y";
 import { getContainer } from "../helpers/render";
 

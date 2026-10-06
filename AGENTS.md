@@ -117,16 +117,21 @@ No task is complete without evidence. Tasks and final spec closure must pass the
 quality gates applicable under [Constitution §§5–6](./docs/constitution.md#5-task-lifecycle-and-verification-gates),
 including its Markdown-only exception:
 
-| Gate          | Command             |
-| ------------- | ------------------- |
-| Lint          | `pnpm lint`         |
-| Format        | `pnpm format:check` |
-| Build         | `pnpm build`        |
-| Unit tests    | `pnpm test:run`     |
-| Accessibility | `pnpm test:a11y`    |
+| Gate          | Command                                 |
+| ------------- | --------------------------------------- |
+| Lint          | `pnpm lint`                             |
+| Format        | `pnpm format:check`                     |
+| Build         | `pnpm build`                            |
+| Unit tests    | `pnpm test:run`                         |
+| Accessibility | `pnpm test:a11y`                        |
+| Integration   | `pnpm test:integration` when applicable |
 
 See [Constitution §§5–8](./docs/constitution.md) for verification and quality
-rules and the conditions under which gates apply.
+rules and the conditions under which gates apply. Integration applies to changes
+affecting page rendering, routing, content, styles, or client behavior, browser-
+complex components, and integration-suite/tooling changes; explicitly record
+when it does not apply. Preserve the Markdown-only exception: only lint and
+format run, and integration is not run, for qualifying Markdown-only changes.
 
 ## Language policy
 

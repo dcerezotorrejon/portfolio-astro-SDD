@@ -48,8 +48,9 @@ for task concurrency, QA handoffs, and final commit/push rules.
 - **`spec.md`** — the problem, requirements, and acceptance criteria. Anchors the
   expected behavior.
 - **`plan.md`** — the technical approach: files to touch, decisions, trade-offs.
-- **`tasks.md`** — checklist. A task is only marked `[x]` with evidence from the
-  unit test, SEO, and accessibility gates.
+- **`tasks.md`** — checklist. A task is only marked `[x]` with evidence from all
+  applicable unit, SEO, accessibility, and integration gates. Integration
+  applicability and the Markdown-only exception follow Constitution §§5–6.
 - **`summary.md`** — date, files changed, and functions/components changed. It
   does not include historical-spec relationships.
 

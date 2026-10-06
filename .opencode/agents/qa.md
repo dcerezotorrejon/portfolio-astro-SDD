@@ -59,19 +59,27 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    current branch with read-only inspection; if it differs, stop and notify the
    Lead instead of switching. State the shared-branch revision and task scope
    verified, accounting for uncommitted task changes.
-2. Own the assigned tests completely: create, modify, or remove them as needed to
-   provide meaningful coverage of the change:
+2. Own the assigned tests completely, including integration test authoring,
+   maintenance, execution, and evidence. Create, modify, or remove them as needed
+   to provide meaningful coverage:
    - **Unit / component** tests (Vitest + Astro Container API).
    - **SEO** checks over rendered HTML (title, meta, canonical) when pages are
      involved.
-   - **Accessibility** checks (axe-core) when markup is involved.
-3. Determine the applicable task gates using the complete changed-file set owned
-   by the assigned task. If every changed file is a `.md` file outside
-   `src/content/**`, run only `pnpm lint` and `pnpm format:check`; record build,
-   unit, SEO, and accessibility gates as not run under the Constitution §§5–6
-   exception. If any changed file is non-Markdown or is under `src/content/**`,
-   run all five gates required by Constitution §6: `pnpm lint`,
-   `pnpm format:check`, `pnpm build`, `pnpm test:run`, and `pnpm test:a11y`.
+   - **Accessibility** checks: retain Vitest axe-core checks when applicable and
+     use Playwright with Chromium and `@axe-core/playwright` for browser audits
+     when assigned. Browser axe audits use applicable WCAG A/AA tags through 2.2.
+   - **Integration** tests with Playwright Test and Chromium when applicable.
+3. Determine task gate applicability using the complete changed-file set owned
+   by the task. If every changed file is a `.md` file outside `src/content/**`,
+   run only `pnpm lint` and `pnpm format:check`; record build, unit, SEO,
+   accessibility, and integration as not run under the Constitution §§5–6
+   exception. Otherwise run `pnpm lint`, `pnpm format:check`, `pnpm build`,
+   `pnpm test:run`, and `pnpm test:a11y`. Also run `pnpm test:integration` when
+   changes affect page rendering, routing, content, styles, client behavior,
+   browser-complex components, or the integration suite/tooling. Explicitly
+   record integration as not applicable for other scopes. The Markdown-only
+   exception takes precedence: do not run integration for qualifying Markdown-
+   only changes.
 4. While the increment is active and before the Lead's final metadata transition,
    record the latest QA report for the assigned task in this spec's `tasks.md` on
    the same branch. Replace the previous report on every re-verification,

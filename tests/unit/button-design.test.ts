@@ -3,7 +3,7 @@ import { getCollection, getEntry } from "astro:content";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
-import ProfileIntroduction from "../../src/components/ProfileIntroduction.astro";
+import ProfileIntroduction from "../../src/components/home/ProfileIntroduction.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import Home from "../../src/pages/index.astro";
 import {
