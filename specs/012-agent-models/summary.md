@@ -2,7 +2,7 @@
 
 - **Spec ID**: `012-agent-models`
 - **Last updated**: 2026-10-06
-- **Status**: feature integrated; Spec Refiner metadata closure pending
+- **Status**: implementation and verification complete; final metadata transition follows
 - **Shared branch**: `spec/012-agent-models`
 
 ## Changes
@@ -18,8 +18,14 @@
   corrected permission ordering for README and permitted template files.
   Feature planning, evidence, summaries, tests, and every `spec.md` remain
   outside Dev edit authority; completed directories remain immutable.
-- Adopted the approved constitutional role separation in version `1.8.0`,
-  with application date 2026-10-06; synchronized the operational guide.
+- Adopted the approved constitutional role separation in version `1.8.0`, then
+  extended it in this same increment to version `1.9.0` for autonomous, narrowly
+  scoped Lead closure; synchronized the operational guide.
+- Authorized the Lead, only after constitutional adoption and loading the updated
+  prompt, to make its final active-spec edit to `Status` and `Last updated` after
+  all QA, evidence, criteria, artifacts, and applicable gates are complete.
+  Substantive spec ownership remains with Spec Refiner; no post-`done` directory
+  edits are permitted.
 
 ## Files changed
 
@@ -28,12 +34,16 @@
 - `.opencode/agents/dev.md`: unsuffixed Luna default, explicit assigned workflow
   and configuration implementation, corrected permissions, amendment approval
   requirement, removal of `Model intent`.
-- `.opencode/agents/qa.md`: unsuffixed Luna default and removal of `Model intent`;
-  other instructions and permissions preserved.
+- `.opencode/agents/qa.md`: unsuffixed Luna default, removal of `Model intent`,
+  and pre-freeze evidence/checkbox boundaries; unrelated permissions preserved.
 - `.opencode/agents/spec-refiner.md`: Sol default and removal of `Model intent`;
-  other instructions and permissions preserved.
-- `docs/constitution.md`: version and approved §5.1 role separation.
-- `AGENTS.md`: current model defaults and implementation/verification boundaries.
+  substantive spec authorship/re-anchoring retained; no final status handoff.
+- `.opencode/agents/qa.md`: preserves verified checkbox authority while requiring
+  task/final-gate evidence to be completed before the Lead freezes the directory.
+- `docs/constitution.md`: version and approved §5.1 role separation, including
+  autonomous closure prerequisites and immutable freeze order.
+- `AGENTS.md`: current model defaults, implementation/verification boundaries,
+  and autonomous closure role split.
 - `specs/012-agent-models/spec.md`: current requirements, acceptance criteria,
   verification, and QA-backed criterion markers; Spec Refiner re-anchored the
   execution account to the actual Lead bootstrap and approved Dev transfer.
@@ -73,10 +83,8 @@ criteria remain unchanged. The spec has status `in progress` so the authorized
 owners can finish current coordination and verification without editing a frozen
 directory.
 
-The Lead renewed lint and format gates on the complete re-anchored increment;
-both passed, and QA recorded the latest results and independently confirmed
-unchanged requirements and criteria. Using the commit skill, the Lead created
-feature commit `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
+The Lead used the commit skill to create feature commit
+`5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
 `chore(spec-012): align agent models and delegate implementation`, and pushed it
 successfully to `origin/spec/012-agent-models`. This final publication record
 is included in a follow-up feature bookkeeping commit after applicable gates.
@@ -87,6 +95,16 @@ verified feature and pushed `main` with merge commit
 retained. Integration records are maintained and verified on that shared branch
 before their final publication and integration under the same approval.
 
-Spec Refiner retains the final `done` metadata transition;
-publication/integration does not authorize the Lead to edit spec prose or status.
-The current spec remains `in progress` until that transition.
+The maintainer requires autonomous Lead closure in this same active spec. T5–T7
+implemented and independently verified constitution `1.9.0`, a path allowance
+limited by prompt to final `Status`/`Last updated`, consistent Refiner/QA guidance,
+pre-freeze evidence ordering, and successful/blocked in-memory closure walkthroughs.
+
+AC1–AC9 have QA-backed completion; T7 passed final independent re-verification
+after the stale closure-state narrative was corrected in this active spec.
+The complete scope remains Markdown-only. The latest final-gate report records
+the applicable gates and prerequisite verification before closure. Prior
+publication/integration does not publish the expanded continuation. All current
+artifacts must be finalized before the Lead's two-field closure metadata transition.
+Actual later Git outcomes will be reported externally after freeze, not through
+post-closure directory edits.

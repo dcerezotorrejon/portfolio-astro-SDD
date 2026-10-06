@@ -62,11 +62,20 @@ maintained in the corresponding agent prompts and are not duplicated here.
   `spec-refiner` use `openrouter/openai/gpt-6.1-sol`, while `dev` and `qa` use
   `openrouter/openai/gpt-6-luna`. No reasoning variant is explicitly selected in
   those defaults. The Auto Router variants in `opencode.json` remain unchanged.
-- The Dev Lead writes only assigned current planning artifacts. All implementation,
-  including operational Markdown and repository configuration, is delegated to Dev
-  with exact file ownership; QA independently verifies and owns assigned tests and
-  evidence without editing production. See the current agent prompts for detailed
-  role procedures and write boundaries.
+- The Dev Lead writes assigned current `plan.md`, `tasks.md`, and `summary.md`, and
+  delegates all implementation, including operational Markdown and repository
+  configuration, to Dev with exact file ownership. After the approved constitutional
+  amendment is adopted and the updated Lead prompt is loaded, the Lead owns one
+  final edit in the assigned current `spec.md`, limited to `Status` and `Last
+updated`, only after every task has QA approval and evidence, all criteria have
+  QA-backed completion, substantive re-anchoring is resolved, directory artifacts
+  and latest final-gate evidence are finalized while active, and applicable gates
+  pass. Failed prerequisites leave the increment active; there is no status-only
+  handoff. The Spec Refiner owns substantive spec content, and QA records evidence
+  and verified criterion markers before freeze. No directory file is edited after
+  `done`; actual later Git outcomes are reported externally, not pre-recorded in
+  the frozen directory. See the current agent prompts for detailed role procedures
+  and write boundaries.
 - Agents are defined as Markdown + YAML frontmatter, the format shared by OpenCode
   and other agent tools (for example Claude Code reads `.claude/agents/`). The
   constitution and current agent prompts define their permissions and historical
