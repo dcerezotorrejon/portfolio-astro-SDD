@@ -1,8 +1,9 @@
 # Specs
 
 This directory holds the specs for the project. The project follows
-**spec-anchored development**: specs are living artifacts kept in sync with the
-code for the entire life of a feature. See
+**spec-anchored development**: an active increment's spec is kept in sync with
+the code through closure. After closure with status `done`, the entire directory
+is an immutable historical snapshot. See
 [`docs/constitution.md`](../docs/constitution.md) for the binding rules.
 
 > All files under `specs/` are written in **English**.
@@ -16,7 +17,7 @@ specs/[NNN]-[feature-slug]/
 ├── spec.md      # requirements + acceptance criteria
 ├── plan.md      # technical approach
 ├── tasks.md     # checklist of tasks with verification evidence
-└── summary.md   # files/functions changed + related specs + date
+└── summary.md   # files/functions changed + date
 ```
 
 - `[NNN]`: zero-padded sequential number, starting at `001`.
@@ -40,7 +41,7 @@ for task concurrency, QA handoffs, and final commit/push rules.
 2. Fill in `spec.md` (requirements and acceptance criteria).
 3. Fill in `plan.md` (technical approach).
 4. Break the work down in `tasks.md`.
-5. When the work is done, write `summary.md` and keep it updated on later changes.
+5. At closure, write `summary.md`; the completed directory is then immutable.
 
 ## Files
 
@@ -49,24 +50,18 @@ for task concurrency, QA handoffs, and final commit/push rules.
 - **`plan.md`** — the technical approach: files to touch, decisions, trade-offs.
 - **`tasks.md`** — checklist. A task is only marked `[x]` with evidence from the
   unit test, SEO, and accessibility gates.
-- **`summary.md`** — date, files changed, functions/components changed, and the
-  **Related specs** section (§4.2).
+- **`summary.md`** — date, files changed, and functions/components changed. It
+  does not include historical-spec relationships.
 
-## Historical spec files
+## Historical specifications
 
-Each incremental spec records anticipated relationships in its own `spec.md`.
-Later increments MUST preserve earlier, historical `spec.md` files unchanged;
-when an earlier feature is affected, update only its `summary.md` relationship
-record. The current feature's `spec.md` remains a living artifact while that
-feature evolves. See [Constitution §4.2](../docs/constitution.md#42-spec-relationships).
-
-## Related specs
-
-Features rarely change alone. Every `summary.md` includes a **Related specs**
-section listing the specs this one affects or is affected by, with a short note
-on each relationship. When a later change touches a feature, update the affected
-spec's `summary.md` too. See
-[Constitution §4.2](../docs/constitution.md#42-spec-relationships).
+Agents MUST NOT read completed specification contents by default. An explicit
+request from the maintainer or an agent with `mode: primary` may authorize all
+participants in that feature, including subagents, to read completed specs.
+Reading never authorizes writing: no file in a completed directory may be
+changed. New increment artifacts MUST NOT identify or link completed specs, and
+existing completed directories are left untouched. See
+[Constitution §4.2](../docs/constitution.md#42-historical-specification-access-and-references).
 
 ## Conflict resolution
 

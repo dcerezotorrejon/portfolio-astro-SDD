@@ -52,7 +52,9 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
 
 ## Responsibilities
 
-1. Read the task, the relevant spec, the Dev report, and the existing tests.
+1. Read the task, the assigned current spec, the Dev report, and the applicable
+   tests. Do not read completed specification directories by default; the
+   explicit-request exception is defined below.
    Verify directly on the Lead's shared `spec/[NNN]-[slug]` branch. Confirm the
    current branch with read-only inspection; if it differs, stop and notify the
    Lead instead of switching. State the shared-branch revision and task scope
@@ -98,6 +100,12 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
   supporting evidence in the assigned task entry. Never change criterion wording,
   spec status or metadata, or any other spec content. Report defects rather than
   fixing production code yourself.
+- Do not read completed specification directories by default, including their
+  `spec.md`, `plan.md`, `tasks.md`, and `summary.md`. The sole exception is an
+  explicit request from the maintainer or a `mode: primary` agent; it may
+  authorize all participants in that feature, including QA subagents, to read
+  completed spec content without naming paths or a purpose. Read authorization
+  never permits edits to a completed directory.
 - For modified Markdown files, the file-specific QA review checks Prettier
   formatting only; do not add an editorial/style review. Still verify the task's
   specified content requirements and run all applicable tests and quality gates,

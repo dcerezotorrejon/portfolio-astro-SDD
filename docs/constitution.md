@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.6.1
+- **Version**: 1.7.0
 - **Last amended**: 2026-10-06
 
 ---
@@ -49,17 +49,20 @@ conventions already present in the codebase, in that order.
 This project follows **spec-anchored development**, not spec-first and not
 spec-as-source:
 
-- **Spec-anchored** means the spec is a _living artifact_. It is written alongside
-  the work and **kept in sync with the code for the entire life of the feature**.
-  It is never discarded once the first implementation ships.
+- **Spec-anchored** means the current increment's spec is a living artifact,
+  written alongside the work and kept in sync with the code while that increment
+  is active. Spec and code evolve together through closure.
 - **Spec-first** (writing a spec and throwing it away) and **spec-as-source**
   (generating code from the spec without editing the code) are explicitly **not**
   the model used here.
-- Specs and code MUST evolve together.
-- **Conflict resolution**: when code and spec diverge, **the code is the source of
-  truth**. The divergence is analyzed, and then the spec is updated to re-anchor
-  against the real behavior. Silently changing code to match a stale spec is not
-  allowed; the spec must be amended to reflect reality.
+- **Conflict resolution during an active increment**: when code and the active
+  spec diverge, **the code is the source of truth**. Analyze the divergence and
+  update the active spec to re-anchor against actual behavior. Do not silently
+  change code to match a stale spec.
+- On closure with status `done`, the entire increment directory becomes a
+  historical snapshot and MUST NOT be changed. Code remains the source of truth
+  for current behavior. A later change is recorded in a new increment rather
+  than by reopening or revising a completed one.
 
 ## 4. Spec structure and naming
 
@@ -85,37 +88,36 @@ Rules:
 
 ### 4.1 `summary.md`
 
-Every spec MUST include a `summary.md` that records, at minimum:
+Every increment MUST include a `summary.md`, created at closure, that records:
 
 - **Date** of the latest update.
 - **Files changed** (paths relative to the repo root).
 - **Functions / components changed** and a short description of what changed.
-- **Related specs** — the specs this one affects or is affected by, with the
-  direction of each relationship (§4.2). State "None." when there are none.
 
-It is created when the spec is completed and **updated on every later change**
-that touches the feature, refreshing the date.
+The summary MUST NOT include a related-spec list. Once the increment is closed
+with status `done`, its summary and every other file in its directory are frozen
+with the rest of the historical snapshot.
 
-### 4.2 Spec relationships
+### 4.2 Historical specification access and references
 
-Features do not exist in isolation: changing one behavior usually touches
-others, and specs must keep those links visible.
-
-- While a spec is being written, its **anticipated relationships** are recorded
-  in `spec.md`: which existing specs it is likely to affect, depend on, or
-  modify.
-- When the spec is completed, `summary.md` MUST resolve them in its
-  **`Related specs`** section, listing every spec that was added, modified, or
-  otherwise impacted, with a short note describing the relationship. If there
-  are none, state "None." explicitly.
-- Relationships are **bidirectional in maintenance**: when a later change
-  touches a feature, the `summary.md` of the affected spec is updated in the
-  same change, refreshing its date.
-- Historical `spec.md` files MUST NOT be rewritten by later incremental specs.
-  A new spec records anticipated relationships in its own `spec.md`; when an
-  earlier feature is affected, update only that feature's `summary.md` relationship
-  record in the same change. The current feature's spec remains a living artifact
-  under §3.
+- Agents MUST NOT read the contents of a completed specification directory by
+  default. This includes opening, searching, indexing, summarizing, or quoting
+  any completed `spec.md`, `plan.md`, `tasks.md`, or `summary.md`. Assignment to a
+  new feature alone does not authorize a historical read.
+- The sole read exception is an explicit request from the maintainer or an agent
+  whose current prompt declares `mode: primary`. Such a request may authorize
+  all participants in that feature, including subagents, to read completed
+  specification content; it need not identify particular directories or state a
+  purpose.
+- Read authorization MUST NOT be treated as write authorization. Agents MUST
+  NOT edit any file in a completed specification directory under any
+  circumstances, including summaries or relationship records.
+- New increment artifacts MUST NOT identify, cite, or link to completed specs by
+  ID, path, or title. New specs MUST NOT record anticipated relationships to
+  completed specs, and new summaries MUST NOT include a `Related specs` section.
+- Existing completed directories and their contents MUST remain untouched,
+  including their existing cross-references. No historical relationship
+  backfill or cleanup is required or permitted.
 
 ## 5. Task lifecycle and verification gates
 
@@ -163,9 +165,9 @@ others, and specs must keep those links visible.
   with it, the applicable current agent prompts. This constitution prevails in a
   conflict. Explicit maintainer decisions may resolve matters not specified here,
   but do not override this constitution unless adopted through the amendment
-  process in §11. Earlier specs are historical or relationship records only; they
-  MUST NOT establish or override current workflow rules, permissions, or role
-  boundaries.
+  process in §11. Completed specification files MUST NOT establish or override
+  current workflow rules, permissions, role boundaries, or current behavior. The
+  access and immutability rules in §4.2 apply to every completed increment.
 
 ## 6. Quality gates
 

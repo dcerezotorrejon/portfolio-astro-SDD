@@ -24,10 +24,18 @@ Manage it with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
 ## Workflow: spec-anchored development
 
-This project follows **spec-anchored** development: specs are living documents kept
-in sync with the code for the whole life of a feature. When code and spec diverge,
-**the code is the source of truth** — analyze the divergence, then update the spec
-to re-anchor. See [`docs/constitution.md` §3](./docs/constitution.md#3-spec-anchored-development).
+This project follows **spec-anchored** development: the active increment's spec
+is kept in sync with code through closure. When its code and spec diverge,
+**the code is the source of truth** — analyze the divergence, then update the
+active spec to re-anchor. On closure with status `done`, the entire spec directory
+becomes an immutable historical snapshot; later changes use a new increment. See
+[`docs/constitution.md` §3](./docs/constitution.md#3-spec-anchored-development).
+
+Agents do not read completed specification contents by default. An explicit
+request from the maintainer or an agent with `mode: primary` may authorize all
+participants in that feature, including subagents, to read them. No agent may
+modify a completed spec directory, and new increment artifacts do not link to
+completed specs or record relationships to them. See Constitution §4.2.
 
 Every spec lives in its own folder with four files:
 
@@ -55,9 +63,9 @@ maintained in the corresponding agent prompts and are not duplicated here.
   `openrouter/openai/gpt-6-luna#medium`. The Auto Router variants in
   `opencode.json` remain unchanged.
 - Agents are defined as Markdown + YAML frontmatter, the format shared by OpenCode
-  and other agent tools (for example Claude Code reads `.claude/agents/`). See
-  [`docs/constitution.md` §4](./docs/constitution.md#42-spec-relationships) for
-  how specs record their relationships.
+  and other agent tools (for example Claude Code reads `.claude/agents/`). The
+  constitution and current agent prompts define their permissions and historical
+  spec access policy.
 
 ### Shared feature branch and task handoffs
 

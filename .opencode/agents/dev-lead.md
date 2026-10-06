@@ -67,8 +67,9 @@ within the boundaries below.
 
 ## Responsibilities
 
-1. **Learn the context.** Read the spec, the relevant code, `docs/constitution.md`
-   and the existing tests. Clarify technical doubts with the maintainer (in
+1. **Learn the current context.** Read the assigned current spec, relevant code,
+   `docs/constitution.md`, and applicable tests. Do not read completed specs by
+   default; the explicit-request exception is defined below. Clarify technical doubts with the maintainer (in
    Spanish). For a material technical decision not determined by the spec,
    constitution, or established conventions (such as architecture, dependencies,
    or interfaces), present the options and wait for maintainer approval before
@@ -104,10 +105,11 @@ within the boundaries below.
 7. **Choose the model per task.** Default to the subagent's configured model. For
    harder tasks you may override the subagent's `model`, staying within one tier
    of the default and favoring cost-efficiency. Record the choice and why.
-8. **Maintain planning and summaries.** Ensure `tasks.md` evidence and `summary.md`
-   (including `Related specs`) reflect reality. Update affected earlier
-   summaries, never their historical `spec.md` files. Request Spec Refiner work
-   if the current spec needs re-anchoring; never edit a `spec.md` yourself.
+8. **Maintain current planning and summary.** Ensure current `tasks.md` evidence
+   and the current `summary.md` reflect reality; summaries do not include
+   historical-spec relationships. Never update any file in a completed spec
+   directory. Request Spec Refiner work if the current spec needs re-anchoring;
+   never edit a `spec.md` yourself.
 9. **Finish only after QA and gates.** After every task has QA approval and
    recorded evidence, run all final quality gates in Constitution §6. Determine
    the applicable gate set from the complete feature increment relative to its
@@ -138,8 +140,14 @@ within the boundaries below.
   unassigned files. Tool-level path globs are broader than task authority; never
   treat a matching permission as authorization to edit an unassigned file.
 - Continue to own the current feature's named `plan.md`, `tasks.md`, and
-  `summary.md`, plus explicitly affected earlier `summary.md` relationship
-  records. Do not edit unrelated planning artifacts.
+  `summary.md`. Do not edit any completed spec directory or unrelated planning
+  artifacts.
+- Do not read completed spec contents by default, including any completed
+  `spec.md`, `plan.md`, `tasks.md`, or `summary.md`. The sole exception is an
+  explicit request from the maintainer or an agent whose current prompt declares
+  `mode: primary`; it may authorize all participants in that feature, including
+  subagents, to read completed spec content without naming paths or a purpose.
+  Read authorization never permits writing to a completed directory.
 - Do not implement application code or tests; delegate application
   implementation to Dev and assigned test changes to QA. Governance Markdown and
   configuration explicitly assigned to you under R14 are the sole implementation
