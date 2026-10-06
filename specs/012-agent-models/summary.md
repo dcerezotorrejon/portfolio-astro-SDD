@@ -2,7 +2,7 @@
 
 - **Spec ID**: `012-agent-models`
 - **Last updated**: 2026-10-06
-- **Status**: verified and re-anchored; approved for final publication
+- **Status**: feature published; integration and spec metadata closure pending
 - **Shared branch**: `spec/012-agent-models`
 
 ## Changes
@@ -73,10 +73,15 @@ criteria remain unchanged. The spec has status `in progress` so the authorized
 owners can finish current coordination and verification without editing a frozen
 directory.
 
-The shared branch is published, but no final feature commit or push has yet been
-performed. The Lead renewed lint and format gates on the complete re-anchored
-increment; both passed, and QA recorded the latest results and independently
-confirmed unchanged requirements and criteria. Final feature commit/push is now
-approved under the workflow, followed by an explicit merge-permission request.
-Spec Refiner retains the final `done` metadata transition;
-publication/integration does not authorize the Lead to edit spec prose or status.
+The Lead renewed lint and format gates on the complete re-anchored increment;
+both passed, and QA recorded the latest results and independently confirmed
+unchanged requirements and criteria. Using the commit skill, the Lead created
+feature commit `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
+`chore(spec-012): align agent models and delegate implementation`, and pushed it
+successfully to `origin/spec/012-agent-models`. This final publication record
+is included in a follow-up feature bookkeeping commit after applicable gates.
+
+Integration into `main` remains pending explicit affirmative maintainer approval;
+the published feature branch is retained. Spec Refiner retains the final `done`
+metadata transition; publication/integration does not authorize the Lead to edit
+spec prose or status. The current spec remains `in progress` until that transition.

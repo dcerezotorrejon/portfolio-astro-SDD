@@ -1,7 +1,7 @@
 # Technical plan
 
 - **Spec ID**: `012-agent-models`
-- **Status**: verified and re-anchored; approved for final publication
+- **Status**: feature published; integration and spec metadata closure pending
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
@@ -14,8 +14,11 @@ tasks and independent QA. No application, test, content, dependency, or
 `opencode.json` changes are planned.
 
 The shared branch was created from `main` at the recorded base and published to
-`origin` before planning. No feature commit has been created. All implementation,
-verification, evidence, and rework remain on this branch.
+`origin` before planning. After all task approvals and renewed applicable final
+gates, the Lead used the commit skill to create and publish feature commit
+`5494d9c3f120dbf9e27683c26cfd7086db0786eb`. All implementation, verification,
+evidence, and final publication records remain on this branch. Integration still
+requires explicit maintainer approval; the branch is retained.
 
 ## Approved decisions and bootstrap authority
 

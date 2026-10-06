@@ -4,7 +4,7 @@
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
-- **Execution status**: verified and re-anchored; approved for final publication
+- **Execution status**: feature published; integration and spec metadata closure pending
 - **Active tasks**: 0
 
 ## Coordination prerequisites
@@ -297,51 +297,55 @@ docs/constitution.md AGENTS.md`, passed and left both owned files unchanged.
 - [x] QA records the latest final-gate results supplied by Lead below.
       Evidence: QA replaced the final report with renewed results and verified
       unchanged requirements/criteria hashes and actual implementation ownership.
-- [ ] Lead uses the commit skill only after approvals, evidence, and passing gates,
+- [x] Lead uses the commit skill only after approvals, evidence, and passing gates,
       then pushes the shared feature branch.
-- [ ] Lead asks for explicit merge permission; no merge without affirmative
-      approval, and the published branch is retained.
+      Evidence: `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
+      `chore(spec-012): align agent models and delegate implementation`, pushed
+      successfully to `origin/spec/012-agent-models` after renewed gates passed.
+- [ ] Maintainer grants explicit merge permission and Lead integrates the
+      published branch. No merge without affirmative approval; retain the branch.
 - [ ] Spec Refiner performs the final `done` metadata transition when authorized
       closure is complete. The Lead cannot edit this field; status `in progress`
       means the directory remains active until that transition.
 
 ## Latest final-gate report
 
-- **Status:** renewed final gates PASS after spec re-anchoring; approval is ready
-  for the Lead's final feature commit/push. No unresolved ownership blocker remains.
-  No commit or push has yet been made. Spec status remains `in progress`; only the
-  Spec Refiner may perform the eventual `done` transition.
-- **Scope/revision:** complete increment on `spec/012-agent-models`, base and
-  shared-branch HEAD `b135c8ea3034280657aa12132410872a7ce94dd7`; all changes remain
-  uncommitted. Lead inspected the complete staged, unstaged, and untracked scope
-  relative to that base: `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
+- **Status:** latest supplied final gates PASS. Feature commit
+  `5494d9c3f120dbf9e27683c26cfd7086db0786eb` was successfully pushed to
+  `origin/spec/012-agent-models`. No unresolved ownership blocker remains.
+- **Scope/revision:** complete increment on `spec/012-agent-models`, base
+  `b135c8ea3034280657aa12132410872a7ce94dd7`, current shared HEAD
+  `5494d9c3f120dbf9e27683c26cfd7086db0786eb`. The full feature diff from the base
+  contains `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
   `.opencode/agents/qa.md`, `.opencode/agents/spec-refiner.md`, `AGENTS.md`,
   `docs/constitution.md`, and `specs/012-agent-models/plan.md`, `spec.md`,
-  `summary.md`, and `tasks.md`. These ten changed files are all Markdown outside
-  `src/content/**`; no other paths changed.
+  `summary.md`, and `tasks.md` (ten Markdown files, all outside
+  `src/content/**`). The current unstaged diff is limited to the current
+  `plan.md`, `tasks.md`, and `summary.md`; there are no staged or untracked paths.
+- **Lead scope commands:** `git diff --name-only
+b135c8ea3034280657aa12132410872a7ce94dd7` — ten paths listed above;
+  `git diff --name-only` — current three planning/evidence/summary files;
+  `git ls-files --others --exclude-standard` — no untracked files.
 - **Ownership re-anchor confirmation:** current spec verification text assigns
   T1/T2 to the explicitly authorized Lead bootstrap and T3/T4 to Dev after the
   approved transfer, matching the task evidence and closed-task records. The
   re-anchor preserves all eight QA-backed acceptance markers. Independently
-  calculated SHA256 over the exact Requirements section (after `## Requirements`
-  and before `## Acceptance criteria`) is
+  recalculated SHA256 over the exact Requirements section (after
+  `## Requirements` and before `## Acceptance criteria`) is
   `19c2de4ba2f1880fed047873106b06d8805f8a9194a47482f917e69842d65f56`; over the
   Acceptance criteria section (before `## Verification`) it is
   `e5c4144e2b4753047302c95cb9afbad9d043fcb8def54a69bfbf8c271704f3c4`. Both
-  match the pre-reanchor hashes supplied for comparison. Spec status remains
-  `in progress`.
-- **Lead scope commands:** `git diff --name-only
-b135c8ea3034280657aa12132410872a7ce94dd7`, `git diff --cached`, and
-  `git ls-files --others --exclude-standard` — inspected the complete scope; no
-  staged paths. `pnpm exec prettier --write specs/012-agent-models/plan.md
-specs/012-agent-models/tasks.md specs/012-agent-models/summary.md` — PASS; all
-  three files unchanged. `git diff --check` — PASS.
+  still match the pre-reanchor hashes. Spec status remains `in progress`.
+- **Prettier:** Lead's `pnpm exec prettier --check
+specs/012-agent-models/plan.md specs/012-agent-models/tasks.md
+specs/012-agent-models/summary.md` — PASS.
 - **Lint:** `pnpm lint` — PASS (exit 0).
-- **Format:** `pnpm format:check` — PASS (exit 0; all matched files use Prettier).
+- **Format:** `pnpm format:check` — PASS (exit 0; all files formatted).
+- **Diff check:** `git diff --check` — PASS.
 - **Build, unit, SEO, accessibility:** NOT RUN and not applicable under
   Constitution §§5–6 because the complete changed-file set consists only of
   Markdown files outside `src/content/**`.
-- **Approval/closure:** final-gate results supplied by the Lead and the
-  re-anchor/hash comparison are verified and recorded. Gates pass and the
-  increment is ready for the Lead's final commit/push. The spec is not marked
-  `done`; that metadata transition remains exclusively with the Spec Refiner.
+- **Publication/closure:** final-gate results supplied by the Lead and the
+  ownership/hash recheck are recorded. The feature commit is already published;
+  integration awaits explicit maintainer approval. The spec remains `in progress`,
+  and only the Spec Refiner may perform its eventual `done` transition.
