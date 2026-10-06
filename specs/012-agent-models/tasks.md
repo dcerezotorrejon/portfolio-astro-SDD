@@ -4,7 +4,7 @@
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
-- **Execution status**: feature published; integration and spec metadata closure pending
+- **Execution status**: feature integrated; Spec Refiner metadata closure pending
 - **Active tasks**: 0
 
 ## Coordination prerequisites
@@ -302,26 +302,36 @@ docs/constitution.md AGENTS.md`, passed and left both owned files unchanged.
       Evidence: `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
       `chore(spec-012): align agent models and delegate implementation`, pushed
       successfully to `origin/spec/012-agent-models` after renewed gates passed.
-- [ ] Maintainer grants explicit merge permission and Lead integrates the
+- [x] Maintainer grants explicit merge permission and Lead integrates the
       published branch. No merge without affirmative approval; retain the branch.
+      Evidence: explicit affirmative maintainer approval on 2026-10-06; merge
+      `65aabd11befbd06b402770964dd7dc102fd7ad9d` pushed successfully to
+      `origin/main`. `spec/012-agent-models` remains available locally and remotely.
 - [ ] Spec Refiner performs the final `done` metadata transition when authorized
       closure is complete. The Lead cannot edit this field; status `in progress`
       means the directory remains active until that transition.
 
 ## Latest final-gate report
 
-- **Status:** latest supplied final gates PASS. Feature commit
-  `5494d9c3f120dbf9e27683c26cfd7086db0786eb` was successfully pushed to
-  `origin/spec/012-agent-models`. No unresolved ownership blocker remains.
+- **Status:** latest supplied final gates PASS after recording integration.
+  Maintainer-approved integration is complete; the remaining coordination records
+  are approved for gated commit/push on the shared feature branch. No unresolved
+  ownership blocker remains.
 - **Scope/revision:** complete increment on `spec/012-agent-models`, base
   `b135c8ea3034280657aa12132410872a7ce94dd7`, current shared HEAD
-  `5494d9c3f120dbf9e27683c26cfd7086db0786eb`. The full feature diff from the base
+  `1d8dc1b5bc028c3dc54a0c74596fe2053776e139`. The full feature diff from the base
   contains `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
   `.opencode/agents/qa.md`, `.opencode/agents/spec-refiner.md`, `AGENTS.md`,
   `docs/constitution.md`, and `specs/012-agent-models/plan.md`, `spec.md`,
   `summary.md`, and `tasks.md` (ten Markdown files, all outside
-  `src/content/**`). The current unstaged diff is limited to the current
-  `plan.md`, `tasks.md`, and `summary.md`; there are no staged or untracked paths.
+  `src/content/**`). The current unstaged diff is limited to `plan.md`, `tasks.md`,
+  and `summary.md`; no staged or untracked paths remain.
+- **Publication/integration:** feature commit
+  `5494d9c3f120dbf9e27683c26cfd7086db0786eb` was pushed to
+  `origin/spec/012-agent-models`. With the maintainer's explicit approval on
+  2026-10-06, the Lead merged the feature into `main` as
+  `65aabd11befbd06b402770964dd7dc102fd7ad9d` and successfully pushed
+  `origin/main`. The published feature branch is retained.
 - **Lead scope commands:** `git diff --name-only
 b135c8ea3034280657aa12132410872a7ce94dd7` — ten paths listed above;
   `git diff --name-only` — current three planning/evidence/summary files;
@@ -340,12 +350,13 @@ b135c8ea3034280657aa12132410872a7ce94dd7` — ten paths listed above;
 specs/012-agent-models/plan.md specs/012-agent-models/tasks.md
 specs/012-agent-models/summary.md` — PASS.
 - **Lint:** `pnpm lint` — PASS (exit 0).
-- **Format:** `pnpm format:check` — PASS (exit 0; all files formatted).
+- **Format:** `pnpm format:check` — PASS (exit 0).
 - **Diff check:** `git diff --check` — PASS.
 - **Build, unit, SEO, accessibility:** NOT RUN and not applicable under
   Constitution §§5–6 because the complete changed-file set consists only of
   Markdown files outside `src/content/**`.
 - **Publication/closure:** final-gate results supplied by the Lead and the
-  ownership/hash recheck are recorded. The feature commit is already published;
-  integration awaits explicit maintainer approval. The spec remains `in progress`,
+  ownership/hash recheck are recorded. Final integration is complete under the
+  same maintainer approval; the remaining coordination records are ready for
+  gated commit/push on the shared feature branch. The spec remains `in progress`,
   and only the Spec Refiner may perform its eventual `done` transition.
