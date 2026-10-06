@@ -4,7 +4,7 @@
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
-- **Execution status**: feature integrated; Spec Refiner metadata closure pending
+- **Execution status**: all seven tasks QA-approved; closure prerequisites verified
 - **Active tasks**: 0
 
 ## Coordination prerequisites
@@ -13,9 +13,10 @@
       Evidence: explicit affirmative confirmation on 2026-10-06, before T1.
 - [x] Request Spec Refiner re-anchoring of bootstrap ownership to the maintainer's
       one-time Lead assignment; final role boundaries remain unchanged. Resolve
-      the mismatch before closure; the Lead never edits `spec.md`.
+      the mismatch before closure; the Lead edits no substantive spec content.
       Evidence: Spec Refiner updated the current spec on 2026-10-06 to reflect
-      Lead T1/T2 and transferred Dev T3/T4; requirements and AC1–AC8 are preserved.
+      Lead T1/T2 and transferred Dev T3/T4; requirements and QA ownership are
+      preserved.
 
 The maintainer approved the constitutional amendment and explicitly assigned this
 bootstrap's six operational files to the Lead under current authority. Resulting
@@ -282,8 +283,9 @@ docs/constitution.md AGENTS.md`, passed and left both owned files unchanged.
 
 ## Closure checklist
 
-- [x] All four tasks have QA approval and recorded evidence; active tasks are 0.
-      Evidence: latest T1–T4 QA reports above, all approved.
+- [x] All seven tasks have current QA approval and recorded evidence; active tasks are 0.
+      T7 is reopened to independently verify the latest closure-state narrative and
+      gates after the Lead's correction. T1–T6 remain approved.
 - [x] Spec Refiner has resolved bootstrap ownership divergence and the current
       active-state metadata without changing completed directories.
       Evidence: the re-anchored spec has status `in progress` and records actual
@@ -292,11 +294,12 @@ docs/constitution.md AGENTS.md`, passed and left both owned files unchanged.
       Evidence: `specs/012-agent-models/summary.md`, dated 2026-10-06.
 - [x] Lead determines the complete feature changed-file set from the base revision
       and runs every applicable final gate.
-      Evidence: renewed lint and format PASS after re-anchoring, complete ten-file
-      Markdown-only scope reviewed; latest final report below.
-- [x] QA records the latest final-gate results supplied by Lead below.
-      Evidence: QA replaced the final report with renewed results and verified
-      unchanged requirements/criteria hashes and actual implementation ownership.
+      Evidence: final ten-path diff from the original base is Markdown-only outside
+      content. `pnpm lint` and `pnpm format:check` passed after all Lead artifact
+      updates; build/unit/SEO/accessibility are not applicable.
+- [x] QA records the latest final-gate results supplied by Lead while still active.
+      Evidence: the latest Lead results and QA's post-report lint/format reruns are
+      recorded in the latest final-gate report below.
 - [x] Lead uses the commit skill only after approvals, evidence, and passing gates,
       then pushes the shared feature branch.
       Evidence: `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
@@ -307,56 +310,329 @@ docs/constitution.md AGENTS.md`, passed and left both owned files unchanged.
       Evidence: explicit affirmative maintainer approval on 2026-10-06; merge
       `65aabd11befbd06b402770964dd7dc102fd7ad9d` pushed successfully to
       `origin/main`. `spec/012-agent-models` remains available locally and remotely.
-- [ ] Spec Refiner performs the final `done` metadata transition when authorized
-      closure is complete. The Lead cannot edit this field; status `in progress`
-      means the directory remains active until that transition.
+- [x] Finalize the current plan/checklist/summary before the QA final-gate report
+      and the Lead's closure-metadata transition. Do not write the directory
+      afterward or pre-record future Git operations as completed.
+      Evidence: plan, checklist, and summary now reflect T1–T7 scope, AC1–AC9,
+      the approved constitutional amendment, and actual prior Git outcomes. No
+      further Lead planning/summary changes are expected before closure.
+- [ ] After the final metadata freeze and successful final feature push, Lead asks
+      for new explicit merge approval for this continuation. If not approved, leave
+      it unmerged and retain the branch. Report actual outcomes externally.
+
+The original publication/integration evidence above records completed operations
+only. The continuation requires a new gated final commit/push and affirmative
+integration approval; report those later outcomes externally after freezing.
+
+## Autonomous-closure continuation
+
+- [x] Maintainer approves the updated plan and version `1.9.0` amendment under §11
+      before implementation. The requested scope is autonomous Lead metadata
+      closure, not substantive spec or operational implementation authority.
+      Evidence: explicit affirmative approval on 2026-10-06 before T5 assignment.
+
+### T5 — Agent closure boundaries
+
+- [x] T5 complete with independent QA approval and recorded evidence.
+- **Status:** approved — closed; latest QA evidence below.
+- **Dependencies:** updated plan/amendment approval.
+- **Implementer:** Dev.
+- **Production ownership:** `.opencode/agents/dev-lead.md`,
+  `.opencode/agents/spec-refiner.md`, and `.opencode/agents/qa.md` only.
+- **Scope:** implement R6/R9 role instructions and the Lead's effective
+  current-spec allowance with template/root-spec denials. Narrow spec authority
+  to final `Status`/`Last updated`; preserve operational delegation and unrelated
+  roles/models/permissions. Remove the status-only Refiner handoff; require QA
+  evidence to finish before freeze and forbid later artifact bookkeeping.
+- **Acceptance coverage:** AC6; contributes to AC8/AC9/AC5.
+- **QA ownership:** this T5 latest report; evidence-backed AC6 marker in current
+  spec; no production or test edits.
+- **Models:** Dev and QA configured defaults, no overrides; bounded Markdown and
+  independent permission/role verification do not require higher-cost models.
+- **Handoff:** Dev formats exactly its three files and reports command/results;
+  QA runs applicable lint/format and permission checks without real closure edits.
+- **Latest QA report:** approved for T5 on shared branch `spec/012-agent-models` at
+  HEAD `545fe78ee378fb7d3473a23a6a043092ba440765`; the assigned changes are
+  uncommitted. Verified only the three T5 production files:
+  `.opencode/agents/dev-lead.md`, `.opencode/agents/spec-refiner.md`, and
+  `.opencode/agents/qa.md`. The feature working set relative to base
+  `b135c8ea3034280657aa12132410872a7ce94dd7` has ten paths: those three plus
+  `.opencode/agents/dev.md`, `AGENTS.md`, `docs/constitution.md`, and this
+  increment's `plan.md`, `spec.md`, `summary.md`, and `tasks.md`. All are Markdown
+  outside `src/content/**`; no untracked paths are present. The assigned scope
+  contains no tests, and no test files were changed.
+
+  **AC6 evidence:** The Lead description and instructions remove direct
+  implementation authority and contain no `R14` reference. Its permissions use
+  a default `**` edit denial, followed by planning-family allows for
+  `specs/*/plan.md`, `specs/*/tasks.md`, and `specs/*/summary.md`, then an allow
+  for `specs/*/spec.md`. Under OpenCode V2 whole-value `*` matching (including
+  `/`) and last-matching-rule semantics, the current increment's plan, tasks,
+  summary, and spec paths match those allows; no later blanket spec denial
+  overrides them. `specs/_template/**` is denied by its later rule and root
+  `spec.md` by its explicit later denial. The Lead's assigned prompt further
+  limits the current-spec path allowance textually to only `Status` and
+  `Last updated` for final closure, after the approved constitutional amendment
+  is adopted and the updated definition is loaded. It prohibits substantive
+  requirements, criterion wording, checkboxes, other metadata, unrelated or
+  completed specs, and indirect write/formatter workarounds, and retains Dev
+  implementation with exact ownership plus independent QA. This is a textual
+  instruction limit, not field-level permission enforcement.
+
+  For the AC6 denied-path cases, `AGENTS.md`, `docs/constitution.md`, all four
+  agent definitions (including the three assigned files), `opencode.json`,
+  `src/pages/index.astro`, `tests/permission-probe.test.ts`, and
+  `specs/README.md` match the default edit denial; template plan/task/summary
+  paths are overridden by the later template denial, template `spec.md` is also
+  denied there, and root `spec.md` matches its explicit denial. The repository's
+  applicable `opencode.json` contains MCP/provider configuration only and no
+  permission override. No forbidden writes or probes were attempted.
+
+  Closure instructions require every task's QA approval/evidence, every
+  criterion's QA-backed completion, resolved substantive re-anchoring, finalized
+  plan/checklist/summary/latest final-gate evidence, and passing applicable gates
+  before closure. Failures leave the increment active; there is no status-only
+  Refiner/maintainer handoff. All directory writes precede the final metadata
+  edit; no artifact may be updated after `done`, and future Git operations are
+  not pre-recorded. Spec Refiner retains substantive ownership; QA's evidence and
+  criterion markers are explicitly pre-freeze. New affirmative maintainer merge
+  permission is still required after publication and the branch is retained.
+  The current constitution remains version `1.8.0` and does not yet authorize
+  Lead spec-metadata edits: T5's prompt capability is conditional and was not
+  exercised; constitutional adoption is T6. Thus this report verifies T5's
+  desired target without representing it as already constitutionally effective.
+
+  Dev reported `pnpm exec prettier --write .opencode/agents/dev-lead.md
+.opencode/agents/spec-refiner.md .opencode/agents/qa.md` — PASS, all three
+  formatted. QA `pnpm lint` — PASS; `pnpm format:check` — PASS. `git diff --check`
+  — PASS. Build, unit tests, rendered-HTML SEO, and accessibility were not run and
+  are not applicable under Constitution §§5–6 because the complete observed
+  changed-file set is Markdown-only outside `src/content/**`. No T5 defect found;
+  AC6 is verified. AC4, AC5, AC8, and AC9 remain pending their assigned later
+  verification.
+
+### T6 — Constitutional closure authority
+
+- [x] T6 complete with independent QA approval and recorded evidence.
+- **Status:** approved — closed; latest QA evidence below.
+- **Dependencies:** T5 approval; recorded amendment approval.
+- **Implementer:** Dev.
+- **Production ownership:** `docs/constitution.md` and `AGENTS.md` only.
+- **Scope:** implement R8 version `1.9.0` and application date, narrowly authorize
+  Lead metadata closure, retain substantive Refiner/independent QA/Dev ownership,
+  and document pre-freeze finalization/external Git outcomes. Guide must match
+  the new authority and preserve all model and Auto Router statements.
+- **Acceptance coverage:** AC4/AC8; contributes to AC5/AC9.
+- **QA ownership:** this T6 latest report; evidence-backed AC4/AC8 markers in
+  current spec; no production or test edits.
+- **Models:** Dev and QA configured defaults, no overrides; bounded approved
+  amendment and cross-file checks.
+- **Handoff:** Dev formats exactly its two files and reports command/results;
+  QA runs applicable lint/format and verifies scope and constitutional consistency.
+- **Latest QA report:** approved for T6 on shared branch `spec/012-agent-models` at
+  HEAD `545fe78ee378fb7d3473a23a6a043092ba440765`; T6 changes are uncommitted.
+  Verified the assigned production scope only: `docs/constitution.md` and
+  `AGENTS.md`. Their diff from the continuation HEAD contains only the approved
+  constitution version/date and §5.1 closure-authority changes plus the matching
+  guide update. The complete changed-file set from base
+  `b135c8ea3034280657aa12132410872a7ce94dd7` is ten Markdown files, all outside
+  `src/content/**`; no untracked paths are present.
+
+  **AC4 evidence:** `AGENTS.md` retains the exact unsuffixed configured defaults
+  (`openrouter/openai/gpt-6.1-sol` for Dev Lead/Spec Refiner and
+  `openrouter/openai/gpt-6-luna` for Dev/QA), identifies frontmatter as their
+  source, states no reasoning variant is explicitly selected, and says the
+  `opencode.json` Auto Router variants remain unchanged (lines 61–64). Its
+  workflow guidance now limits Lead writing to assigned current planning
+  artifacts plus a single final edit of only `Status` and `Last updated` after
+  the stated QA, criteria, re-anchoring, artifact, and gate prerequisites; it
+  leaves substantive spec content with Spec Refiner and requires QA evidence and
+  criterion markers before freeze, with no post-`done` directory edits or
+  pre-recorded later Git outcomes (lines 65–78). This agrees with the current
+  Lead, Spec Refiner, and QA prompts.
+
+  **AC8 evidence:** `docs/constitution.md` is version `1.9.0` with actual
+  application date `2026-10-06`. Section 5.1 conditions the Lead's sole final
+  directory edit on adoption of the approved amendment and loaded prompt; limits
+  it to `Status` and `Last updated`; requires all task approvals/evidence,
+  QA-backed criteria, resolved substantive re-anchoring, finalized artifacts and
+  latest gate evidence, and passing applicable gates; leaves the increment active
+  if a prerequisite fails; and prohibits any post-transition directory edits or
+  pre-recording subsequent Git outcomes. It preserves the ban on Lead
+  implementation, indirect writes, and broadening authority by assignment; Dev
+  retains exact-path implementation and QA remains independent. The Spec Refiner
+  prompt retains substantive authorship and rejects a status-only handoff; the QA
+  prompt requires evidence and verified markers before freeze. The plan records
+  explicit maintainer approval of the updated plan and §11 amendment on
+  2026-10-06 before T5 assignment (plan.md lines 61–68). The constitution diff is
+  limited to version `1.9.0`, its amendment date, and the §5.1 amendment; all
+  unrelated constitutional rules remain unchanged, including explicit
+  affirmative merge approval and branch retention. Dev reported
+  `pnpm exec prettier --write docs/constitution.md AGENTS.md` completed; the
+  repository-wide format check below also passes.
+
+  `pnpm lint` — PASS. `pnpm format:check` — PASS. Build, unit tests, rendered-HTML
+  SEO, and accessibility were not run and are not applicable under Constitution
+  §§5–6 because the complete changed-file set is Markdown-only and outside
+  `src/content/**`; no test files or pages are in scope. No T6 defects found;
+  AC8 is verified and its checkbox is marked. AC4 remains unchecked for the
+  complete T7 verification; AC5 and AC9 also remain pending T7. T6 is approved
+  with evidence.
+
+### T7 — Complete autonomous-closure verification
+
+- [x] T7 complete with independent QA approval and recorded evidence.
+- **Status:** approved — latest closure-state narrative and refreshed final gates independently verified.
+- **Dependencies:** T5 and T6 approval/evidence.
+- **Owner:** QA, verification-only; no implementation or test writes assigned.
+- **Read-only scope:** all six operational files, current spec/plan/task/summary,
+  whole increment relative to the original base, and permission rules.
+- **Evidence ownership:** this T7 latest report; evidence-backed AC5/AC9 markers
+  in current spec. Preserve AC1–AC3/AC7; no criterion text/metadata edits.
+- **Scope:** evaluate actual permission order and field limits; walk through
+  successful and blocked closures using in-memory text. Include missing QA,
+  missing evidence, failing gate, unresolved substantive re-anchoring, exact
+  metadata diff, immutable post-close handling, truthful Git reporting, explicit
+  merge approval, and branch retention. Do not close real specs or create probes.
+- **Model:** QA configured default, no override; independent bounded governance
+  verification with no additional dependencies.
+- **Gates:** lint/format for the complete Markdown-only scope; build/unit/SEO/
+  accessibility explicitly not applicable. Lead still runs final feature gates.
+- **Latest QA report:** approved for reopened T7 on shared branch
+  `spec/012-agent-models` at HEAD `545fe78ee378fb7d3473a23a6a043092ba440765`.
+  Verified scope is the complete increment relative to original base
+  `b135c8ea3034280657aa12132410872a7ce94dd7`, plus this T7 report and its assigned
+  checklist updates. The ten changed paths from base are
+  `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
+  `.opencode/agents/qa.md`, `.opencode/agents/spec-refiner.md`, `AGENTS.md`,
+  `docs/constitution.md`, and `specs/012-agent-models/{plan,spec,summary,tasks}.md`.
+  All ten are Markdown outside `src/content/**`; at verification start nine were
+  uncommitted relative to HEAD, with `.opencode/agents/dev.md` already in the
+  original-base history. No staged or untracked files existed. `opencode.json`,
+  application/source/content/assets, and tests are unchanged; no test files are
+  assigned or modified. QA made no production or spec edits.
+
+  **Current closure narrative and approved content:** the current spec has status
+  `In progress`; its approved R1–R9/AC1–AC9 content reflects the maintainer-approved
+  1.9.0 amendment. The narrative correction does not change requirement or
+  criterion wording. Constitution 1.9.0 is current; §5.1 and the four prompts
+  agree that, once prerequisites pass, only the Lead performs the final `Status`
+  and `Last updated` edit. The current spec's context and verification narrative
+  accurately state AC1–AC9 as independently QA-verified, T1–T7 approvals, the
+  adopted amendment, and the Lead's conditional closure authority. T1–T6 retain
+  their recorded approvals; reopened T7 is approved by this report.
+
+  **AC4:** `AGENTS.md` identifies frontmatter as the configured-default source,
+  lists exact unsuffixed Sol defaults for Dev Lead/Spec Refiner and Luna defaults
+  for Dev/QA, says no reasoning variant is explicitly selected, and says Auto
+  Router variants in `opencode.json` remain unchanged. Its closure guidance agrees
+  with Constitution §5.1 and the Lead, Spec Refiner, and QA prompts.
+
+  **AC5 / whole-scope inspection:** compared all six operational files against
+  the original base and reviewed the complete ten-path increment diff. Changes
+  are limited to the specified model, delegation, permission, constitutional,
+  guide, and active-increment documentation requirements. Agent modes/colors are
+  unchanged; QA and Spec Refiner permission blocks are unchanged; Lead/Dev
+  permission changes are limited to their specified rules. No other operational
+  or application paths changed, and `opencode.json` is unchanged. Prior QA reports
+  for T1–T6 remain approved with evidence.
+
+  **Effective permission matrix (OpenCode V2 last-matching-rule and whole-value
+  wildcard semantics):** Lead's default `edit ** deny` is overridden for assigned
+  plan/tasks/summary by `specs/*/{plan,tasks,summary}.md` allows and for the active
+  spec by `specs/*/spec.md` allow; the later `specs/_template/**` deny blocks
+  templates and root `spec.md` matches its explicit deny. These path families
+  also match unrelated/completed feature paths and do not enforce fields. The
+  Lead prompt therefore limits actual edits to assigned current artifacts and
+  permits only final `Status`/`Last updated` in the active spec, barring
+  substantive, criterion, checkbox, other metadata, completed-spec, and indirect
+  formatter/write changes. Constitution §§3–4.2 preserve historical
+  immutability. Operational paths, `opencode.json`, `src/pages/index.astro`,
+  `tests/permission-probe.test.ts`, and `specs/README.md` match the default deny.
+  Dev's ordered rules allow the six assigned operational files, `opencode.json`,
+  `specs/README.md`, and permitted template files; later rules deny tests,
+  feature planning/evidence/summaries, every `spec.md`, and root `spec.md`.
+  These family matches do not authorize unassigned files. Inspection of the
+  repository `opencode.json` found no permission override. No forbidden-write
+  probe was attempted.
+
+  **AC9 in-memory closure walkthrough (no status edit/probe):** success requires
+  adopted maintainer-approved §11 amendment and loaded updated Lead definition;
+  QA approval/evidence for all tasks; QA-backed completion of every criterion;
+  resolved substantive re-anchoring; finalized plan/checklist/summary and latest
+  final-gate report while active; and passing applicable gates. Only then does the
+  Lead make the exact two-field final edit: actual current `Status: In progress`
+  → `Status: done` and `Last updated` → the actual closure date. It is not a
+  whole-spec rewrite or format operation. Missing task approval, missing evidence,
+  an incomplete criterion, a failing gate, or unresolved substantive re-anchoring
+  each blocks the edit and leaves the increment active. All evidence and
+  checkboxes precede freeze; no directory edits follow `done`. Subsequent
+  publication/integration is not pre-recorded: only the Lead commits and pushes
+  after approval/evidence/gates, then requests new explicit affirmative maintainer
+  merge permission. Without approval it leaves the branch unmerged; after approved
+  integration the branch remains retained. Later Git outcomes are reported
+  externally. No T7 acceptance-criterion defect found; AC4, AC5, and AC9 are
+  verified. The previously identified task-list header contradiction is resolved:
+  line 7 now reports all seven tasks QA-approved and closure prerequisites
+  verified, consistent with T7's approval and the active-task count of zero. The
+  plan and summary also state that implementation and verification are complete
+  and that the final metadata transition follows.
+
+  **Latest final-gate evidence:** after the final plan/task/summary status edits,
+  the Lead confirmed the complete ten-path increment remains Markdown-only outside
+  `src/content/**`, with no staged or untracked paths. The Lead ran
+  `pnpm exec prettier --write specs/012-agent-models/plan.md
+specs/012-agent-models/tasks.md specs/012-agent-models/summary.md`,
+  `pnpm lint` — PASS, `pnpm format:check` — PASS, and `git diff --check` — PASS.
+  QA ran `pnpm exec prettier --write specs/012-agent-models/tasks.md` after
+  recording this report/checklist, then reran `pnpm lint` — PASS and
+  `pnpm format:check` — PASS, verifying the complete increment after QA edits.
+  `git diff --check b135c8ea3034280657aa12132410872a7ce94dd7` also passes.
+  Build, unit, rendered-HTML SEO, and accessibility are NOT RUN / NOT APPLICABLE
+  under Constitution §§5–6 because every changed file is `.md` outside
+  `src/content/**`. T7 is approved with evidence; the current spec remains active
+  and only the Lead performs the final metadata transition.
 
 ## Latest final-gate report
 
-- **Status:** latest supplied final gates PASS after recording integration.
-  Maintainer-approved integration is complete; the remaining coordination records
-  are approved for gated commit/push on the shared feature branch. No unresolved
-  ownership blocker remains.
-- **Scope/revision:** complete increment on `spec/012-agent-models`, base
-  `b135c8ea3034280657aa12132410872a7ce94dd7`, current shared HEAD
-  `1d8dc1b5bc028c3dc54a0c74596fe2053776e139`. The full feature diff from the base
-  contains `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
+- **Status:** approved — applicable gates pass, T1–T7 have QA approval/evidence,
+  AC1–AC9 are QA-backed, and no closure bookkeeping contradiction remains. The
+  plan, checklist, summary, and latest final-gate report are finalized while the
+  increment remains active. The current spec remains `In progress`, ready for the
+  Lead's final two-field metadata transition; no directory freeze has occurred.
+- **Scope/revision:** complete increment on `spec/012-agent-models`, original
+  base `b135c8ea3034280657aa12132410872a7ce94dd7`, shared HEAD
+  `545fe78ee378fb7d3473a23a6a043092ba440765`. The ten paths from base are
+  `.opencode/agents/dev-lead.md`, `.opencode/agents/dev.md`,
   `.opencode/agents/qa.md`, `.opencode/agents/spec-refiner.md`, `AGENTS.md`,
-  `docs/constitution.md`, and `specs/012-agent-models/plan.md`, `spec.md`,
-  `summary.md`, and `tasks.md` (ten Markdown files, all outside
-  `src/content/**`). The current unstaged diff is limited to `plan.md`, `tasks.md`,
-  and `summary.md`; no staged or untracked paths remain.
-- **Publication/integration:** feature commit
-  `5494d9c3f120dbf9e27683c26cfd7086db0786eb` was pushed to
-  `origin/spec/012-agent-models`. With the maintainer's explicit approval on
-  2026-10-06, the Lead merged the feature into `main` as
-  `65aabd11befbd06b402770964dd7dc102fd7ad9d` and successfully pushed
-  `origin/main`. The published feature branch is retained.
-- **Lead scope commands:** `git diff --name-only
-b135c8ea3034280657aa12132410872a7ce94dd7` — ten paths listed above;
-  `git diff --name-only` — current three planning/evidence/summary files;
-  `git ls-files --others --exclude-standard` — no untracked files.
-- **Ownership re-anchor confirmation:** current spec verification text assigns
-  T1/T2 to the explicitly authorized Lead bootstrap and T3/T4 to Dev after the
-  approved transfer, matching the task evidence and closed-task records. The
-  re-anchor preserves all eight QA-backed acceptance markers. Independently
-  recalculated SHA256 over the exact Requirements section (after
-  `## Requirements` and before `## Acceptance criteria`) is
-  `19c2de4ba2f1880fed047873106b06d8805f8a9194a47482f917e69842d65f56`; over the
-  Acceptance criteria section (before `## Verification`) it is
-  `e5c4144e2b4753047302c95cb9afbad9d043fcb8def54a69bfbf8c271704f3c4`. Both
-  still match the pre-reanchor hashes. Spec status remains `in progress`.
-- **Prettier:** Lead's `pnpm exec prettier --check
-specs/012-agent-models/plan.md specs/012-agent-models/tasks.md
-specs/012-agent-models/summary.md` — PASS.
-- **Lint:** `pnpm lint` — PASS (exit 0).
-- **Format:** `pnpm format:check` — PASS (exit 0).
-- **Diff check:** `git diff --check` — PASS.
-- **Build, unit, SEO, accessibility:** NOT RUN and not applicable under
-  Constitution §§5–6 because the complete changed-file set consists only of
-  Markdown files outside `src/content/**`.
-- **Publication/closure:** final-gate results supplied by the Lead and the
-  ownership/hash recheck are recorded. Final integration is complete under the
-  same maintainer approval; the remaining coordination records are ready for
-  gated commit/push on the shared feature branch. The spec remains `in progress`,
-  and only the Spec Refiner may perform its eventual `done` transition.
+  `docs/constitution.md`, and `specs/012-agent-models/{plan,spec,summary,tasks}.md`.
+  Every path is `.md` outside `src/content/**`. At verification start, nine paths
+  were uncommitted relative to HEAD; `.opencode/agents/dev.md` is already in the
+  original-base history. QA's assigned T7 report/checklist changes are additional
+  unstaged edits to the existing `tasks.md` path. The latest inventory has no
+  staged or untracked files.
+- **Closure prerequisites:** T1–T7 have QA approval and recorded evidence; AC1–AC9
+  are QA-backed and checked; substantive ownership re-anchoring is resolved. The
+  plan and summary report implementation and verification complete. The current
+  checklist and latest final-gate report are finalized while active. Constitution
+  `1.9.0` is adopted and the updated Lead prompt is loaded. Only the Lead performs
+  the final two-field edit, as the last directory edit.
+- **Lead's latest complete-increment results:** after the final plan/task/summary
+  edits, Lead confirmed the ten-path scope is Markdown-only and outside
+  `src/content/**`, with staged and untracked sets empty. Lead ran
+  `pnpm exec prettier --write specs/012-agent-models/plan.md
+specs/012-agent-models/tasks.md specs/012-agent-models/summary.md` — PASS;
+  `pnpm lint` — PASS; `pnpm format:check` — PASS; and `git diff --check` — PASS.
+- **QA's post-report/checklist results:** after recording this T7 report and its
+  assigned closure checklist markers, `pnpm exec prettier --write
+specs/012-agent-models/tasks.md` — PASS, unchanged. QA's post-edit `pnpm lint`
+  — PASS and `pnpm format:check` — PASS; the full repository format check thus
+  verifies the latest task evidence. `git diff --check
+b135c8ea3034280657aa12132410872a7ce94dd7` — PASS.
+- **Build, unit, SEO, accessibility:** NOT RUN / NOT APPLICABLE under Constitution
+  §§5–6 because every changed file is `.md` outside `src/content/**`.
+- **Git outcomes:** prior feature publication/integration remain recorded only as
+  actual earlier events. No continuation feature commit or push has occurred.
+  New affirmative maintainer merge permission for the continuation has not been
+  requested/granted and no continuation merge has occurred. Report later actual
+  outcomes externally without changing the frozen directory.

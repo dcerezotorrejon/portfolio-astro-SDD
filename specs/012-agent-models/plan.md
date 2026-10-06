@@ -1,7 +1,7 @@
 # Technical plan
 
 - **Spec ID**: `012-agent-models`
-- **Status**: feature integrated; Spec Refiner metadata closure pending
+- **Status**: implementation and verification complete; final metadata transition follows
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
@@ -21,6 +21,12 @@ evidence, and final publication records remain on this branch. The maintainer
 explicitly approved integration on 2026-10-06; the Lead merged and pushed `main`
 with merge commit `65aabd11befbd06b402770964dd7dc102fd7ad9d`. The feature branch
 is retained, and remaining integration bookkeeping is verified on that branch.
+
+The same active increment now includes R6/R8/R9 autonomous closure. The original
+base remains unchanged; the continuation starts at
+`545fe78ee378fb7d3473a23a6a043092ba440765`. Preserve existing commits, models,
+and unchanged QA evidence. The previous integration does not approve publication
+or integration of the new scope, and its gate results do not verify these changes.
 
 ## Approved decisions and bootstrap authority
 
@@ -50,8 +56,16 @@ is retained, and remaining integration bookkeeping is verified on that branch.
 - Spec Refiner re-anchored the execution account on 2026-10-06: T1/T2 were
   explicitly authorized Lead bootstrap work, and T3/T4 were implemented by Dev
   after the approved transfer. Requirements and all eight QA-backed acceptance
-  markers remained unchanged. The spec is `in progress` pending the remaining
-  closure steps; only its authorized owner may change its status.
+  markers remained unchanged. The spec is `in progress`; the adopted R6/R8/R9
+  rules authorize the Lead's narrowly scoped final metadata transition after all
+  closure prerequisites and the loaded updated role definition are confirmed.
+- The maintainer requires the Lead to own final closure metadata in this same
+  spec. Proposed adoption is constitution `1.9.0`, with edits limited to `Status`
+  and `Last updated` after all QA, criteria, evidence, artifacts, and final gates
+  are complete. Spec Refiner keeps substantive ownership, QA keeps verified
+  checkboxes, and Dev retains all operational implementation. Obtain explicit
+  approval of this updated plan and amendment before assigning T5. The maintainer
+  explicitly approved both on 2026-10-06, before T5 assignment, under §11.
 
 ## Named ownership and sequence
 
@@ -75,18 +89,45 @@ Tasks execute serially. QA owns only the assigned evidence entry in
 `specs/012-agent-models/tasks.md` and the evidence-backed acceptance checkbox
 markers in `specs/012-agent-models/spec.md`. No tests are assigned for modification.
 The Lead owns this plan, task coordination, and the current summary created at
-closure. Spec Refiner alone owns substantive current-spec re-anchoring and status.
+closure. Spec Refiner owns substantive current-spec re-anchoring; the updated
+closure rules assign final status/date metadata to the Lead after adoption.
+
+### Autonomous-closure continuation
+
+5. **T5 — Agent closure boundaries:** Dev implements only
+   `.opencode/agents/dev-lead.md`, `.opencode/agents/spec-refiner.md`, and
+   `.opencode/agents/qa.md`. QA verifies the path allowance, exact-field textual
+   boundary, closure prerequisites/order, substantive ownership, and pre-freeze
+   evidence rules. Do not exercise the metadata capability before constitutional
+   adoption or close a real spec during task verification.
+6. **T6 — Constitutional closure authority:** After T5 QA approval, Dev implements
+   only `docs/constitution.md` and `AGENTS.md`, applying approved version `1.9.0`
+   and consistent role guidance. QA verifies AC4/AC8 and cross-file consistency.
+7. **T7 — Complete closure verification:** After T5/T6 approvals, QA performs
+   the complete permission matrix, satisfied/blocked closure walkthroughs using
+   in-memory text, and whole-increment scope checks. No production or test edits
+   are assigned. Verify AC5/AC9 and preservation of AC1–AC3/AC7.
+
+Continuation tasks are serialized, including QA evidence writes. QA owns only the
+assigned latest report in this increment's task file and evidence-backed criterion
+markers. Lead directly edits only current plan/tasks/summary under present rules;
+the resulting narrowly authorized metadata operation must not be exercised until
+the new constitution and updated Lead definition are effective. Confirm or reload
+the role definition before relying on that new authority. No renewed bootstrap
+implementation exception is authorized.
 
 ## Permission implementation
 
 ### Lead
 
 Retain a default edit denial. Allow the `plan.md`, `tasks.md`, and `summary.md`
-feature families only; place explicit template and spec denials after matching
-allowances. Remove all broad edit allowances and governance/configuration
-implementation exceptions, including `R14` references. Instructions constrain
-family permissions to the three assigned current artifacts and forbid indirect
-operational edits through shell commands or formatters.
+feature families and the current-spec family. Keep final explicit template and
+root-spec denials, removing blanket spec denials that would override the intended
+allowance. Path permissions cannot enforce field-level edits, so the Lead prompt
+must limit the assigned active spec to `Status` and `Last updated` for final
+closure only. No requirement, checkbox, other metadata, completed directory, or
+whole-spec formatter write is authorized. Preserve the ban on implementation and
+indirect workarounds outside authorized coordination edits.
 
 Retain the current subagent and Git/integration permissions. Preserve the existing
 model override policy and every unrelated responsibility. A family allowance
@@ -107,13 +148,20 @@ Retain Dev's branch/merge/commit/push/subagent restrictions and QA test ownershi
 
 ## Risks and safeguards
 
-- **Current state:** T1–T4 have QA approval and recorded evidence. The permission
+- **Current state:** T1–T7 have QA approval and recorded evidence. The permission
   blocker was resolved through the approved Dev ownership transfer, not a bypass.
   Spec Refiner has resolved the bootstrap ownership divergence without changing
   final requirements or acceptance markers. The Lead reran the complete
-  increment's applicable final gates after re-anchoring; lint and format passed,
-  and QA recorded and approved the latest final report. Build, unit, SEO, and
-  accessibility were not run under the Markdown-only exception.
+  increment's applicable final gates after re-anchoring; lint and format passed
+  for that scope. Build, unit, SEO, and accessibility were not run under the
+  Markdown-only exception. Those results predate the autonomous-closure scope;
+  autonomous-closure scope has now been reviewed in full. The Lead reran lint and
+  format on the complete ten-file increment after updating coordination artifacts;
+  both passed. QA recorded the latest final report and confirmed evidence
+  formatting before the closure transition.
+- **Expanded scope:** T5–T7 have now been approved against the autonomous closure
+  requirements, including adoption of version `1.9.0`. Renewed complete-increment
+  lint and format gates passed with QA evidence.
 - **Resolved blocker:** The first Lead T3 patch was rejected after the Lead
   definition changed; no operational file was modified by that attempt. The Lead
   stopped and obtained maintainer approval to transfer T3/T4 to Dev, which
@@ -125,10 +173,13 @@ Retain Dev's branch/merge/commit/push/subagent restrictions and QA test ownershi
   QA approval. If new effective rules prevent a remaining edit or rework, stop
   and report the exact blocker for an authorized resolution; never bypass it
   using shell writes, stale session permissions, or an inferred exception.
-- **Spec ownership:** Re-anchoring is complete. QA must not rewrite spec prose,
-  and the Lead must not edit any `spec.md`, including status metadata. The
-  increment remains active until its authorized owner sets status `done`; do not
-  represent final publication or integration as that metadata transition.
+- **Spec ownership:** Substantive re-anchoring stays with Spec Refiner. After
+  adoption, only the Lead performs final closure metadata; QA never changes
+  status. Version `1.9.0` is adopted and the current Lead definition is loaded.
+- **Freeze ordering:** Finalize all coordination/evidence before `done`, then
+  make no further directory edits. Do not pre-mark future commit/push/merge steps
+  complete. Actual later outcomes belong in Git and external final reports, not
+  frozen bookkeeping. Failed prerequisites leave the spec active.
 - **Permission breadth:** Verify positive and negative examples from the spec,
   including README, templates, tests, configuration, and feature planning.
   Do not create probe files or attempt forbidden edits.
@@ -141,7 +192,9 @@ Retain Dev's branch/merge/commit/push/subagent restrictions and QA test ownershi
 
 The T1/T2 bootstrap implementer used the Lead's configured GPT-6.1 Sol model;
 T3/T4 use Dev's configured GPT-6 Luna model with no override for bounded Markdown
-implementation. QA uses its configured GPT-6 Luna model, without an override,
+implementation. T5/T6 also use Dev's configured default without an override for
+bounded operational Markdown. T7 uses QA's configured default for independent
+verification. QA uses its configured GPT-6 Luna model, without an override,
 because these bounded governance checks do not warrant added cost.
 Do not impose a reasoning variant or retain `Model intent` prose.
 
@@ -161,7 +214,19 @@ Markdown-only scope outside `src/content/**`, run lint and format and explicitly
 record build, unit, SEO, and accessibility as not applicable under constitution
 §§5–6. Any scope expansion invalidating that exception requires all five gates.
 
-Only after all task approvals/evidence, spec re-anchoring, summary, and final gates
-may the Lead use the commit skill and push final feature commits. Then ask for
-explicit affirmative merge permission; without it, leave the published branch
-unmerged and do not delete it.
+T1–T7 are approved; AC1–AC9 have QA-backed completion. Recompute the complete
+increment relative to the original base and rerun applicable gates after all
+coordination/evidence edits. QA must record those latest final results before the
+metadata freeze. Finalize summary, checklist, and final-gate evidence while active.
+The Lead reruns applicable gates on the complete increment relative to the
+original base, including committed and uncommitted work. After successful
+prerequisites and effective adoption, the Lead's final directory edit sets only
+the current spec's `Status` to `done` and `Last updated` to the closure date.
+Readonly closing checks may run afterward; report their outcomes externally.
+No post-freeze checkbox, evidence, plan, or summary updates are allowed.
+
+Only after those approvals and passing gates may the Lead use the commit skill
+and push final feature changes. Report actual publication/integration through Git
+and the external final response. After successful final push, ask for new explicit
+affirmative merge permission for this scope; prior integration approval does not
+cover it. Without approval, leave the branch unmerged and retained.

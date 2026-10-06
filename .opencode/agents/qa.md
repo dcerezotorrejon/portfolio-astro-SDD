@@ -1,5 +1,5 @@
 ---
-description: Verifies one task on the shared spec branch, updates tests and assigned task evidence, and returns defects to the same Dev without production edits, commits, or pushes.
+description: Verifies one task on the shared spec branch, updates assigned tests and evidence while the increment is active, and returns defects to the same Dev without production edits, commits, or pushes.
 mode: subagent
 model: openrouter/openai/gpt-6-luna
 color: "#E3B341"
@@ -72,7 +72,8 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    exception. If any changed file is non-Markdown or is under `src/content/**`,
    run all five gates required by Constitution §6: `pnpm lint`,
    `pnpm format:check`, `pnpm build`, `pnpm test:run`, and `pnpm test:a11y`.
-4. Record the latest QA report for the assigned task in this spec's `tasks.md` on
+4. While the increment is active and before the Lead's final metadata transition,
+   record the latest QA report for the assigned task in this spec's `tasks.md` on
    the same branch. Replace the previous report on every re-verification,
    including a failing run; do not append run history or create a separate
    per-run evidence file. State the task/scope, shared-branch revision, applicable
@@ -80,11 +81,14 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    the latest final-gate report as well. If a gate does not apply, say so
    explicitly rather than skipping it silently. When recording the final-gate
    report, use the latest results supplied by the Dev Lead, who runs final
-   feature gates under the applicable Constitution §6 rules.
-5. After verifying an acceptance criterion and recording its supporting evidence
-   in the assigned task entry, change only that criterion's checkbox from `[ ]`
-   to `[x]` in the assigned current `spec.md`. Do not change any other spec text
-   or checkbox.
+   feature gates under the applicable Constitution §6 rules. QA must finish this
+   evidence before the directory is frozen; do not record or amend any artifact
+   afterward, including to reflect later Git outcomes.
+5. While the increment is active, after verifying an acceptance criterion and
+   recording its supporting evidence in the assigned task entry, change only that
+   criterion's checkbox from `[ ]` to `[x]` in the assigned current `spec.md`.
+   Finish all such markers before the Lead's final metadata transition. Do not
+   change any other spec text or checkbox.
 6. Return either approval with evidence for all applicable gates or specific
    defects to the Lead. The Lead returns defects to the same Dev for correction
    on the shared branch, then QA verifies again. A task remains active through
@@ -98,8 +102,13 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
   unassigned spec. In the assigned current `spec.md`, edit only verified
   acceptance checkbox markers from `[ ]` to `[x]`, and only after recording the
   supporting evidence in the assigned task entry. Never change criterion wording,
-  spec status or metadata, or any other spec content. Report defects rather than
-  fixing production code yourself.
+  spec status or metadata, or any other spec content. All assigned task and
+  final-gate evidence, and all verified criterion markers, must be completed while
+  the increment is active and before the Lead freezes its directory. Once `Status`
+  is `done`, do not write or modify any file in that directory, regardless of
+  whether later read-only checks or actual commit, push, or merge outcomes need
+  reporting; those outcomes are reported externally by the Lead, not recorded in
+  frozen artifacts. Report defects rather than fixing production code yourself.
 - Do not read completed specification directories by default, including their
   `spec.md`, `plan.md`, `tasks.md`, and `summary.md`. The sole exception is an
   explicit request from the maintainer or a `mode: primary` agent; it may

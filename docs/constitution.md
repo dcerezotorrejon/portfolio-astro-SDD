@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.8.0
+- **Version**: 1.9.0
 - **Last amended**: 2026-10-06
 
 ---
@@ -148,10 +148,22 @@ with the rest of the historical snapshot.
   branch. Verification may update assigned tests and task evidence but MUST NOT
   edit production code.
 - The Dev Lead orchestrates work and writes only the assigned current increment's
-  `plan.md`, `tasks.md`, and `summary.md`. It MUST NOT implement application,
-  operational Markdown, repository configuration, tests, or spec content, nor
-  write indirectly through shell commands, formatters, or other means. An explicit
-  task assignment does not expand this authority. The Lead MUST assign all
+  `plan.md`, `tasks.md`, and `summary.md`, except for the following final closure
+  operation in that increment's `spec.md`. Only after the approved §11 amendment
+  is adopted and the updated Lead role definition is loaded, the Lead may make
+  one final directory edit, limited to `Status` and `Last updated`, after every
+  task has QA approval and recorded evidence, every acceptance criterion has
+  QA-backed completion, substantive re-anchoring is resolved, all directory
+  artifacts and the latest final-gate evidence are finalized while active, and
+  all applicable final gates pass. The Lead MUST then set only `Status` to
+  `done` and `Last updated` to the actual closure date. If any prerequisite fails,
+  the increment remains active and no metadata transition occurs. After this
+  edit, no file in the increment directory may be changed; actual subsequent Git
+  outcomes MUST be reported externally and MUST NOT be pre-recorded in the frozen
+  directory. The Lead MUST NOT implement application, operational Markdown,
+  repository configuration, tests, or substantive spec content, nor write
+  indirectly through shell commands, formatters, or other means. An explicit task
+  assignment does not expand this authority. The Lead MUST assign all
   implementation, including operational Markdown and repository configuration,
   to Dev with exact file ownership and within Dev's current permissions.
 - Dev implements only its assigned production files. QA independently owns

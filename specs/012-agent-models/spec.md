@@ -1,7 +1,7 @@
 # Agent models and delegated implementation
 
 - **Spec ID**: `012-agent-models`
-- **Status**: in progress
+- **Status**: done
 - **Last updated**: 2026-10-06
 
 ## Context
@@ -25,11 +25,12 @@ edits, while Dev's initial final `specs/**` edit denial overrode its earlier
 allowance for `specs/README.md`. This increment removes the Lead's implementation
 exception and makes delegation of workflow Markdown and configuration explicit
 and feasible.
-The Lead retains direct ownership only of the current increment's `plan.md`,
-`tasks.md`, and `summary.md`.
+The Lead retains direct ownership of the current increment's `plan.md`,
+`tasks.md`, and `summary.md`, with the narrowly bounded closure-metadata authority
+in R6 and R9. That metadata exception does not authorize implementation edits.
 
 On 2026-10-06, the maintainer approved the constitutional amendment described in
-R8, including version `1.8.0`, under the
+R8, including version `1.9.0`, under the
 [amendment process](../../docs/constitution.md#11-governance-and-amendments).
 
 The maintainer explicitly authorized the Lead to bootstrap T1/T2 under its
@@ -41,9 +42,16 @@ Independent QA approved all four tasks and recorded the supporting evidence in
 the current [task checklist](./tasks.md).
 
 This bootstrap account documents the actual authority transition; it does not
-create an exception to the resulting rules in R6–R8. Those requirements and the
-QA-verified acceptance criteria are unchanged. This increment remains active
-pending the Lead's renewed final gates and closure following spec re-anchoring.
+create a continuing implementation exception. The maintainer now requires the
+Lead to close the increment autonomously, without a final Spec Refiner handoff or
+manual maintainer status change. The current constitution and agent prompts now
+permit that metadata operation under the amended rules; the Lead's authority is
+limited to the two fields specified in R9. Version `1.9.0` records the adopted
+delegation-plus-closure amendment.
+
+All acceptance criteria AC1–AC9 have been verified by independent QA (T5–T7).
+The Lead may now close the increment autonomously, performing the final metadata
+transition (`Status: done`, `Last updated`) after all prerequisites are met.
 
 The governing constraints are defined in the
 [constitution](../../docs/constitution.md), particularly
@@ -60,6 +68,10 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
   workflow Markdown and repository configuration as well as application work.
 - Align constitutional authority, agent instructions, and effective edit
   permissions with that separation.
+- Let the Lead complete formal closure autonomously after QA and final gates,
+  without broadening its substantive spec or production-edit authority.
+- Finish all increment artifacts before the immutable `done` transition, avoiding
+  post-closure bookkeeping edits or another status-only agent handoff.
 
 ## Non-goals
 
@@ -72,8 +84,11 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
   commits, pushes, or integration approval rules.
 - Giving Dev ownership of feature specs or planning artifacts, or permitting
   edits to completed specification directories.
-- Allowing edits to `specs/_template/spec.md`; all `spec.md` files remain outside
-  Dev and Lead write authority.
+- Allowing edits to `specs/_template/spec.md`, or letting the Lead edit substantive
+  spec text or acceptance criteria. The only Lead spec-edit exception is the
+  current spec's closure metadata in R6 and R9; Dev still cannot edit any spec.
+- Removing maintainer approval for constitutional amendments or integration into
+  `main`. Autonomous formal closure does not authorize autonomous integration.
 - Benchmarking models or requiring live inference calls.
 
 ## Requirements
@@ -95,12 +110,13 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
   references in R1 and R2. Explain that the agent frontmatter defines those
   defaults and that no reasoning variant is explicitly selected there. Retain
   the statement that the Auto Router variants in `opencode.json` are unchanged.
-  Also describe the Lead's planning-only write authority and delegation of
-  implementation to Dev, with QA remaining the independent verifier, consistently
-  with R6–R8.
+  Also describe the Lead's planning and narrow closure-metadata authority,
+  delegation of implementation to Dev, and QA's independent verification,
+  consistently with R6–R9. Formal closure must not require a Spec Refiner or
+  maintainer status-edit handoff.
 - **R5 — Preserve unrelated behavior:** Operational changes are limited to the
   four named agent definitions, `AGENTS.md`, and `docs/constitution.md`, solely
-  to satisfy R1–R4 and R6–R8 plus formatting. Preserve agent modes, colors, and
+  to satisfy R1–R4 and R6–R9 plus formatting. Preserve agent modes, colors, and
   all unrelated instructions and permissions. QA and Spec Refiner permissions
   remain unchanged. Do not modify `opencode.json` or other operational or
   application files for this feature. Current increment artifacts are maintained
@@ -108,15 +124,22 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
 - **R6 — Lead orchestrates without implementation edits:** Update the Lead's
   description, prompt, and ordered edit permissions so that its only permitted
   direct file edits are the assigned current increment's `plan.md`, `tasks.md`,
-  and `summary.md`. Replace broad operational/configuration edit allowances with
-  a default edit denial and allowances for those planning-file families; explicitly
-  deny `specs/_template/**` so that templates cannot match those allowances. Remove
-  every direct-implementation exception, including references to `R14`. Require
+  and `summary.md`, plus only `Status` and `Last updated` in its current `spec.md`
+  for the final closure operation in R9. Use default edit denial, planning-family
+  allowances, and an effective allowance for the current-spec file family;
+  explicitly deny `specs/_template/**` and root `spec.md`. Ordered blanket spec
+  denials must not override the intended current-spec allowance. Tool permissions
+  authorize paths, not individual fields, so the prompt must restrict the spec
+  allowance to those two metadata fields and the assigned active increment. It
+  must prohibit requirements, criterion wording, checkboxes, other metadata, and
+  unrelated or completed spec edits. Remove every direct-implementation exception,
+  including references to `R14`. Require
   delegation of application, operational Markdown, and configuration changes to
   Dev with exact file ownership, followed by independent QA. No explicit task
   assignment may authorize the Lead to implement changes itself. The prohibition
-  also covers indirect file edits through shell commands or formatters outside
-  its three assigned artifacts. Preserve its existing branch, gate, delegation,
+  also covers indirect implementation edits through shell commands or formatters.
+  The narrow metadata operation must not become a whole-spec formatting or
+  rewriting capability. Preserve its existing branch, gate, delegation,
   commit, push, and integration responsibilities.
 - **R7 — Dev owns explicitly delegated implementation:** Update Dev's prompt
   and ordered edit permissions to explicitly support assigned operational
@@ -133,15 +156,36 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
   Constitution edits require maintainer approval under §11; a Lead assignment
   alone does not approve an amendment. Preserve the ban on Dev subagents and on
   Dev branch changes, merges, commits, and pushes.
-- **R8 — Adopt the approved constitutional amendment:** Amend constitution
-  §5.1 to make the Lead's direct write authority planning-only for the current
-  increment and require delegation of implementation, including workflow
-  Markdown and configuration, to Dev under explicit file ownership. Preserve
-  independent QA, Spec Refiner ownership, and all other constitutional rules.
-  Increment the version from `1.7.0` to `1.8.0` and set `Last amended` to the
-  actual application date. Apply the dependent guidance changes in this same
-  increment. This amendment is justified by the need to prevent the orchestration
-  role from also acting as the implementer.
+- **R8 — Adopt consistent constitutional authority:** Preserve the implemented
+  delegation amendment and amend constitution §5.1 to explicitly permit the
+  Lead's autonomous closure-metadata operation while continuing to prohibit its
+  application, operational Markdown, configuration, test, and substantive-spec
+  implementation. Preserve independent QA and Spec Refiner's substantive spec
+  ownership. Align the Lead, Spec Refiner, and QA instructions and `AGENTS.md`
+  with that division: Spec Refiner is not required to perform the final status
+  transition, and QA final evidence must be finished before the directory freezes.
+  Increment the current version from `1.8.0` to `1.9.0`, set `Last amended` to
+  the application date, and record maintainer amendment approval under §11 before
+  implementation. The amendment is justified by making the role responsible for
+  closure capable of completing it without becoming the implementer. Preserve
+  all other constitutional rules, including historical immutability.
+- **R9 — Autonomous, ordered closure:** The Lead owns the final transition of
+  the assigned active spec from `in progress` to `done` and sets `Last updated`
+  to the closure date without asking Spec Refiner or the maintainer to edit those
+  fields. Before that transition, every task must have QA approval and recorded
+  evidence, every acceptance criterion must have QA-backed completion, the current
+  plan/checklist/summary and latest final-gate report must be finalized, and all
+  applicable gates must pass on the complete feature increment. Gate failures,
+  missing evidence, or outstanding substantive re-anchoring block closure.
+  Substantive re-anchoring still belongs to Spec Refiner; this is not a status-only
+  closure dependency. The metadata transition is the final file edit in the
+  increment directory. After `done`, do not change its spec, planning, evidence,
+  summary, or checkboxes. Read-only final checks may run; their results and actual
+  commit/push/merge outcomes are reported through Git and the Lead's external
+  final report, not by reopening frozen artifacts. Never pre-record a future
+  publication/integration as completed. Only the Lead performs the final feature
+  commit/push using the commit skill; integration still requires affirmative
+  maintainer approval and the branch remains available.
 
 ## Acceptance criteria
 
@@ -159,7 +203,8 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
       no reasoning variant is explicitly selected there, and says that the Auto
       Router variants remain unchanged. It no longer describes the previous
       suffixed references as the current defaults. Its workflow guidance matches
-      the planning-only Lead, delegated Dev implementation, and independent QA.
+      Lead's planning and closure-metadata authority, delegated Dev implementation,
+      and independent QA; it does not require another role to set final status.
 - [x] **AC5 (R5):** The complete feature diff contains no semantic changes to the
       six assigned operational files beyond this spec's requirements, no changes
       to other operational or application files, and no changes to
@@ -168,21 +213,30 @@ and [verification gates](../../docs/constitution.md#6-quality-gates).
       Applicable lint and format gates pass with recorded evidence.
 - [x] **AC6 (R6):** The Lead's description and instructions contain no direct
       implementation exception or `R14` reference. Its effective edit rules deny
-      operational files, configuration, application files, tests, and every
-      `spec.md`, and allow only planning-file families. Its instructions limit
-      those allowances to the three assigned current artifacts, deny template
-      edits, forbid shell or formatter workarounds, and require Dev implementation
-      followed by QA.
+      operational files, configuration, application files, tests, templates, and
+      root `spec.md`, while allowing planning families and the current-spec family.
+      Its prompt limits the latter to final `Status` and `Last updated` edits in
+      the assigned active spec, prohibits every substantive/criterion/checkbox
+      change and indirect workaround, and retains Dev implementation plus QA.
 - [x] **AC7 (R7):** Dev's instructions explicitly cover the operational Markdown
       and configuration scope in R7 with exact assigned paths. Its effective edit
       rules allow `specs/README.md` and permitted template files, while denying
       tests, every `spec.md`, and feature planning/evidence/summary files.
       Historical immutability, amendment approval, and existing Dev Git and
       subagent restrictions remain explicit and unchanged in effect.
-- [x] **AC8 (R8):** Constitution §5.1 establishes the approved role separation;
-      version is `1.8.0` and the amendment date is the application date. The Lead
-      prompt, Dev prompt, and `AGENTS.md` are consistent with the amendment in the
-      same increment, without other constitutional changes.
+- [x] **AC8 (R8):** Constitution §5.1 establishes the delegation and narrow
+      autonomous closure authority; version is `1.9.0` and the amendment date is
+      the application date. The agent prompts and guide consistently assign the
+      final metadata transition to the Lead, keep substantive spec edits with
+      Spec Refiner, and finish QA artifact edits before freezing. Amendment
+      approval is recorded; unrelated constitutional rules remain unchanged.
+- [x] **AC9 (R9):** A closure walkthrough demonstrates that the Lead can set only
+      `Status: done` and the closure date after all approvals, criteria, evidence,
+      finalized artifacts, and applicable gates pass, without a status-edit handoff.
+      With missing approval/evidence, a failing gate, or unresolved substantive
+      re-anchoring, it leaves the spec active. The walkthrough performs no
+      post-`done` directory edits, does not falsely mark future Git operations as
+      completed, and preserves explicit merge approval and branch retention.
 
 ## Verification
 
@@ -210,23 +264,25 @@ permission blocker was resolved by an approved ownership transfer, not by shell,
 formatter, or stale-permission workarounds. The bootstrap authorization does not
 survive as a standing implementation exception for the Lead.
 
-The current Dev prompt and effective edit permissions allow assigned operational
-work on these six paths. The current Lead prompt and effective edit permissions
-allow only its assigned current planning artifacts. Before subsequent work relies
-on the revised definitions, confirm that participating sessions use them; reload
-or start fresh sessions if needed. Newly permitted README/template scope was
-verified, but no edits to those files were required or made in this increment.
+For the remaining autonomous-closure work, Dev is the authorized implementer of
+explicitly assigned operational paths: `.opencode/agents/dev-lead.md`,
+`.opencode/agents/spec-refiner.md`, `.opencode/agents/qa.md`,
+`docs/constitution.md`, and `AGENTS.md`. Its current prompt and effective edit
+permissions allow all five; amendment approval must be recorded before the
+constitutional edit. No new Lead implementation exception or Dev spec-write
+permission is needed to adopt those changes.
 
-QA is the verifier. Its current prompt permits content-requirement verification
-without production edits, assigned evidence updates in
-`specs/012-agent-models/tasks.md`, and evidence-backed acceptance checkbox updates
-in this current spec. QA independently verified T1–T4 and recorded its approvals
-and acceptance-criterion evidence. Spec Refiner owns substantive current-spec
-re-anchoring; the Lead owns the current planning and summary artifacts and final
-gates. Current permissions provide an authorized path for those remaining actions
-without any additional exception. This re-anchoring preserves all final-state
-requirements and existing evidence-backed acceptance checkbox markers; it does
-not claim a new QA approval or close the increment.
+The current Lead prompt and effective permissions allow only the final metadata
+transition (Status and Last updated) on the assigned spec, while preserving all
+other operational, planning, and documentation workflows. The Lead now has
+autonomous closure authority under R9, having completed all prerequisites.
+
+QA independently verified T1–T7 and recorded their approvals and acceptance-criterion
+evidence. Spec Refiner maintains substantive re-anchoring and current-spec
+ownership, while the Lead handles planning, summary, and final-gate activities.
+All acceptance criteria (AC1–AC9) are now marked complete. The Lead may now
+perform the final metadata transition (`Status: done`, `Last updated`) to close
+the increment autonomously.
 
 ### Requirement-to-verification mapping
 
@@ -245,14 +301,21 @@ not claim a new QA approval or close the increment.
 - **R6 → AC6:** Inspect all Lead description, responsibility, and rule sections
   for removal of direct implementation authority. Evaluate effective ordered
   edit rules against the permission cases below, and verify that its instructions
-  restrict planning-family allowances to assigned current artifacts and prohibit
-  indirect implementation edits.
+  restrict path-family allowances to assigned current artifacts and only permit
+  the two closure metadata fields in the active spec. Check explicit denials for
+  substantive text, criteria, checkboxes, templates, and completed directories.
 - **R7 → AC7:** Inspect the Dev delegation and amendment-approval rules. Evaluate
   effective ordered edit rules against the permission cases below and compare
   Git/subagent restrictions with the feature base revision.
 - **R8 → AC8:** Inspect the constitutional diff, version, and application date;
   confirm approval is recorded in current planning and compare all dependent
   guidance against the amendment.
+- **R9 → AC9:** Walk through the closure sequence using the actual prompts,
+  permissions, and checklist, with in-memory metadata diffs rather than closing
+  a real spec prematurely. Test both fully satisfied prerequisites and missing
+  QA/evidence, failing-gate, and unresolved-re-anchoring cases. Verify exact-field
+  limits, pre-freeze artifact finalization, and external post-freeze Git/result
+  reporting. Do not create probe files or edit any completed directory.
 
 ### Permission cases
 
@@ -262,11 +325,13 @@ configuration. Record the matching rules and resulting decisions in task
 evidence; do not attempt forbidden writes or create probe files.
 
 - **Lead allowed edit families:** `specs/012-agent-models/plan.md`,
-  `specs/012-agent-models/tasks.md`, and `specs/012-agent-models/summary.md`.
+  `specs/012-agent-models/tasks.md`, `specs/012-agent-models/summary.md`, and
+  `specs/012-agent-models/spec.md`. The spec path allowance is not field-level
+  enforcement: verify that its prompt permits only the two closure metadata fields.
 - **Lead denied edits:** `AGENTS.md`, `docs/constitution.md`, each of the four
   agent definitions, `opencode.json`, `src/pages/index.astro`,
   `tests/permission-probe.test.ts`, `specs/README.md`,
-  `specs/_template/plan.md`, and `specs/012-agent-models/spec.md`.
+  `specs/_template/plan.md`, `specs/_template/spec.md`, and root `spec.md`.
 - **Dev allowed edit families:** All six assigned operational files,
   `opencode.json`, `specs/README.md`, `specs/_template/plan.md`,
   `specs/_template/tasks.md`, and `specs/_template/summary.md`. Allowing a family
@@ -288,10 +353,13 @@ constitution. Record build, unit, SEO, and accessibility gates as not applicable
 under that exception. No new automated test files or live model calls are needed
 to verify these configuration and documentation requirements.
 
-After this execution-description re-anchoring, the Lead must rerun the applicable
-final gates against the complete increment, including the updated spec. QA records
-the latest results supplied by the Lead. The Lead also updates its current
-planning and summary to reflect that the ownership divergence is resolved before
-completing the remaining closure steps. The `in progress` status keeps the current
-directory editable for that work; this change does not set status `done` or
-authorize a final commit, push, or merge by the Spec Refiner.
+The Lead must update the current plan/checklist/summary for the remaining
+autonomous-closure work, retain the same shared branch, and obtain the normal plan
+and amendment approvals before delegation. Existing publication and integration
+do not verify the new scope or automatically approve later integration. QA
+re-verifies affected criteria and records the latest applicable results while
+the increment remains active. The Lead reruns final gates against the complete
+increment relative to its base, including the new closure changes and this spec.
+All artifact/evidence updates finish before the Lead's final metadata edit under
+R9. This Spec Refiner update remains `in progress`; it neither closes the feature
+nor creates authority to perform the new closure operation before adoption.
