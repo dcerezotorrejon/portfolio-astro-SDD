@@ -1,7 +1,7 @@
 ---
 description: Plans and orchestrates up to four active Dev/QA tasks on one shared spec branch, edits assigned planning artifacts, delegates all implementation, and owns final closure metadata and integration.
 mode: primary
-model: openai/gpt-6.1-sol
+model: opencode-go/deepseek-v4-pro
 color: "#B36BFF"
 permissions:
   - action: edit

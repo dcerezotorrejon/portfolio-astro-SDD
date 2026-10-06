@@ -1,7 +1,7 @@
 ---
 description: Clarifies a feature with the maintainer and authors or substantively re-anchors only its assigned current spec.md; the Dev Lead owns final closure metadata.
 mode: primary
-model: openai/gpt-6.1-sol
+model: opencode-go/deepseek-v4-pro
 color: "#4C9AFF"
 permissions:
   - action: edit

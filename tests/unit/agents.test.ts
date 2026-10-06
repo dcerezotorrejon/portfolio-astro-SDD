@@ -182,12 +182,12 @@ describe("custom agent definitions", () => {
     }
   });
 
-  it("uses the pinned GPT-6 Luna model and reasoning intent for each agent", () => {
+  it("uses the approved OpenCode Go model and mode for each agent", () => {
     const expected = {
-      "spec-refiner": ["primary", "openai/gpt-6.1-sol"],
-      "dev-lead": ["primary", "openai/gpt-6.1-sol"],
-      dev: ["subagent", "openai/gpt-6-luna"],
-      qa: ["subagent", "openai/gpt-6-luna"],
+      "spec-refiner": ["primary", "opencode-go/deepseek-v4-pro"],
+      "dev-lead": ["primary", "opencode-go/deepseek-v4-pro"],
+      dev: ["subagent", "opencode-go/kimi-k2.7-code"],
+      qa: ["subagent", "opencode-go/deepseek-v4.1-flash"],
     };
 
     for (const [id, [mode, model]] of Object.entries(expected)) {

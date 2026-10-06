@@ -1,7 +1,7 @@
 ---
 description: Verifies one task on the shared spec branch, updates assigned tests and evidence while the increment is active, and returns defects to the same Dev without production edits, commits, or pushes.
 mode: subagent
-model: openai/gpt-6-luna
+model: opencode-go/deepseek-v4.1-flash
 color: "#E3B341"
 permissions:
   - action: edit

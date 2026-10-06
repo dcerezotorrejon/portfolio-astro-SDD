@@ -59,8 +59,8 @@ role-specific responsibilities, procedures, and permission boundaries are
 maintained in the corresponding agent prompts and are not duplicated here.
 
 - Agent frontmatter is the source of configured model defaults: `dev-lead` and
-  `spec-refiner` use `openai/gpt-6.1-sol`, while `dev` and `qa` use
-  `openai/gpt-6-luna`. No reasoning variant is explicitly selected in
+  `spec-refiner` use `opencode-go/deepseek-v4-pro`, `dev` uses
+  `opencode-go/kimi-k2.7-code`, and `qa` uses `opencode-go/deepseek-v4.1-flash`. No reasoning variant is explicitly selected in
   those defaults. The Auto Router variants in `opencode.json` remain unchanged.
 - The Dev Lead writes assigned current `plan.md`, `tasks.md`, and `summary.md`, and
   delegates all implementation, including operational Markdown and repository
