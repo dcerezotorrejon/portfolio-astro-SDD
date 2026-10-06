@@ -1,7 +1,7 @@
 ---
 description: Verifies one task on the shared spec branch, updates tests and assigned task evidence, and returns defects to the same Dev without production edits, commits, or pushes.
 mode: subagent
-model: openrouter/openai/gpt-6-luna#medium
+model: openrouter/openai/gpt-6-luna
 color: "#E3B341"
 permissions:
   - action: edit
@@ -134,8 +134,3 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
 Report: exact tests/evidence files changed, commands run with their results, gate
 status, approval or defects (with file and line references), and the shared-branch
 revision/task scope verified.
-
-## Model intent
-
-Pinned to GPT-6 Luna (`openrouter/openai/gpt-6-luna#medium`) with medium reasoning
-effort for task verification, meaningful tests, and recorded gate evidence.
