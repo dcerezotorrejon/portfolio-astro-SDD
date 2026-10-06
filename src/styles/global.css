@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@layer components {
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-primary);
+  }
+}
+
 @view-transition {
   navigation: auto;
 }
@@ -56,8 +64,7 @@
   /* --- 1. Primitive tokens --------------------------------------------- */
 
   /* Palette */
-  --palette-primary-blue: #1d9bf0; /* general blue accent / navigator indicator */
-  --palette-action-blue: #0c7abf; /* primary button background */
+  --palette-action-blue: #0c7abf; /* shared general accent / primary button background */
   --palette-action-blue-hover: #096aa7; /* primary button hover background */
   --palette-action-blue-active: #075985; /* primary button pressed background */
   --palette-link-blue: #075985; /* links and focus outlines */
@@ -96,7 +103,7 @@
 
   /* Color roles. Public names are preserved as aliases of the palette
      primitives so existing styles, tests and consumers keep working. */
-  --color-primary: var(--palette-primary-blue);
+  --color-primary: var(--palette-action-blue);
   --color-button: var(--palette-action-blue);
   --color-button-hover: var(--palette-action-blue-hover);
   --color-button-active: var(--palette-action-blue-active);
@@ -194,8 +201,7 @@
   --nav-indicator-inset: var(--space-4);
   --nav-indicator-width: calc(50% - var(--nav-indicator-inset));
   --nav-indicator-radius: var(--radius-pill);
-  /* Action blue (not the general --color-primary accent) so the white
-     active label reaches >= 4.5:1 contrast. */
+  /* Shared primary blue keeps the active label at >= 4.5:1 contrast. */
   --nav-indicator-background: var(--color-button);
 }
 

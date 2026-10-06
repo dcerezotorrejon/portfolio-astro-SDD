@@ -78,6 +78,17 @@ describe("experience detail routes", () => {
       expect(header?.querySelectorAll("p")[0]?.textContent?.trim()).toBe(
         "Empresa de ejemplo",
       );
+      const companyIcon =
+        header?.querySelector<HTMLImageElement>(".company-icon");
+      expect(companyIcon?.getAttribute("src")).toBe(
+        "/images/companies/astro.svg",
+      );
+      expect(companyIcon?.getAttribute("alt")).toBe(
+        "Icono provisional de Astro para Empresa de ejemplo",
+      );
+      expect(companyIcon?.getAttribute("width")).toBe("40");
+      expect(companyIcon?.getAttribute("height")).toBe("40");
+      expect(companyIcon?.hasAttribute("loading")).toBe(false);
       expect(header?.querySelectorAll("p")[1]?.textContent?.trim()).toBe(
         dateRange,
       );

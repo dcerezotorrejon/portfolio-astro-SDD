@@ -26,6 +26,7 @@ describe("home page", () => {
     expect(image?.getAttribute("alt")).toBe("Imagen de perfil provisional");
     expect(image?.getAttribute("width")).toBe("240");
     expect(image?.getAttribute("height")).toBe("240");
+    expect(image?.hasAttribute("loading")).toBe(false);
   });
 
   it("renders the approved social links with visible, unambiguous names", async () => {
@@ -45,9 +46,48 @@ describe("home page", () => {
       ["LinkedIn", "https://www.linkedin.com/"],
     ]);
     expect(
-      links.every((link) => link.querySelector("svg[aria-hidden='true']")),
-    ).toBe(true);
+      links.map((link) => {
+        const icon = link.querySelector<SVGSVGElement>("svg");
+        const use = icon?.querySelector("use");
+
+        return {
+          className: icon?.getAttribute("class"),
+          hidden: icon?.getAttribute("aria-hidden"),
+          focusable: icon?.getAttribute("focusable"),
+          symbol: use?.getAttribute("href"),
+          visibleLabel: link.querySelector("span")?.textContent?.trim(),
+        };
+      }),
+    ).toEqual([
+      {
+        className: "icon text-white",
+        hidden: "true",
+        focusable: "false",
+        symbol: "/icons/github.svg#icon",
+        visibleLabel: "GitHub",
+      },
+      {
+        className: "icon text-white",
+        hidden: "true",
+        focusable: "false",
+        symbol: "/icons/linkedin.svg#icon",
+        visibleLabel: "LinkedIn",
+      },
+    ]);
     expect(links.every((link) => !link.hasAttribute("target"))).toBe(true);
+    expect(links.every((link) => !link.hasAttribute("aria-label"))).toBe(true);
+    expect(links.map((link) => link.classList.contains("gap-x-2"))).toEqual([
+      true,
+      true,
+    ]);
+    expect(
+      links.map((link) =>
+        Array.from(link.children, (child) => child.localName),
+      ),
+    ).toEqual([
+      ["svg", "span"],
+      ["svg", "span"],
+    ]);
   });
 
   it("renders complete employment cards newest first with their technologies and detail links", async () => {
@@ -62,6 +102,34 @@ describe("home page", () => {
       "Trayectoria profesional",
     );
     expect(cards).toHaveLength(2);
+    expect(
+      cards.map((card) => {
+        const image = card.querySelector<HTMLImageElement>(".company-icon");
+
+        return {
+          loading: image?.getAttribute("loading"),
+          src: image?.getAttribute("src"),
+          alt: image?.getAttribute("alt"),
+          width: image?.getAttribute("width"),
+          height: image?.getAttribute("height"),
+        };
+      }),
+    ).toEqual([
+      {
+        loading: "lazy",
+        src: "/images/companies/astro.svg",
+        alt: "Icono provisional de Astro para Empresa de ejemplo",
+        width: "40",
+        height: "40",
+      },
+      {
+        loading: "lazy",
+        src: "/images/companies/astro.svg",
+        alt: "Icono provisional de Astro para Empresa de ejemplo",
+        width: "40",
+        height: "40",
+      },
+    ]);
     expect(
       cards.map((card) => card.querySelector("a")?.getAttribute("href")),
     ).toEqual([

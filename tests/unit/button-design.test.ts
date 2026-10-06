@@ -6,7 +6,11 @@ import { describe, expect, it } from "vitest";
 import ProfileIntroduction from "../../src/components/ProfileIntroduction.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import Home from "../../src/pages/index.astro";
-import { readStylesheetTokens, resolveToken } from "../helpers/css-tokens";
+import {
+  readStylesheetTokens,
+  resolveDeclaration,
+  resolveToken,
+} from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
@@ -57,13 +61,18 @@ function contrastRatio(foreground: string, background: string): number {
 }
 
 describe("T9 primary-button color tokens", () => {
-  it("defines the accessible button background tokens and keeps them separate from the accent", () => {
+  it("defines one shared primary/action blue and preserves the distinct button states", () => {
     expect(token("--color-button")).toBe("#0c7abf");
     expect(token("--color-button-hover")).toBe("#096aa7");
     expect(token("--color-button-active")).toBe("#075985");
-    // The general bright-blue accent is preserved; T11 moved the *navigator
-    // indicator* onto the darker action blue (see the navigator test below).
-    expect(token("--color-primary")).toBe("#1d9bf0");
+    expect(token("--color-primary")).toBe("#0c7abf");
+    expect(tokens.base.get("--color-primary")).toBe(
+      "var(--palette-action-blue)",
+    );
+    expect(tokens.base.get("--color-button")).toBe(
+      "var(--palette-action-blue)",
+    );
+    expect(tokens.base.has("--palette-primary-blue")).toBe(false);
   });
 
   it("maps white foreground and each component state background to a distinct token chain", () => {
@@ -113,6 +122,25 @@ describe("T9 primary-button color tokens", () => {
       4.61,
       1,
     );
+  });
+
+  it("keeps the default icon accent in the component layer and exposes visible keyboard focus", () => {
+    const componentLayer = css.match(
+      /@layer\s+components\s*\{([\s\S]*?)\n\}/,
+    )?.[1];
+
+    expect(componentLayer).toMatch(/\.icon\s*\{/);
+    const icon = cssRule(".icon");
+    expect(icon).toMatch(/width:\s*1rem/);
+    expect(icon).toMatch(/height:\s*1rem/);
+    expect(resolveDeclaration(icon, "color", tokens)).toBe("#0c7abf");
+
+    const focus = cssRule(
+      ":where(a, button, input, select, textarea):focus-visible",
+    );
+    expect(focus).toMatch(/outline:\s*3px solid var\(--color-focus\)/);
+    expect(focus).toMatch(/outline-offset:\s*3px/);
+    expect(token("--color-focus")).toBe("#075985");
   });
 
   it("drives the floating navigator's indicator and active/inactive labels from the T11 tokens", () => {
@@ -167,7 +195,7 @@ describe("T9 primary-button color tokens", () => {
 });
 
 describe("T9 rendered primary actions", () => {
-  it("renders the social buttons with icons that inherit the white foreground", async () => {
+  it("renders social icons as white-utility external symbol references with decorative semantics", async () => {
     const profileEntry = await getEntry("profile", "profile");
     expect(profileEntry).toBeDefined();
     if (!profileEntry) throw new Error("profile entry missing");
@@ -182,17 +210,31 @@ describe("T9 rendered primary actions", () => {
       ),
     );
 
-    expect(links.length).toBeGreaterThanOrEqual(1);
-    expect(links.map((link) => link.querySelector("svg") !== null)).toEqual(
-      links.map(() => true),
-    );
+    expect(links).toHaveLength(2);
     expect(
-      links.map((link) =>
-        Array.from(link.querySelectorAll("path")).every(
-          (path) => path.getAttribute("fill") === "currentColor",
-        ),
-      ),
-    ).toEqual(links.map(() => true));
+      links.map((link) => {
+        const icon = link.querySelector("svg");
+        return {
+          className: icon?.getAttribute("class"),
+          ariaHidden: icon?.getAttribute("aria-hidden"),
+          focusable: icon?.getAttribute("focusable"),
+          href: icon?.querySelector("use")?.getAttribute("href"),
+        };
+      }),
+    ).toEqual([
+      {
+        className: "icon text-white",
+        ariaHidden: "true",
+        focusable: "false",
+        href: "/icons/github.svg#icon",
+      },
+      {
+        className: "icon text-white",
+        ariaHidden: "true",
+        focusable: "false",
+        href: "/icons/linkedin.svg#icon",
+      },
+    ]);
     // No inline color overrides on the rendered buttons.
     expect(links.every((link) => !link.hasAttribute("style"))).toBe(true);
   });

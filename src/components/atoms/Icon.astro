@@ -1,0 +1,15 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { iconMap, type IconName } from "./iconMap";
+
+type Props = {
+  name: IconName;
+  class?: string;
+} & Omit<HTMLAttributes<"svg">, "class">;
+
+const { name, class: className, ...rest } = Astro.props;
+---
+
+<svg class:list={["icon", className]} {...rest}>
+  <use href={iconMap[name]} />
+</svg>
