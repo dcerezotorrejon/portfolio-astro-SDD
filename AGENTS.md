@@ -58,10 +58,15 @@ Four custom agents are defined under `.opencode/agents/`. Their
 role-specific responsibilities, procedures, and permission boundaries are
 maintained in the corresponding agent prompts and are not duplicated here.
 
-- The workflow agents use pinned model references: `dev-lead` uses
-  `openrouter/openai/gpt-6-luna#high`; `spec-refiner`, `dev`, and `qa` use
-  `openrouter/openai/gpt-6-luna#medium`. The Auto Router variants in
-  `opencode.json` remain unchanged.
+- Agent frontmatter is the source of configured model defaults: `dev-lead` and
+  `spec-refiner` use `openrouter/openai/gpt-6.1-sol`, while `dev` and `qa` use
+  `openrouter/openai/gpt-6-luna`. No reasoning variant is explicitly selected in
+  those defaults. The Auto Router variants in `opencode.json` remain unchanged.
+- The Dev Lead writes only assigned current planning artifacts. All implementation,
+  including operational Markdown and repository configuration, is delegated to Dev
+  with exact file ownership; QA independently verifies and owns assigned tests and
+  evidence without editing production. See the current agent prompts for detailed
+  role procedures and write boundaries.
 - Agents are defined as Markdown + YAML frontmatter, the format shared by OpenCode
   and other agent tools (for example Claude Code reads `.claude/agents/`). The
   constitution and current agent prompts define their permissions and historical

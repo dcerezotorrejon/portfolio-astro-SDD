@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.7.0
+- **Version**: 1.8.0
 - **Last amended**: 2026-10-06
 
 ---
@@ -147,6 +147,19 @@ with the rest of the historical snapshot.
   place on the shared branch; defects return to the same implementer on that
   branch. Verification may update assigned tests and task evidence but MUST NOT
   edit production code.
+- The Dev Lead orchestrates work and writes only the assigned current increment's
+  `plan.md`, `tasks.md`, and `summary.md`. It MUST NOT implement application,
+  operational Markdown, repository configuration, tests, or spec content, nor
+  write indirectly through shell commands, formatters, or other means. An explicit
+  task assignment does not expand this authority. The Lead MUST assign all
+  implementation, including operational Markdown and repository configuration,
+  to Dev with exact file ownership and within Dev's current permissions.
+- Dev implements only its assigned production files. QA independently owns
+  assigned test changes and task evidence and MUST NOT edit production files. In
+  the assigned current `spec.md`, QA may change only evidence-backed acceptance
+  checkbox markers as defined by its current prompt; substantive current-spec
+  ownership remains with the Spec Refiner. These role boundaries do not otherwise
+  change the verification, evidence, or spec-ownership rules above.
 - On a Git or change conflict, participants MUST stop the affected operation,
   record the conflicting branches/files and blocking state, and MUST NOT overwrite
   work or guess a resolution. Decisions requiring judgment MUST be escalated to

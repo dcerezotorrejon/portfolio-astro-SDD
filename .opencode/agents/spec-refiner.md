@@ -1,7 +1,7 @@
 ---
 description: Clarifies a feature with the maintainer, writes only its assigned current spec.md, and hands off to dev-lead without consulting completed specs.
 mode: primary
-model: openrouter/openai/gpt-6-luna#medium
+model: openrouter/openai/gpt-6.1-sol
 color: "#4C9AFF"
 permissions:
   - action: edit
@@ -81,8 +81,3 @@ you write; you never implement.
 
 When finished, report: the spec path, a one-line summary, any open questions, and
 a suggested handoff message for the Dev Lead.
-
-## Model intent
-
-Pinned to GPT-6 Luna (`openrouter/openai/gpt-6-luna#medium`) with medium reasoning
-effort for requirement clarification and spec refinement.
