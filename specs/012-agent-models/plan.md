@@ -1,7 +1,7 @@
 # Technical plan
 
 - **Spec ID**: `012-agent-models`
-- **Status**: feature published; integration and spec metadata closure pending
+- **Status**: feature integrated; Spec Refiner metadata closure pending
 - **Last updated**: 2026-10-06
 - **Shared branch**: `spec/012-agent-models`
 - **Base revision**: `b135c8ea3034280657aa12132410872a7ce94dd7`
@@ -17,8 +17,10 @@ The shared branch was created from `main` at the recorded base and published to
 `origin` before planning. After all task approvals and renewed applicable final
 gates, the Lead used the commit skill to create and publish feature commit
 `5494d9c3f120dbf9e27683c26cfd7086db0786eb`. All implementation, verification,
-evidence, and final publication records remain on this branch. Integration still
-requires explicit maintainer approval; the branch is retained.
+evidence, and final publication records remain on this branch. The maintainer
+explicitly approved integration on 2026-10-06; the Lead merged and pushed `main`
+with merge commit `65aabd11befbd06b402770964dd7dc102fd7ad9d`. The feature branch
+is retained, and remaining integration bookkeeping is verified on that branch.
 
 ## Approved decisions and bootstrap authority
 

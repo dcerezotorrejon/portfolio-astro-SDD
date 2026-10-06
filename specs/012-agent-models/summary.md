@@ -2,7 +2,7 @@
 
 - **Spec ID**: `012-agent-models`
 - **Last updated**: 2026-10-06
-- **Status**: feature published; integration and spec metadata closure pending
+- **Status**: feature integrated; Spec Refiner metadata closure pending
 - **Shared branch**: `spec/012-agent-models`
 
 ## Changes
@@ -81,7 +81,12 @@ feature commit `5494d9c3f120dbf9e27683c26cfd7086db0786eb`,
 successfully to `origin/spec/012-agent-models`. This final publication record
 is included in a follow-up feature bookkeeping commit after applicable gates.
 
-Integration into `main` remains pending explicit affirmative maintainer approval;
-the published feature branch is retained. Spec Refiner retains the final `done`
-metadata transition; publication/integration does not authorize the Lead to edit
-spec prose or status. The current spec remains `in progress` until that transition.
+The maintainer explicitly approved integration on 2026-10-06. The Lead merged the
+verified feature and pushed `main` with merge commit
+`65aabd11befbd06b402770964dd7dc102fd7ad9d`. The published feature branch is
+retained. Integration records are maintained and verified on that shared branch
+before their final publication and integration under the same approval.
+
+Spec Refiner retains the final `done` metadata transition;
+publication/integration does not authorize the Lead to edit spec prose or status.
+The current spec remains `in progress` until that transition.
