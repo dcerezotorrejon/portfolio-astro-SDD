@@ -227,12 +227,13 @@ describe("T2/T10 global style contracts", () => {
       resolveDeclaration(cssRule("html"), "scroll-padding-block-start", tokens),
     ).toBe("16px");
     // Reduced motion still removes the indicator and button transitions and
-    // disables view-transition animation; only the obsolete homepage
-    // `scroll-behavior: auto` override was removed in the flicker fix.
+    // disables view-transition animation (`animation: none`); the native
+    // cross-document `@view-transition { navigation: none }` trigger is retired
+    // in favor of ClientRouter.
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.floating-nav-indicator,[\s\S]*?transition:\s*none/,
     );
-    expect(css).toMatch(
+    expect(css).not.toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?@view-transition[\s\S]*?navigation:\s*none/,
     );
     // The one-off decorative ink tint is intentionally kept literal in both
