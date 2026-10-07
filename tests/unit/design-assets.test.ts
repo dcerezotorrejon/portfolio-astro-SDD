@@ -291,9 +291,11 @@ describe("T2/T10 global style contracts", () => {
     ).toBe("16px");
 
     // Reduced motion still removes the indicator transition via the utility
-    // variant and disables view-transition animation globally.
+    // variant and disables view-transition animation (`animation: none`); the
+    // native cross-document `@view-transition { navigation: none }` trigger is
+    // retired in favor of ClientRouter.
     expect(floatingNavSource).toContain("motion-reduce:transition-none");
-    expect(css).toMatch(
+    expect(css).not.toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?@view-transition[\s\S]*?navigation:\s*none/,
     );
     expect(css).toMatch(
