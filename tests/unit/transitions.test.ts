@@ -135,11 +135,9 @@ describe("native experience view transitions", () => {
     }
   });
 
-  it("enables native MPA transitions and disables them for reduced motion", () => {
-    expect(css).toMatch(/@view-transition\s*\{\s*navigation:\s*auto;\s*\}/);
-    expect(css).toMatch(
-      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?@view-transition\s*\{\s*navigation:\s*none;\s*\}/,
-    );
+  it("relies on ClientRouter instead of the native MPA trigger and disables animations for reduced motion", () => {
+    expect(css).not.toMatch(/@view-transition\s*\{\s*navigation:\s*auto;\s*\}/);
+    expect(css).not.toMatch(/@view-transition\s*\{\s*navigation:\s*none;\s*\}/);
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?::view-transition-group\(\*\)[\s\S]*?animation:\s*none/,
     );

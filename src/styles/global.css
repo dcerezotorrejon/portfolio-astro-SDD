@@ -8,16 +8,13 @@
   }
 }
 
-@view-transition {
-  navigation: auto;
-}
-
-/* Native cross-document transitions ship a UA default of 250 ms, while the
-   global design specifies 200 ms for shared-element transitions. Pin that
-   timing explicitly instead of inferring it from the navigator's CSS duration.
-   Only the native view-transition pseudo-elements are targeted; the reduced
-   motion block below resets these with `animation: none` and, appearing later
-   with equal specificity, wins over this duration. */
+/* Astro's ClientRouter uses same-document view transitions. The UA default
+   duration is ~250 ms, while the global design specifies 200 ms for
+   shared-element transitions. Pin that timing explicitly on the
+   view-transition pseudo-elements instead of inferring it from the navigator's
+   CSS duration. The reduced-motion block below resets these with
+   `animation: none` and, appearing later with equal specificity, wins over
+   this duration. */
 ::view-transition-group(*),
 ::view-transition-old(*),
 ::view-transition-new(*) {
@@ -573,10 +570,6 @@ svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  @view-transition {
-    navigation: none;
-  }
-
   .floating-nav-indicator,
   [data-molecule="button"] {
     transition: none;

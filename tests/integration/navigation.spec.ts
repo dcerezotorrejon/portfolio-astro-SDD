@@ -54,3 +54,57 @@ test("pointer and keyboard navigation track both sections and detail return", as
   await expect(experienceSection).toBeInViewport();
   await expect(experienceLink).toHaveAttribute("aria-current", "location");
 });
+
+test("home → detail → home round-trip stays client-side without a full reload", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  // Seed a window-scoped marker after the initial document load. A full
+  // document reload replaces `window` and clears the marker, while an
+  // Astro ClientRouter (SPA) transition keeps the same `window` instance.
+  await page.evaluate(() => {
+    (window as unknown as Record<string, string>).__clientRouterMarker =
+      "initial";
+  });
+
+  const experienceSection = page.locator("#trayectoria");
+  const detailLink = experienceSection
+    .locator("article")
+    .first()
+    .getByRole("link");
+  const detailHref = await detailLink.getAttribute("href");
+  expect(detailHref).toMatch(/^\/experiencia\/.+\/$/);
+
+  await detailLink.click();
+  await expect(page).toHaveURL(new RegExp(`${detailHref}$`));
+  await expect(page.locator("article[data-experience-slug]")).toBeVisible();
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as Record<string, string>).__clientRouterMarker,
+      ),
+    )
+    .toBe("initial");
+
+  // Re-seed for the return leg so detail → home is proven client-side too.
+  await page.evaluate(() => {
+    (window as unknown as Record<string, string>).__clientRouterMarker =
+      "return";
+  });
+
+  await page.getByRole("link", { name: /volver/i }).click();
+  await expect(page).toHaveURL(/\/#trayectoria$/);
+  await expect(experienceSection).toBeInViewport();
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as Record<string, string>).__clientRouterMarker,
+      ),
+    )
+    .toBe("return");
+});
