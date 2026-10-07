@@ -29,7 +29,7 @@ export const companyIconSchema = z.object({
 
 const seoSchema = z.object({
   title: nonEmptyString,
-  description: nonEmptyString,
+  description: nonEmptyString.max(160, "Must be at most 160 characters"),
 });
 
 export const profileSchema = z.object({
