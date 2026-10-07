@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.11.1
+- **Version**: 1.11.2
 - **Last amended**: 2026-10-07
 
 ---
@@ -153,37 +153,31 @@ with the rest of the historical snapshot.
   edit production code.
 - The Dev Lead orchestrates work. Workflow Markdown — `AGENTS.md`,
   `docs/constitution.md`, and the agent definitions (`.opencode/agents/*.md`) — is
-  always implemented directly by the Lead, who delegates only its verification to
-  QA; Dev NEVER edits these files. The Lead also writes the assigned current
-  increment's `plan.md`, `tasks.md`, and `summary.md`, and delegates all other
-  implementation (application code, content, non-workflow operational Markdown,
-  repository configuration, and tests) to Dev with exact file ownership and
-  within Dev's current permissions. For final closure, the Lead may make one
-  final edit in that increment's `spec.md`, limited to `Status` and `Last
-updated`, only after every task has QA approval and recorded evidence, every
-  acceptance criterion has QA-backed completion, substantive re-anchoring is
-  resolved, all directory artifacts and the latest final-gate evidence are
-  finalized while active, and all applicable final gates pass. The Lead MUST then
-  set only `Status` to `done` and `Last updated` to the actual closure date. If
-  any prerequisite fails, the increment remains active and no metadata transition
-  occurs. After this edit, no file in the increment directory may be changed;
-  actual subsequent Git outcomes MUST be reported externally and MUST NOT be
-  pre-recorded in the frozen directory. The Lead MUST NOT implement application
-  code, content, non-workflow operational Markdown, repository configuration,
-  tests, or substantive spec content, nor write indirectly through shell
-  commands, formatters, or other means. An explicit task assignment does not
-  expand this authority.
-- Dev implements its assigned production files AND writes and validates the
-  task's unit/component tests under `tests/unit/**`, running them (e.g.
-  `pnpm exec vitest run tests/unit`) before handing the task to QA. QA verifies
-  that those unit tests sufficiently cover the task's acceptance criteria,
-  returns specific defects to the same Dev when coverage is insufficient, and
-  independently owns and runs the remaining tests (`tests/seo/**`, `tests/a11y/**`,
-  `tests/integration/**`) and all applicable gates, plus the task evidence. QA
-  MUST NOT edit `tests/unit/**` or production files. In the assigned current
-  `spec.md`, QA may change only evidence-backed acceptance checkbox markers as
-  defined by its current prompt; substantive current-spec ownership remains with
-  the Spec Refiner. These role boundaries do not otherwise change the
+  owned by the Lead, who implements it directly and delegates only its
+  verification to QA; Dev NEVER edits these files. The Lead also owns the assigned
+  current increment's `plan.md`, `tasks.md`, and `summary.md`, and delegates every
+  other implementation to Dev with exact file ownership and within Dev's current
+  permissions. The Lead MUST NOT implement application code, content, non-workflow
+  operational Markdown, repository configuration, tests, or substantive spec
+  content, nor write indirectly through shell commands, formatters, or other
+  means; an explicit task assignment does not expand this authority.
+- For final closure, the Lead makes one final edit in that increment's `spec.md`,
+  limited to `Status` and `Last updated`, only after every task has QA approval
+  and recorded evidence, every acceptance criterion has QA-backed completion,
+  substantive re-anchoring is resolved, all directory artifacts and the latest
+  final-gate evidence are finalized while active, and all applicable final gates
+  pass. The Lead sets only `Status` to `done` and `Last updated` to the actual
+  closure date. If any prerequisite fails, the increment remains active and no
+  metadata transition occurs. After this edit, no file in the increment directory
+  may be changed; actual subsequent Git outcomes MUST be reported externally and
+  MUST NOT be pre-recorded in the frozen directory.
+- Per task, Dev implements its assigned production files and owns the
+  unit/component tests under `tests/unit/**`; QA verifies those tests' sufficiency
+  against the acceptance criteria and owns the remaining tests (SEO, accessibility,
+  integration) and all applicable gates, plus the task evidence. QA MUST NOT edit
+  `tests/unit/**` or production files. In the current `spec.md`, QA changes only
+  evidence-backed acceptance checkbox markers, and the Spec Refiner owns
+  substantive spec content. These ownership rules do not otherwise change the
   verification, evidence, or spec-ownership rules above.
 - On a Git or change conflict, participants MUST stop the affected operation,
   record the conflicting branches/files and blocking state, and MUST NOT overwrite
