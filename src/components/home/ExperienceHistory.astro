@@ -36,8 +36,8 @@ const { experiences, profile } = Astro.props;
 
       return (
         <article
+          transition:name={`experience-transition-${slug}`}
           class="experience-card"
-          style={`view-transition-name: experience-${slug}`}
         >
           <Heading level={3} variant="card">
             {role}
