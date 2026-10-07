@@ -41,7 +41,7 @@ permissions:
     resource: "docs/constitution.md"
     effect: deny
   - action: edit
-    resource: ".opencode/agents/**"
+    resource: ".opencode/agents/*.md"
     effect: deny
   - action: shell
     resource: "git branch *"
@@ -119,16 +119,16 @@ Lead, following the spec and the plan. You do **not** validate your own work.
 - Implement operational Markdown and repository configuration when the Dev Lead
   explicitly assigns the exact paths in the current task and this prompt's
   permissions allow them. This excludes workflow Markdown (`AGENTS.md`,
-  `docs/constitution.md`, and `.opencode/agents/**`), which the Lead owns and
+  `docs/constitution.md`, and `.opencode/agents/*.md`), which the Lead owns and
   implements directly. Non-workflow operational Markdown may be assigned under
   root-level `*.md`, `docs/**`, `specs/README.md`, and `specs/_template/**`,
   except every `spec.md` file. Repository configuration may be at any path or
   extension when it configures package management, build/runtime tools, agents,
   lint/format/test tooling, or CI. These capabilities do not authorize unrelated
   changes.
-- Never edit workflow Markdown: `AGENTS.md`, `docs/constitution.md`, or any file
-  under `.opencode/agents/`. Those files are implemented by the Dev Lead, who
-  delegates only their verification to QA.
+- Never edit workflow Markdown: `AGENTS.md`, `docs/constitution.md`, or any
+  `.md` file under `.opencode/agents/`. Those files are implemented by the Dev
+  Lead, who delegates only their verification to QA.
 - Never write any `spec.md`, including the template spec. Do not edit feature
   planning, task evidence, or summaries; those remain with their authorized
   owners. Operational template files other than `spec.md` may be assigned, but

@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.11.0
+- **Version**: 1.11.1
 - **Last amended**: 2026-10-07
 
 ---
@@ -152,7 +152,7 @@ with the rest of the historical snapshot.
   branch. Verification may update assigned tests and task evidence but MUST NOT
   edit production code.
 - The Dev Lead orchestrates work. Workflow Markdown — `AGENTS.md`,
-  `docs/constitution.md`, and the agent definitions (`.opencode/agents/**`) — is
+  `docs/constitution.md`, and the agent definitions (`.opencode/agents/*.md`) — is
   always implemented directly by the Lead, who delegates only its verification to
   QA; Dev NEVER edits these files. The Lead also writes the assigned current
   increment's `plan.md`, `tasks.md`, and `summary.md`, and delegates all other
