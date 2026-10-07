@@ -229,20 +229,20 @@ describe("custom agent definitions", () => {
 
     const dev = agents.get("dev")!;
     expect(effectivePermission(dev, "edit", "docs/constitution.md")).toBe(
-      "allow",
+      "deny",
     );
     expect(
       effectivePermission(dev, "edit", "src/components/FloatingNav.tsx"),
     ).toBe("allow");
     expect(effectivePermission(dev, "edit", "tests/unit/agents.test.ts")).toBe(
-      "deny",
+      "allow",
     );
     expect(
       effectivePermission(dev, "edit", "specs/008-lib-reorganization/spec.md"),
     ).toBe("deny");
     expectPromptFragments("dev", [
       "implement exactly one task",
-      "Do not write or modify tests",
+      "Write and validate the task's unit/component tests under `tests/unit/**`",
       "do not merge, commit, or push",
       "Before handing off, run Prettier on every file modified for the assigned task.",
       "Report the exact formatter command, the complete list of files formatted, and the result.",
@@ -253,13 +253,13 @@ describe("custom agent definitions", () => {
     expect(qaTuples.slice(0, 6)).toEqual([
       ["edit", "**", "deny"],
       ["edit", "tests/**", "allow"],
+      ["edit", "tests/unit/**", "deny"],
       ["edit", "specs/*/tasks.md", "allow"],
       ["edit", "specs/**/spec.md", "deny"],
       ["edit", "specs/*/spec.md", "allow"],
-      ["shell", "git branch *", "deny"],
     ]);
     expect(effectivePermission(qa, "edit", "tests/unit/agents.test.ts")).toBe(
-      "allow",
+      "deny",
     );
     expect(
       effectivePermission(qa, "edit", "specs/009-workflow-governance/tasks.md"),
@@ -359,15 +359,12 @@ describe("custom agent definitions", () => {
     expect(effectivePermission(lead, "shell", "git merge main")).toBe("allow");
 
     expectPromptFragments("dev-lead", [
-      "Your direct edits are limited to the assigned current increment's `plan.md`, `tasks.md`, and `summary.md`",
-      "Delegate all implementation, including operational Markdown and repository configuration, to Dev with exact file ownership and independent QA.",
+      "Your direct edits are the assigned current increment's `plan.md`, `tasks.md`, and `summary.md`",
+      "Delegate all other implementation — application code, content, non-workflow operational Markdown, repository configuration, and tests — to Dev with exact file ownership and independent QA.",
       "Never update any file in a completed spec directory.",
     ]);
 
     for (const resource of [
-      "AGENTS.md",
-      "docs/constitution.md",
-      ".opencode/agents/dev-lead.md",
       "package.json",
       "src/components/FloatingNav.tsx",
       "public/content.md",
@@ -389,7 +386,7 @@ describe("shared and role-specific workflow guidance", () => {
 
   it("amends the constitution with an incremented version and actual amendment date", () => {
     expect(constitution).toMatch(/\*\*Version\*\*: \d+\.\d+\.\d+/);
-    expect(constitution).toContain("**Last amended**: 2026-10-06");
+    expect(constitution).toContain("**Last amended**: 2026-10-07");
     expect(constitution).toContain(
       "### 4.2 Historical specification access and references",
     );
@@ -455,7 +452,7 @@ describe("shared and role-specific workflow guidance", () => {
     );
 
     expect(agentsGuide.replace(/\s+/g, " ")).toContain(
-      "Role-specific procedures and write boundaries are defined in the applicable current agent prompts.",
+      "Their responsibilities, procedures, and permission boundaries live in those prompts and in the constitution.",
     );
     expect(agentsGuide).not.toMatch(
       /Lead alone uses the commit skill|maintainer alone performs the merge|retain a full verification history/i,
@@ -468,20 +465,20 @@ describe("shared and role-specific workflow guidance", () => {
       expect(agentsGuide).toContain(id);
     }
     expect(agentsGuide.replace(/\s+/g, " ")).toContain(
-      "Role-specific procedures and write boundaries are defined in the applicable current agent prompts.",
+      "Their responsibilities, procedures, and permission boundaries live in those prompts and in the constitution.",
     );
     for (const roleProcedure of [
-      "Clarifies the feature with you and writes `spec.md`.",
-      "Turns the spec into `plan.md`/`tasks.md` and orchestrates `dev` then `qa`.",
-      "Implements one task. Does not validate its own work.",
-      "Tests, records evidence, marks only evidenced acceptance boxes.",
+      "Clarifies a feature with the maintainer and authors or substantively re-anchors only its assigned current `spec.md`",
+      "Plans and orchestrates up to four active Dev/QA tasks on one shared spec branch",
+      "Implements exactly one assigned task on the shared spec branch, writes and validates the task's unit tests",
+      "Verifies one task on the shared spec branch, reviews Dev's unit tests for sufficiency",
     ]) {
       expect(agentsGuide.replace(/\s+/g, " ")).not.toContain(roleProcedure);
     }
     expect(agentsGuide).not.toContain("The Lead returns defects");
     expect(agentsGuide).not.toContain("QA may change only that criterion's");
-    expect(workflow).not.toContain("QA MUST");
-    expect(workflow).not.toContain("Dev MUST");
+    expect(agentsGuide).not.toContain("QA MUST");
+    expect(agentsGuide).not.toContain("Dev MUST");
   });
 
   it("requires explicit post-push maintainer confirmation for Lead merge and forbids Dev/QA integration", () => {
@@ -547,11 +544,11 @@ describe("shared and role-specific workflow guidance", () => {
       "Orchestrate at most four active tasks.",
       "Never launch a fifth task while four are active.",
       "serialize tasks with overlapping files or dependencies on unfinished work.",
-      "QA may update assigned tests and task evidence but not production code.",
+      "QA verifies Dev's `tests/unit/**` for sufficiency against the acceptance criteria and owns/runs the remaining tests and gates.",
       "Return defects to the same Dev for correction on the same branch",
       "Record the approved decision in the relevant planning artifact.",
       "The metadata transition is the last directory edit.",
-      "Delegate all implementation, including operational Markdown and repository configuration, to Dev with exact file ownership",
+      "Delegate all other implementation — application code, content, non-workflow operational Markdown, repository configuration, and tests — to Dev with exact file ownership",
     ]);
   });
 
@@ -562,7 +559,7 @@ describe("shared and role-specific workflow guidance", () => {
     ]);
     expectPromptFragments("dev", [
       "Implement the smallest correct change that satisfies the task within the explicitly assigned file/scope ownership.",
-      "Do not write or modify tests: QA owns `tests/`.",
+      "Write and validate the task's unit/component tests under `tests/unit/**`",
       "Actual edits must stay within its named files",
     ]);
     expectPromptFragments("qa", [

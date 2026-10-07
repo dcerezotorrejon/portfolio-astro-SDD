@@ -98,6 +98,20 @@ describe("portfolio content schemas", () => {
     expect(earlier.endDate?.toISOString()).toBe("2023-12-01T00:00:00.000Z");
   });
 
+  it("enforces a 160-character maximum on the shared SEO description", () => {
+    const atLimit = {
+      ...approvedProfile,
+      seo: { title: "Título", description: "x".repeat(160) },
+    };
+    const overLimit = {
+      ...approvedProfile,
+      seo: { title: "Título", description: "x".repeat(161) },
+    };
+
+    expect(profileSchema.safeParse(atLimit).success).toBe(true);
+    expect(profileSchema.safeParse(overLimit).success).toBe(false);
+  });
+
   it("allows profile copy and social destinations to be replaced without schema changes", () => {
     const replacement = profileSchema.parse({
       ...approvedProfile,
