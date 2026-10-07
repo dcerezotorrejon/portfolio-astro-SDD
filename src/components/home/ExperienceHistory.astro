@@ -27,7 +27,7 @@ const { experiences, profile } = Astro.props;
   <Heading level={2} variant="section" id="history-heading">
     {profile.historyHeading}
   </Heading>
-  <div class="experience-list">
+  <div class="experience-list grid gap-5">
     {experiences.map((experience) => {
       const { role, company, startDate, endDate, summary, technologies, slug } =
         experience.data;
@@ -37,15 +37,15 @@ const { experiences, profile } = Astro.props;
       return (
         <article
           transition:name={`experience-transition-${slug}`}
-          class="experience-card"
+          class="experience-card w-full rounded-card border border-border bg-surface p-6"
         >
           <Heading level={3} variant="card">
             {role}
           </Heading>
-          <p class="company-identity">
+          <p class="company-identity flex min-w-0 items-center gap-3">
             <img
               loading="lazy"
-              class="company-icon"
+              class="company-icon size-10 shrink-0 object-contain"
               src={companyIcon.src}
               alt={companyIcon.alt}
               width="40"

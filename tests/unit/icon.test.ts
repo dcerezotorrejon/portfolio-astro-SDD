@@ -28,7 +28,7 @@ describe("Icon atom", () => {
       expect(roots).toHaveLength(1);
       expect(root?.querySelectorAll("use")).toHaveLength(1);
       expect(root?.querySelector("use")?.getAttribute("href")).toBe(href);
-      expect(root?.getAttribute("class")).toBe("icon");
+      expect(root?.getAttribute("class")).toBe("icon size-4");
     },
   );
 
@@ -48,6 +48,7 @@ describe("Icon atom", () => {
 
     expect(root?.getAttribute("class")?.split(/\s+/)).toEqual([
       "icon",
+      "size-4",
       "text-white",
       "custom-icon",
     ]);

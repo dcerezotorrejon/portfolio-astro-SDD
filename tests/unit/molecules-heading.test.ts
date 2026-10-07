@@ -11,12 +11,12 @@ import {
 } from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
-const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
 const headingSource = readFileSync(
   "src/components/molecules/Heading.astro",
   "utf8",
 );
+const globalCss = readFileSync("src/styles/global.css", "utf8");
 
 const BREAKPOINT = "@media (min-width: 768px)";
 
@@ -35,15 +35,6 @@ function element(doc: Document, selector: string): HTMLElement {
 /** Resolves a token (through any alias depth) to its final value. */
 function token(name: string): string {
   return resolveToken(name, tokens);
-}
-
-/** Extracts the declaration block of the first rule starting with `selector`. */
-function cssRule(selector: string): string {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const rule = css.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, "s"));
-
-  expect(rule, `expected CSS rule for ${selector}`).not.toBeNull();
-  return rule?.[1] ?? "";
 }
 
 /** Returns the `type Props = { … }` object literal from a component source. */
@@ -190,30 +181,46 @@ describe("Heading molecule tokens", () => {
     ).toBe("32px");
   });
 
-  it("drives each heading variant rule from the molecule hooks and heading tokens", () => {
-    const display = cssRule(
-      '[data-molecule="heading"][data-variant="display"]',
-    );
-    const section = cssRule(
-      '[data-molecule="heading"][data-variant="section"]',
-    );
-    const card = cssRule('[data-molecule="heading"][data-variant="card"]');
+  it("drives each heading variant from utility classes on the rendered markup", async () => {
+    const doc = documentFrom(await render(MoleculesFixture));
+    const display = element(doc, "#fixture-heading-1");
+    const section = element(doc, "#fixture-heading-2");
+    const card = element(doc, "#fixture-heading-3");
 
-    expect(display).toMatch(/font-size:\s*var\(--heading-display-size\)/);
-    expect(display).toMatch(/font-weight:\s*var\(--heading-display-weight\)/);
-    expect(display).toMatch(/line-height:\s*var\(--heading-display-leading\)/);
-    expect(display).toMatch(
-      /letter-spacing:\s*var\(--heading-display-tracking\)/,
-    );
+    // Display: large clamped size with tight leading and negative tracking.
+    expect(display.className).toMatch(/\btext-display\b/);
+    expect(display.className).toMatch(/\bfont-bold\b/);
+    expect(display.className).toMatch(/\bleading-display\b/);
+    expect(display.className).toMatch(/\btracking-display\b/);
 
-    expect(section).toMatch(/margin-block-end:\s*var\(--heading-section-gap\)/);
-    expect(section).toMatch(/color:\s*var\(--heading-section-ink\)/);
-    expect(section).toMatch(/font-size:\s*var\(--heading-section-size\)/);
-    expect(section).toMatch(/font-weight:\s*var\(--heading-section-weight\)/);
-    expect(section).toMatch(/line-height:\s*var\(--heading-section-leading\)/);
+    // Section: responsive 24px → 32px, ink color, tight leading, bottom gap.
+    expect(section.className).toMatch(/\btext-24\b/);
+    expect(section.className).toMatch(/\bmd:text-32\b/);
+    expect(section.className).toMatch(/\btext-ink\b/);
+    expect(section.className).toMatch(/\bfont-bold\b/);
+    expect(section.className).toMatch(/\bleading-tight\b/);
+    expect(section.className).toMatch(/\bmb-6\b/);
 
-    expect(card).toMatch(/font-size:\s*var\(--heading-card-size\)/);
-    expect(card).toMatch(/font-weight:\s*var\(--heading-card-weight\)/);
-    expect(card).toMatch(/line-height:\s*var\(--heading-card-leading\)/);
+    // Card: smaller title size with its own leading.
+    expect(card.className).toMatch(/\btext-card\b/);
+    expect(card.className).toMatch(/\bfont-bold\b/);
+    expect(card.className).toMatch(/\bleading-card\b/);
+
+    // No inline color overrides leak onto rendered headings.
+    expect(display.hasAttribute("style")).toBe(false);
+    expect(section.hasAttribute("style")).toBe(false);
+    expect(card.hasAttribute("style")).toBe(false);
+
+    // The source encodes the same contracts as a single source of truth.
+    expect(headingSource).toContain("text-display");
+    expect(headingSource).toContain("leading-display");
+    expect(headingSource).toContain("tracking-display");
+    expect(headingSource).toContain("text-24");
+    expect(headingSource).toContain("md:text-32");
+    expect(headingSource).toContain("text-card");
+    expect(headingSource).toContain("leading-card");
+
+    // Global CSS no longer carries component-specific attribute selectors.
+    expect(globalCss).not.toContain('[data-molecule="heading"]');
   });
 });

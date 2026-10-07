@@ -10,6 +10,14 @@ type Props = {
 const { name, class: className, ...rest } = Astro.props;
 ---
 
-<svg class:list={["icon", className]} {...rest}>
+<svg class:list={["icon size-4", className]} {...rest}>
   <use href={iconMap[name]} />
 </svg>
+
+<style>
+  @layer components {
+    .icon {
+      color: var(--color-primary);
+    }
+  }
+</style>

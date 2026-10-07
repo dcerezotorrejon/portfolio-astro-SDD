@@ -8,12 +8,12 @@ import { formatViolations, runAxeOnHtml } from "../helpers/a11y";
 import { readStylesheetTokens, resolveToken } from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
-const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
 const buttonSource = readFileSync(
   "src/components/molecules/Button.astro",
   "utf8",
 );
+const globalCss = readFileSync("src/styles/global.css", "utf8");
 
 function documentFrom(html: string): Document {
   return new JSDOM(html).window.document;
@@ -30,15 +30,6 @@ function element(doc: Document, selector: string): HTMLElement {
 /** Resolves a token (through any alias depth) to its final value. */
 function token(name: string): string {
   return resolveToken(name, tokens);
-}
-
-/** Extracts the declaration block of the first rule starting with `selector`. */
-function cssRule(selector: string): string {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const rule = css.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, "s"));
-
-  expect(rule, `expected CSS rule for ${selector}`).not.toBeNull();
-  return rule?.[1] ?? "";
 }
 
 /** Returns the `type Props = { … }` object literal from a component source. */
@@ -222,27 +213,53 @@ describe("Button secondary tokens and contrast", () => {
     expect(token("--button-secondary-border")).toBe("#cfd9de");
   });
 
-  it("drives the variant rules from the molecule hooks and component tokens", () => {
-    const primary = cssRule('[data-molecule="button"][data-variant="primary"]');
-    const secondary = cssRule(
-      '[data-molecule="button"][data-variant="secondary"]',
+  it("drives the variant rules from utility classes on the rendered markup", async () => {
+    const doc = documentFrom(await render(MoleculesFixture));
+    const primary = element(doc, "#fixture-primary-link");
+    const secondary = element(doc, "#fixture-secondary-link");
+
+    // Base geometry and motion are shared across variants.
+    expect(primary.className).toMatch(/\binline-flex\b/);
+    expect(primary.className).toMatch(/\bmin-h-11\b/);
+    expect(primary.className).toMatch(/\bmin-w-11\b/);
+    expect(primary.className).toMatch(/\brounded-pill\b/);
+    expect(primary.className).toMatch(/\bduration-control\b/);
+    expect(primary.classList.contains("duration-control")).toBe(true);
+    expect(primary.classList.contains("motion-reduce:transition-none")).toBe(
+      true,
     );
 
-    expect(primary).toMatch(/background:\s*var\(--button-background\)/);
-    expect(primary).toMatch(/color:\s*var\(--button-label\)/);
-    expect(secondary).toMatch(
-      /background:\s*var\(--button-secondary-background\)/,
-    );
-    expect(secondary).toMatch(
-      /border:\s*1px solid var\(--button-secondary-border\)/,
-    );
-    expect(secondary).toMatch(/color:\s*var\(--button-secondary-label\)/);
-    expect(
-      cssRule('[data-molecule="button"][data-variant="secondary"]:hover'),
-    ).toMatch(/background:\s*var\(--button-secondary-background-hover\)/);
-    expect(
-      cssRule('[data-molecule="button"][data-variant="secondary"]:active'),
-    ).toMatch(/background:\s*var\(--button-secondary-background-active\)/);
+    // Primary: action surface with stateful backgrounds.
+    expect(primary.className).toMatch(/\bbg-button\b/);
+    expect(primary.className).toMatch(/\btext-surface\b/);
+    expect(primary.className).toMatch(/\bhover:bg-button-hover\b/);
+    expect(primary.className).toMatch(/\bactive:bg-button-active\b/);
+
+    // Secondary: outline surface with stateful backgrounds.
+    expect(secondary.className).toMatch(/\bborder\b/);
+    expect(secondary.className).toMatch(/\bborder-border\b/);
+    expect(secondary.className).toMatch(/\bbg-surface\b/);
+    expect(secondary.className).toMatch(/\btext-ink\b/);
+    expect(secondary.className).toMatch(/\bhover:bg-page\b/);
+    expect(secondary.className).toMatch(/\bactive:bg-border\b/);
+
+    // No inline color overrides leak onto the rendered buttons.
+    expect(primary.hasAttribute("style")).toBe(false);
+    expect(secondary.hasAttribute("style")).toBe(false);
+
+    // The source encodes the same contracts as a single source of truth.
+    expect(buttonSource).toContain("bg-button");
+    expect(buttonSource).toContain("text-surface");
+    expect(buttonSource).toContain("hover:bg-button-hover");
+    expect(buttonSource).toContain("active:bg-button-active");
+    expect(buttonSource).toContain("border-border");
+    expect(buttonSource).toContain("bg-surface");
+    expect(buttonSource).toContain("text-ink");
+    expect(buttonSource).toContain("hover:bg-page");
+    expect(buttonSource).toContain("active:bg-border");
+
+    // Global CSS no longer carries component-specific attribute selectors.
+    expect(globalCss).not.toContain('[data-molecule="button"]');
   });
 
   it("keeps the secondary label at >= 4.5:1 in normal, hover and pressed states", () => {

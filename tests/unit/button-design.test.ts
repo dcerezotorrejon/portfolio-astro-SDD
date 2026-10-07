@@ -3,31 +3,24 @@ import { getCollection, getEntry } from "astro:content";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
+import Button from "../../src/components/molecules/Button.astro";
 import ProfileIntroduction from "../../src/components/home/ProfileIntroduction.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import Home from "../../src/pages/index.astro";
-import {
-  readStylesheetTokens,
-  resolveDeclaration,
-  resolveToken,
-} from "../helpers/css-tokens";
+import { readStylesheetTokens, resolveToken } from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
-
-/** Public hook for the primary variant, replacing the removed `.button-link`. */
-const PRIMARY_BUTTON = '[data-molecule="button"][data-variant="primary"]';
-
-function cssRule(selector: string): string {
-  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const rule = css.match(
-    new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`, "s"),
-  );
-
-  expect(rule, `expected CSS rule for ${selector}`).not.toBeNull();
-  return rule?.[1] ?? "";
-}
+const buttonSource = readFileSync(
+  "src/components/molecules/Button.astro",
+  "utf8",
+);
+const iconSource = readFileSync("src/components/atoms/Icon.astro", "utf8");
+const floatingNavSource = readFileSync(
+  "src/components/home/FloatingNav/FloatingNav.tsx",
+  "utf8",
+);
 
 /** Resolves a token (through any alias depth) to its final value. */
 function token(name: string): string {
@@ -75,35 +68,37 @@ describe("T9 primary-button color tokens", () => {
     expect(tokens.base.has("--palette-primary-blue")).toBe(false);
   });
 
-  it("maps white foreground and each component state background to a distinct token chain", () => {
-    // The button consumes component tokens; each must resolve through the
-    // semantic layer to the approved primitive hex values.
-    expect(cssRule(PRIMARY_BUTTON)).toMatch(
-      /background:\s*var\(--button-background\)/,
-    );
-    expect(cssRule(PRIMARY_BUTTON)).toMatch(/color:\s*var\(--button-label\)/);
+  it("maps white foreground and each component state background to a distinct token chain", async () => {
+    const html = await render(Button, { variant: "primary", href: "/" });
+    const { document } = new JSDOM(html).window;
+    const primary = document.querySelector('[data-molecule="button"]');
+
+    expect(primary).not.toBeNull();
+    // The rendered primary button uses semantic utilities generated from the
+    // same component tokens; no inline color overrides are present.
+    expect(primary?.className).toMatch(/\bbg-button\b/);
+    expect(primary?.className).toMatch(/\btext-surface\b/);
+    expect(primary?.className).toMatch(/\bhover:bg-button-hover\b/);
+    expect(primary?.className).toMatch(/\bactive:bg-button-active\b/);
+    expect(primary?.hasAttribute("style")).toBe(false);
+
+    // Token chains remain intact.
     expect(resolveToken("--button-background", tokens)).toBe("#0c7abf");
     expect(resolveToken("--button-background-hover", tokens)).toBe("#096aa7");
     expect(resolveToken("--button-background-active", tokens)).toBe("#075985");
     expect(resolveToken("--button-label", tokens)).toBe("#ffffff");
-    // The component tokens stay aliased to the semantic roles, not hard-coded.
     expect(tokens.base.get("--button-background")).toBe("var(--color-button)");
     expect(tokens.base.get("--button-label")).toBe("var(--color-surface)");
-    expect(cssRule(PRIMARY_BUTTON)).not.toMatch(/--color-ink/);
-    expect(cssRule(`${PRIMARY_BUTTON}:hover`)).toMatch(
-      /background:\s*var\(--button-background-hover\)/,
-    );
-    expect(cssRule(`${PRIMARY_BUTTON}:active`)).toMatch(
-      /background:\s*var\(--button-background-active\)/,
-    );
-    // Hover/active must not reintroduce a dark label on the darker blue.
-    for (const state of [
-      `${PRIMARY_BUTTON}:hover`,
-      `${PRIMARY_BUTTON}:active`,
-    ]) {
-      expect(cssRule(state)).not.toMatch(/color:/);
-    }
     expect(token("--color-surface")).toBe("#ffffff");
+
+    // The source encodes the same contracts.
+    expect(buttonSource).toContain("bg-button");
+    expect(buttonSource).toContain("text-surface");
+    expect(buttonSource).toContain("hover:bg-button-hover");
+    expect(buttonSource).toContain("active:bg-button-active");
+
+    // Global CSS no longer selects on the molecule hook.
+    expect(css).not.toContain('[data-molecule="button"]');
   });
 
   it("gives white at least 4.5:1 contrast on normal, hover and active backgrounds", () => {
@@ -125,48 +120,66 @@ describe("T9 primary-button color tokens", () => {
   });
 
   it("keeps the default icon accent in the component layer and exposes visible keyboard focus", () => {
-    const componentLayer = css.match(
-      /@layer\s+components\s*\{([\s\S]*?)\n\}/,
-    )?.[1];
+    // The icon default size and accent now live in Icon.astro's scoped style.
+    const scopedStyle =
+      iconSource.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? "";
 
-    expect(componentLayer).toMatch(/\.icon\s*\{/);
-    const icon = cssRule(".icon");
-    expect(icon).toMatch(/width:\s*1rem/);
-    expect(icon).toMatch(/height:\s*1rem/);
-    expect(resolveDeclaration(icon, "color", tokens)).toBe("#0c7abf");
+    expect(scopedStyle).toMatch(/@layer\s+components/);
+    expect(scopedStyle).toMatch(/\.icon\s*\{/);
+    expect(scopedStyle).toMatch(/color:\s*var\(--color-primary\)/);
+    expect(resolveToken("--color-primary", tokens)).toBe("#0c7abf");
 
-    const focus = cssRule(
-      ":where(a, button, input, select, textarea):focus-visible",
-    );
-    expect(focus).toMatch(/outline:\s*3px solid var\(--color-focus\)/);
-    expect(focus).toMatch(/outline-offset:\s*3px/);
+    const focusRule =
+      css.match(
+        /:where\(a,\s*button,\s*input,\s*select,\s*textarea\):focus-visible\s*\{([^}]*)\}/,
+      )?.[1] ?? "";
+
+    expect(focusRule).toMatch(/outline:\s*3px solid var\(--color-focus\)/);
+    expect(focusRule).toMatch(/outline-offset:\s*3px/);
     expect(token("--color-focus")).toBe("#075985");
   });
 
   it("drives the floating navigator's indicator and active/inactive labels from the T11 tokens", () => {
     // Inactive labels stay dark ink on the white navigator surface.
-    expect(cssRule(".floating-nav-link")).toMatch(
-      /color:\s*var\(--nav-link-text\)/,
-    );
     expect(resolveToken("--nav-link-text", tokens)).toBe("#0f1419");
-    // The active label is white and is selected purely by aria-current, so the
-    // same current-section state that positions the slider also recolors it.
-    const activeLink = cssRule('.floating-nav-link[aria-current="location"]');
+    expect(tokens.base.get("--nav-link-text")).toBe("var(--color-ink)");
 
-    expect(activeLink).toMatch(/color:\s*var\(--nav-link-text-active\)/);
+    // The active label is white and is selected purely by aria-current.
     expect(resolveToken("--nav-link-text-active", tokens)).toBe("#ffffff");
     expect(tokens.base.get("--nav-link-text-active")).toBe(
       "var(--color-surface)",
     );
+
     // T11: the indicator moved off the bright accent onto the action blue so
     // the white active label reaches >= 4.5:1 contrast.
-    expect(cssRule(".floating-nav-indicator")).toMatch(
-      /background:\s*var\(--nav-indicator-background\)/,
-    );
     expect(resolveToken("--nav-indicator-background", tokens)).toBe("#0c7abf");
     expect(tokens.base.get("--nav-indicator-background")).toBe(
       "var(--color-button)",
     );
+
+    // The TSX source encodes the navigator styling as Tailwind utilities.
+    expect(floatingNavSource).toContain("bg-button");
+    expect(floatingNavSource).toContain("text-ink");
+    expect(floatingNavSource).toContain("aria-[current=location]:text-surface");
+    expect(floatingNavSource).toContain("w-[min(360px,calc(100%-32px))]");
+    expect(floatingNavSource).toContain(
+      "bottom-[calc(16px+env(safe-area-inset-bottom,0px))]",
+    );
+    expect(floatingNavSource).toContain("border-[rgb(15_20_25/8%)]");
+    expect(floatingNavSource).toContain(
+      "shadow-[0_4px_20px_rgb(15_20_25/14%)]",
+    );
+    expect(floatingNavSource).toContain(
+      "group-data-[active-index=0]:translate-x-0",
+    );
+    expect(floatingNavSource).toContain(
+      "group-data-[active-index=1]:translate-x-full",
+    );
+    expect(floatingNavSource).toContain(
+      "group-data-[positioned=false]:transition-none",
+    );
+    expect(floatingNavSource).toContain("motion-reduce:transition-none");
+    expect(floatingNavSource).toContain("duration-control");
 
     // Both label states meet the AC7/AC12 4.5:1 minimum against their surface.
     expect(
@@ -182,15 +195,14 @@ describe("T9 primary-button color tokens", () => {
       ),
     ).toBeGreaterThanOrEqual(4.5);
 
-    expect(cssRule(".technology-badge")).toMatch(
-      /background:\s*var\(--badge-surface\)/,
-    );
-    expect(cssRule(".technology-badge")).toMatch(
-      /color:\s*var\(--badge-text\)/,
-    );
+    // Technology badges are also styled via utilities now.
     expect(resolveToken("--badge-surface", tokens)).toBe("#ffffff");
     expect(resolveToken("--badge-text", tokens)).toBe("#0f1419");
     expect(token("--color-ink")).toBe("#0f1419");
+
+    // Global CSS no longer carries component-specific navigator or badge selectors.
+    expect(css).not.toContain(".floating-nav");
+    expect(css).not.toContain(".technology-badge");
   });
 });
 
@@ -223,13 +235,13 @@ describe("T9 rendered primary actions", () => {
       }),
     ).toEqual([
       {
-        className: "icon text-white",
+        className: "icon size-4 text-white",
         ariaHidden: "true",
         focusable: "false",
         href: "/icons/github.svg#icon",
       },
       {
-        className: "icon text-white",
+        className: "icon size-4 text-white",
         ariaHidden: "true",
         focusable: "false",
         href: "/icons/linkedin.svg#icon",

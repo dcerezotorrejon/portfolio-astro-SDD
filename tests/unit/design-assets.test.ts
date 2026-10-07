@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
+import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
+import Home from "../../src/pages/index.astro";
 import {
   extractTokens,
   normalizeSpaces,
@@ -11,16 +13,14 @@ import {
   resolveValue,
   type TokenMap,
 } from "../helpers/css-tokens";
+import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
-const font = readFileSync("public/fonts/open-sans-latin.woff2");
-const license = readFileSync("public/fonts/OFL.txt", "utf8");
-const placeholder = readFileSync(
-  "public/images/profile-placeholder.svg",
+const floatingNavSource = readFileSync(
+  "src/components/home/FloatingNav/FloatingNav.tsx",
   "utf8",
 );
-const design = readFileSync("docs/design.md", "utf8");
 
 function cssRule(selector: string): string {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -33,6 +33,13 @@ function cssRule(selector: string): string {
 }
 
 describe("T2 local design assets", () => {
+  const font = readFileSync("public/fonts/open-sans-latin.woff2");
+  const license = readFileSync("public/fonts/OFL.txt", "utf8");
+  const placeholder = readFileSync(
+    "public/images/profile-placeholder.svg",
+    "utf8",
+  );
+
   it("contains a structurally valid WOFF2 font file", () => {
     expect(font.length).toBeGreaterThan(48);
     expect(font.toString("ascii", 0, 4)).toBe("wOF2");
@@ -96,6 +103,8 @@ describe("T2/T10 global style contracts", () => {
       ["--color-link", "#075985"],
     ] as const;
 
+    const design = readFileSync("docs/design.md", "utf8");
+
     for (const [name, value] of expectedTokens) {
       expect(design.toLowerCase()).toContain(value);
       // Resolution traverses the alias layers; a missing link in the chain
@@ -137,65 +146,121 @@ describe("T2/T10 global style contracts", () => {
     expect(resolveToken("--control-transition-duration", tokens)).toBe("200ms");
   });
 
-  it("defines the responsive container and profile image geometry", () => {
-    const container = cssRule(".site-container");
-    const profileImage = cssRule(".profile-image");
+  it("registers design tokens with Tailwind via @theme inline and removes component selectors", () => {
+    expect(css).toMatch(/@theme\s+inline\s*\{/);
 
-    expect(resolveDeclaration(container, "width", tokens)).toBe(
+    // Generated-namespace keys referenced by the new utility classes.
+    const themeBlock = css.match(/@theme\s+inline\s*\{([^}]*)/s)?.[1] ?? "";
+
+    for (const key of [
+      "--color-surface",
+      "--color-button",
+      "--color-button-hover",
+      "--color-button-active",
+      "--color-ink",
+      "--color-page",
+      "--color-border",
+      "--radius-card",
+      "--radius-pill",
+      "--text-24",
+      "--text-32",
+      "--text-display",
+      "--text-card",
+      "--leading-display",
+      "--leading-card",
+      "--tracking-display",
+      "--transition-duration-control",
+    ]) {
+      expect(css).toContain(key);
+    }
+
+    // Tailwind v4 duration-* utilities read the --transition-duration-*
+    // namespace; the :root --duration-control token is the source of truth.
+    expect(themeBlock).toContain(
+      "--transition-duration-control: var(--duration-control)",
+    );
+    expect(themeBlock).not.toContain("--duration-control:");
+
+    // Component-specific selectors are no longer authored in global.css.
+    for (const selector of [
+      ".icon {",
+      '[data-molecule="button"]',
+      '[data-molecule="heading"]',
+      ".profile-image",
+      ".profile-intro",
+      ".experience-card",
+      ".experience-list",
+      ".company-identity",
+      ".company-icon",
+      ".technology-list",
+      ".technology-badge",
+      ".floating-nav",
+      ".detail-content",
+      ".provisional-notice",
+    ]) {
+      expect(css, `global.css should not contain ${selector}`).not.toContain(
+        selector,
+      );
+    }
+  });
+
+  it("defines the responsive container as a Tailwind @utility and preserves profile image geometry", async () => {
+    const utility = css.match(/@utility\s+site-container\s*\{([^}]*)\}/s)?.[1];
+
+    expect(utility).toBeDefined();
+    expect(utility).toMatch(
+      /min\(\s*var\(--content-width\)\s*,\s*calc\(\s*100%\s+-\s*2\s*\*\s*var\(--page-gutter\)\s*\)\s*\)/,
+    );
+    expect(resolveDeclaration(utility ?? "", "width", tokens)).toBe(
       "min(1120px, calc(100% - 2 * 16px))",
     );
-    expect(resolveDeclaration(container, "margin-inline", tokens)).toBe("auto");
-    expect(resolveDeclaration(profileImage, "width", tokens)).toBe(
-      "min(200px, 100%)",
+    expect(resolveDeclaration(utility ?? "", "margin-inline", tokens)).toBe(
+      "auto",
     );
-    expect(resolveDeclaration(profileImage, "aspect-ratio", tokens)).toBe("1");
-    expect(resolveDeclaration(profileImage, "border-radius", tokens)).toBe(
-      "24px",
-    );
+
+    const homeHtml = await render(Home);
+    const { document } = new JSDOM(homeHtml).window;
+    const image = document.querySelector(".profile-image");
+
+    expect(image).not.toBeNull();
+    expect(image?.className).toMatch(/\baspect-square\b/);
+    expect(image?.className).toMatch(/w-\[min\(200px,100%\)\]/);
+    expect(image?.className).toMatch(/\brounded-card\b/);
+    expect(image?.className).toMatch(/\bobject-cover\b/);
+    expect(image?.className).toMatch(/md:w-\[240px\]/);
+    expect(image?.hasAttribute("style")).toBe(false);
+
     // Desktop profile image width comes from its component token.
     expect(resolveToken("--profile-image-width-desktop", tokens)).toBe("240px");
   });
 
-  it("keeps the floating navigator bounded, safe-area aware, and in sync with its CSS indicator contract", () => {
-    const nav = cssRule(".floating-nav");
-    const indicator = cssRule(".floating-nav-indicator");
+  it("keeps the floating navigator bounded, safe-area aware, and in sync with its utility indicator contract", () => {
+    // Positioning/surface are now Tailwind utilities in the React component.
+    expect(floatingNavSource).toContain("w-[min(360px,calc(100%-32px))]");
+    expect(floatingNavSource).toContain("p-1");
+    expect(floatingNavSource).toContain(
+      "bottom-[calc(16px+env(safe-area-inset-bottom,0px))]",
+    );
+    expect(floatingNavSource).toContain("rounded-pill");
+    expect(floatingNavSource).toContain("bg-surface");
 
-    expect(resolveDeclaration(nav, "width", tokens)).toBe(
-      "min(360px, calc(100% - 2 * 16px))",
+    // Indicator transition and transform states are utility-driven.
+    expect(floatingNavSource).toContain("transition-transform");
+    expect(floatingNavSource).toContain("duration-control");
+    expect(floatingNavSource).toContain(
+      "group-data-[active-index=0]:translate-x-0",
     );
-    expect(resolveDeclaration(nav, "padding", tokens)).toBe("4px");
-    expect(resolveDeclaration(nav, "bottom", tokens)).toBe(
-      "calc(16px + env(safe-area-inset-bottom, 0px))",
+    expect(floatingNavSource).toContain(
+      "group-data-[active-index=1]:translate-x-full",
     );
-    expect(resolveDeclaration(indicator, "transition", tokens)).toBe(
-      "transform 200ms ease",
-    );
-    expect(
-      resolveDeclaration(cssRule(".floating-nav-link"), "min-height", tokens),
-    ).toBe("44px");
-    expect(
-      resolveDeclaration(
-        cssRule('[data-molecule="button"]'),
-        "min-width",
-        tokens,
-      ),
-    ).toBe("44px");
-    expect(
-      resolveDeclaration(
-        cssRule('[data-molecule="button"]'),
-        "min-height",
-        tokens,
-      ),
-    ).toBe("44px");
-    expect(
-      cssRule('.floating-nav[data-active-index="0"] .floating-nav-indicator'),
-    ).toMatch(/translateX\(0\)/);
-    expect(
-      cssRule('.floating-nav[data-active-index="1"] .floating-nav-indicator'),
-    ).toMatch(/translateX\(100%\)/);
-    expect(cssRule("html.home-page")).toMatch(
-      /scroll-snap-type:\s*y proximity/,
-    );
+
+    // Minimum tap target is preserved on links.
+    expect(floatingNavSource).toContain("min-h-11");
+    expect(floatingNavSource).toContain("min-w-0");
+
+    // Button molecule geometry still resolves to the 44px minimum target.
+    expect(resolveToken("--button-min-target", tokens)).toBe("44px");
+    expect(css).toMatch(/scroll-snap-type:\s*y proximity/);
   });
 
   it("keeps homepage fragment navigation instant and suppresses the pre-position indicator transition", () => {
@@ -215,33 +280,31 @@ describe("T2/T10 global style contracts", () => {
     // The indicator must not animate before the navigator has measured and
     // painted the active section: `data-positioned` flips to "true" after the
     // first frame, and the transition is suppressed until then.
-    expect(
-      cssRule(
-        '.floating-nav:not([data-positioned="true"]) .floating-nav-indicator',
-      ),
-    ).toMatch(/transition:\s*none/);
+    expect(floatingNavSource).toContain(
+      "group-data-[positioned=false]:transition-none",
+    );
   });
 
   it("preserves the scroll inset, reduced-motion overrides and un-themed decorations", () => {
     expect(
       resolveDeclaration(cssRule("html"), "scroll-padding-block-start", tokens),
     ).toBe("16px");
-    // Reduced motion still removes the indicator and button transitions and
-    // disables view-transition animation; only the obsolete homepage
-    // `scroll-behavior: auto` override was removed in the flicker fix.
-    expect(css).toMatch(
-      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.floating-nav-indicator,[\s\S]*?transition:\s*none/,
-    );
+
+    // Reduced motion still removes the indicator transition via the utility
+    // variant and disables view-transition animation globally.
+    expect(floatingNavSource).toContain("motion-reduce:transition-none");
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?@view-transition[\s\S]*?navigation:\s*none/,
     );
-    // The one-off decorative ink tint is intentionally kept literal in both
-    // refactors, so its value stays pinned here.
-    expect(cssRule(".floating-nav")).toMatch(
-      /border:\s*1px solid rgb\(15 20 25 \/ 8%\)/,
+    expect(css).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?::view-transition-[a-z-]+\(\*\)[\s\S]*?animation:\s*none/,
     );
-    expect(cssRule(".floating-nav")).toMatch(
-      /box-shadow:\s*0 4px 20px rgb\(15 20 25 \/ 14%\)/,
+
+    // The one-off decorative ink tint is intentionally kept literal in the
+    // component source, so its value stays pinned here.
+    expect(floatingNavSource).toContain("border-[rgb(15_20_25/8%)]");
+    expect(floatingNavSource).toContain(
+      "shadow-[0_4px_20px_rgb(15_20_25/14%)]",
     );
   });
 });

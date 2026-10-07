@@ -11,20 +11,27 @@ interface Props {
 const { profile } = Astro.props;
 ---
 
-<section class="profile-intro" id="inicio" aria-labelledby="profile-name">
+<section
+  class="profile-intro flex min-h-[min(70svh,640px)] flex-col items-stretch justify-center gap-7 py-10 md:flex-row md:items-center md:justify-start md:gap-12"
+  id="inicio"
+  aria-labelledby="profile-name"
+>
   <img
-    class="profile-image"
+    class="profile-image aspect-square w-[min(200px,100%)] shrink-0 self-center rounded-card object-cover md:w-[240px] md:self-auto"
     src={profile.image.src}
     alt={profile.image.alt}
     width="240"
     height="240"
   />
-  <div class="profile-details">
+  <div class="profile-details min-w-0 text-left">
     <Heading level={1} variant="display" id="profile-name">
       {profile.name}
     </Heading>
-    <p>{profile.headline}</p>
-    <ul class="technology-list social-links" aria-label="Redes sociales">
+    <p class="mt-3 mb-5">{profile.headline}</p>
+    <ul
+      class="social-links mt-4 mb-5 flex list-none flex-wrap gap-2 p-0"
+      aria-label="Redes sociales"
+    >
       {profile.socials.map(({ platform, label, url }) => (
         <li>
           <Button variant="primary" class="gap-x-2" href={url}>
@@ -39,6 +46,8 @@ const { profile } = Astro.props;
         </li>
       ))}
     </ul>
-    <p class="provisional-notice">{profile.notice}</p>
+    <p class="provisional-notice mb-6 w-fit max-w-full rounded-xl border border-border bg-surface px-[14px] py-2 text-[0.9rem] font-semibold text-ink">
+      {profile.notice}
+    </p>
   </div>
 </section>

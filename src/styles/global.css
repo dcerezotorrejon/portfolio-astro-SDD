@@ -1,11 +1,35 @@
 @import "tailwindcss";
 
-@layer components {
-  .icon {
-    width: 1rem;
-    height: 1rem;
-    color: var(--color-primary);
-  }
+@theme inline {
+  /* Color roles (semantic --color-* tokens, already Tailwind's namespace) */
+  --color-primary: var(--color-primary);
+  --color-button: var(--color-button);
+  --color-button-hover: var(--color-button-hover);
+  --color-button-active: var(--color-button-active);
+  --color-ink: var(--color-ink);
+  --color-surface: var(--color-surface);
+  --color-page: var(--color-page);
+  --color-border: var(--color-border);
+  --color-link: var(--color-link);
+  --color-focus: var(--color-focus);
+
+  /* Radii */
+  --radius-pill: var(--radius-pill);
+  --radius-card: var(--radius-card);
+
+  /* Type size (text-* utilities) */
+  --text-24: var(--type-size-24);
+  --text-32: var(--type-size-32);
+  --text-display: var(--heading-display-size);
+  --text-card: var(--heading-card-size);
+
+  /* Type leading / tracking */
+  --leading-display: var(--heading-display-leading);
+  --leading-card: var(--heading-card-leading);
+  --tracking-display: var(--heading-display-tracking);
+
+  /* Motion */
+  --transition-duration-control: var(--duration-control);
 }
 
 @view-transition {
@@ -205,62 +229,64 @@
   --nav-indicator-background: var(--color-button);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-page);
+    scroll-padding-block-start: var(--space-16);
+  }
+
+  html.home-page {
+    scroll-snap-type: y proximity;
+  }
+
+  body {
+    min-width: 320px;
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: var(--type-weight-regular);
+    line-height: 1.6;
+    text-align: left;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  a {
+    color: var(--color-link);
+    text-underline-offset: 0.16em;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  img,
+  svg {
+    display: block;
+  }
 }
 
-html {
-  background: var(--color-page);
-  scroll-padding-block-start: var(--space-16);
-}
-
-html.home-page {
-  scroll-snap-type: y proximity;
-}
-
-body {
-  min-width: 320px;
-  margin: 0;
-  background: var(--color-page);
-  color: var(--color-ink);
-  font-family: "Open Sans", Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  font-weight: var(--type-weight-regular);
-  line-height: 1.6;
-  text-align: left;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-a {
-  color: var(--color-link);
-  text-underline-offset: 0.16em;
-}
-
-a:hover {
-  text-decoration-thickness: 2px;
-}
-
-:where(a, button, input, select, textarea):focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
-}
-
-img,
-svg {
-  display: block;
-}
-
-.site-container {
+@utility site-container {
   width: min(var(--content-width), calc(100% - 2 * var(--page-gutter)));
   margin-inline: auto;
 }
@@ -280,306 +306,17 @@ svg {
   scroll-snap-align: start;
 }
 
-.profile-intro {
-  display: flex;
-  min-height: min(70svh, 640px);
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: var(--profile-intro-gap);
-  padding-block: var(--profile-intro-block-padding);
-}
-
-.profile-image {
-  width: min(var(--profile-image-width), 100%);
-  height: auto;
-  aspect-ratio: 1;
-  flex: 0 0 auto;
-  align-self: center;
-  border-radius: var(--profile-image-radius);
-  object-fit: cover;
-}
-
-.profile-details {
-  min-width: 0;
-  text-align: left;
-}
-
-.profile-details p {
-  margin-block: var(--space-12) var(--space-20);
-}
-
-.provisional-notice {
-  width: fit-content;
-  max-width: 100%;
-  margin-block: 0 var(--space-24);
-  padding: var(--space-8) 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-surface);
-  color: var(--color-ink);
-  font-size: 0.9rem;
-  font-weight: var(--type-weight-semibold);
-}
-
-.experience-list {
-  display: grid;
-  gap: var(--space-20);
-}
-
-.experience-card {
-  width: 100%;
-  padding: var(--card-padding);
-  border: var(--card-border);
-  border-radius: var(--card-radius);
-  background: var(--card-surface);
-}
-
-.company-identity {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: var(--space-12);
-}
-
-.company-icon {
-  width: var(--space-40);
-  height: var(--space-40);
-  flex: 0 0 var(--space-40);
-  object-fit: contain;
-}
-
-.technology-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-  margin: var(--space-16) 0 var(--space-20);
-  padding: 0;
-  list-style: none;
-}
-
-.technology-badge {
-  display: inline-flex;
-  align-items: center;
-  max-width: 100%;
-  padding: var(--badge-padding-y) var(--badge-padding-x);
-  border: var(--badge-border);
-  border-radius: var(--badge-radius);
-  background: var(--badge-surface);
-  color: var(--badge-text);
-  overflow-wrap: anywhere;
-  line-height: 1.5;
-}
-
-/* Molecule hooks (Button): the components carry data-molecule/data-variant, so
-   the styles below are the single source for both variants. */
-[data-molecule="button"] {
-  display: inline-flex;
-  min-width: var(--button-min-target);
-  min-height: var(--button-min-target);
-  align-items: center;
-  justify-content: center;
-  padding: var(--button-padding-y) var(--button-padding-x);
-  border-radius: var(--button-radius);
-  font-weight: var(--type-weight-semibold);
-  line-height: var(--type-control-leading);
-  text-align: center;
-  text-decoration: none;
-  transition: background-color var(--control-transition-duration) ease;
-}
-
-[data-molecule="button"][data-variant="primary"] {
-  border: var(--button-border);
-  background: var(--button-background);
-  color: var(--button-label);
-}
-
-[data-molecule="button"][data-variant="primary"]:hover {
-  background: var(--button-background-hover);
-}
-
-[data-molecule="button"][data-variant="primary"]:active {
-  background: var(--button-background-active);
-}
-
-[data-molecule="button"][data-variant="secondary"] {
-  border: 1px solid var(--button-secondary-border);
-  background: var(--button-secondary-background);
-  color: var(--button-secondary-label);
-}
-
-[data-molecule="button"][data-variant="secondary"]:hover {
-  background: var(--button-secondary-background-hover);
-}
-
-[data-molecule="button"][data-variant="secondary"]:active {
-  background: var(--button-secondary-background-active);
-}
-
-/* Molecule hooks (Heading): variant selects the visual style only; the
-   semantic level comes from the component's rendered tag. */
-[data-molecule="heading"][data-variant="display"] {
-  margin: 0;
-  font-size: var(--heading-display-size);
-  font-weight: var(--heading-display-weight);
-  line-height: var(--heading-display-leading);
-  letter-spacing: var(--heading-display-tracking);
-}
-
-[data-molecule="heading"][data-variant="section"] {
-  margin-block-end: var(--heading-section-gap);
-  color: var(--heading-section-ink);
-  font-size: var(--heading-section-size);
-  font-weight: var(--heading-section-weight);
-  line-height: var(--heading-section-leading);
-}
-
-[data-molecule="heading"][data-variant="card"] {
-  margin: 0;
-  font-size: var(--heading-card-size);
-  font-weight: var(--heading-card-weight);
-  line-height: var(--heading-card-leading);
-}
-
-/* Expanded Markdown section headings on detail pages. Compiled Markdown cannot
-   use the Heading component, so this rule is retained and keeps the section
-   style token-driven. */
-.detail-content h2,
-.detail-content h3 {
-  margin-block-end: var(--heading-section-gap);
-  color: var(--heading-section-ink);
-  font-size: var(--heading-section-size);
-  font-weight: var(--heading-section-weight);
-  line-height: var(--heading-section-leading);
-}
-
-.detail-content {
-  max-width: 70ch;
-  line-height: 1.75;
-}
-
-.detail-content p {
-  margin-block: 0 1.25em;
-}
-
-.floating-nav {
-  position: fixed;
-  z-index: 10;
-  right: 0;
-  bottom: calc(var(--nav-clearance) + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  width: min(var(--nav-max-width), calc(100% - 2 * var(--nav-clearance)));
-  margin-inline: auto;
-  padding: var(--nav-padding);
-  /* Ink-based tint; kept literal because it is a one-off decorative edge. */
-  border: 1px solid rgb(15 20 25 / 8%);
-  border-radius: var(--nav-radius);
-  background: var(--nav-surface);
-  box-shadow: 0 4px 20px rgb(15 20 25 / 14%);
-}
-
-/* Keyboard focus safeguard: when a focus-visible control outside the navigator
-   would be covered by it, the navigator is hidden (not removed from the tab
-   order) until focus enters the navigator or leaves the overlapping region. */
-.floating-nav[data-focus-obscured="true"] {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.floating-nav-list {
-  position: relative;
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.floating-nav-link {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  min-width: 0;
-  min-height: var(--nav-link-min-target);
-  align-items: center;
-  justify-content: center;
-  padding: var(--nav-link-padding-y) var(--nav-link-padding-x);
-  border-radius: var(--nav-link-radius);
-  color: var(--nav-link-text);
-  font-weight: var(--type-weight-semibold);
-  line-height: var(--type-control-leading);
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.floating-nav-link:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-}
-
-/* Active label sits over the indicator; it must be legible as white text.
-   Hover intentionally does not change color, so the current label stays white
-   and inactive labels keep the dark ink color. */
-.floating-nav-link[aria-current="location"] {
-  color: var(--nav-link-text-active);
-}
-
-.floating-nav-indicator {
-  position: absolute;
-  top: var(--nav-indicator-inset);
-  bottom: var(--nav-indicator-inset);
-  left: var(--nav-indicator-inset);
-  width: var(--nav-indicator-width);
-  border-radius: var(--nav-indicator-radius);
-  background: var(--nav-indicator-background);
-  pointer-events: none;
-  transition: transform var(--control-transition-duration) ease;
-}
-
-/* Until the navigator has measured the active section after hydration, the
-   indicator must not animate from its default position to the selected one. */
-.floating-nav:not([data-positioned="true"]) .floating-nav-indicator {
-  transition: none;
-}
-
-.floating-nav[data-active-index="0"] .floating-nav-indicator {
-  transform: translateX(0);
-}
-
-.floating-nav[data-active-index="1"] .floating-nav-indicator {
-  transform: translateX(100%);
-}
-
 @media (min-width: 768px) {
   :root {
     --page-gutter: var(--space-32);
     --heading-section-size: var(--heading-section-size-desktop);
     --section-heading-size: var(--section-heading-size-desktop);
   }
-
-  .profile-intro {
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--profile-intro-gap-desktop);
-  }
-
-  .profile-image {
-    width: var(--profile-image-width-desktop);
-    align-self: auto;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   @view-transition {
     navigation: none;
-  }
-
-  .floating-nav-indicator,
-  [data-molecule="button"] {
-    transition: none;
   }
 
   ::view-transition-group(*),

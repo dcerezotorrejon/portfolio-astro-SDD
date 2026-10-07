@@ -234,18 +234,21 @@ export default function FloatingNav({
 
   return (
     <nav
-      className="floating-nav"
+      className="floating-nav group fixed inset-x-0 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-[min(360px,calc(100%-32px))] rounded-pill border border-[rgb(15_20_25/8%)] bg-surface p-1 shadow-[0_4px_20px_rgb(15_20_25/14%)] data-[focus-obscured=true]:pointer-events-none data-[focus-obscured=true]:opacity-0"
       aria-label={ariaLabel}
       data-active-index={activeIndex}
       data-positioned={isPositioned ? "true" : "false"}
       data-focus-obscured={isFocusObscured ? "true" : undefined}
       ref={navRef}
     >
-      <span className="floating-nav-indicator" aria-hidden="true" />
-      <div className="floating-nav-list">
+      <span
+        className="floating-nav-indicator pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-pill bg-button transition-transform duration-control group-data-[positioned=false]:transition-none motion-reduce:transition-none group-data-[active-index=0]:translate-x-0 group-data-[active-index=1]:translate-x-full"
+        aria-hidden="true"
+      />
+      <div className="floating-nav-list relative m-0 grid w-full list-none grid-cols-2 p-0">
         {sections.map(({ id, label }) => (
           <a
-            className="floating-nav-link"
+            className="floating-nav-link relative z-[1] flex min-h-11 min-w-0 items-center justify-center rounded-pill px-3 py-2 text-center font-semibold leading-tight no-underline whitespace-nowrap text-ink decoration-2 hover:underline aria-[current=location]:text-surface"
             href={`#${id}`}
             aria-current={activeSectionId === id ? "location" : undefined}
             onClick={(event) => handleLinkClick(event, id)}

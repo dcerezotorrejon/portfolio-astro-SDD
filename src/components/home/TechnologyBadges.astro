@@ -6,8 +6,10 @@ interface Props {
 const { technologies } = Astro.props;
 ---
 
-<ul class="technology-list">
+<ul class="technology-list mt-4 mb-5 flex list-none flex-wrap gap-2 p-0">
   {technologies.map((technology) => (
-    <li class="technology-badge">{technology}</li>
+    <li class="technology-badge inline-flex max-w-full items-center rounded-pill border border-border bg-surface px-3 py-1 text-ink [overflow-wrap:anywhere] leading-normal">
+      {technology}
+    </li>
   ))}
 </ul>

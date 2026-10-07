@@ -60,14 +60,14 @@ describe("home page", () => {
       }),
     ).toEqual([
       {
-        className: "icon text-white",
+        className: "icon size-4 text-white",
         hidden: "true",
         focusable: "false",
         symbol: "/icons/github.svg#icon",
         visibleLabel: "GitHub",
       },
       {
-        className: "icon text-white",
+        className: "icon size-4 text-white",
         hidden: "true",
         focusable: "false",
         symbol: "/icons/linkedin.svg#icon",

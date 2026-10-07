@@ -1,7 +1,7 @@
 # General styles — Tailwind-first cleanup
 
 - **Spec ID**: `019-general-styles`
-- **Status**: draft
+- **Status**: done
 - **Last updated**: 2026-10-08
 
 > Keep this increment's spec anchored to code while it is active. On closure
@@ -121,29 +121,29 @@ The shared visual language and token values remain governed by
 
 ## Acceptance criteria
 
-- [ ] **AC1** — `global.css` contains no component-specific selector: grep for
+- [x] **AC1** — `global.css` contains no component-specific selector: grep for
       `[data-molecule`, `.icon`, `.profile-`, `.experience-`, `.company-`,
       `.technology-`, `.floating-nav`, `.detail-content`, and `.provisional-notice`
       returns no matches (only cross-cutting rules remain).
-- [ ] **AC2** — The `:root` tokens still resolve to the approved values
+- [x] **AC2** — The `:root` tokens still resolve to the approved values
       (`--color-button` → `#0c7abf`, `--color-surface` → `#ffffff`,
       `--heading-section-size` 24px → 32px at the 768px breakpoint, etc.); the
       existing token-resolution tests pass.
-- [ ] **AC3** — Tailwind generates semantic utilities from the tokens (for
+- [x] **AC3** — Tailwind generates semantic utilities from the tokens (for
       example `bg-surface`, `text-ink`, `text-primary`, `rounded-card`) and they are
       present in the built CSS.
-- [ ] **AC4** — Component markup uses utility classes for layout, typography, and
+- [x] **AC4** — Component markup uses utility classes for layout, typography, and
       color; rendered HTML contains no inline `style` color overrides and no
       `[data-molecule]`-based styling.
-- [ ] **AC5** — `.site-container` is defined as a Tailwind `@utility` and used by
+- [x] **AC5** — `.site-container` is defined as a Tailwind `@utility` and used by
       both `index.astro` and the detail page.
-- [ ] **AC6** — Visual parity holds: `pnpm test:a11y` and `pnpm test:integration`
+- [x] **AC6** — Visual parity holds: `pnpm test:a11y` and `pnpm test:integration`
       pass unchanged (computed styles, contrast, keyboard focus, and reduced-motion
       intact).
-- [ ] **AC7** — Residual CSS is scoped: the Markdown descendant rules live in the
+- [x] **AC7** — Residual CSS is scoped: the Markdown descendant rules live in the
       detail page's scoped `<style>`, the `.icon` default is scoped in `Icon.astro`,
       and no component page leaks selectors it does not own.
-- [ ] **AC8** — All gates pass: `pnpm lint`, `pnpm format:check`, `pnpm build`,
+- [x] **AC8** — All gates pass: `pnpm lint`, `pnpm format:check`, `pnpm build`,
       `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration`.
 
 ## Verification

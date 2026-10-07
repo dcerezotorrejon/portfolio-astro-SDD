@@ -9,10 +9,6 @@ import Home from "../../src/pages/index.astro";
 import { resolveCompanyIcon } from "../../src/content/parsers/content";
 import { experienceSchema } from "../../src/content/parsers/content-schema";
 import { render } from "../helpers/render";
-import {
-  readStylesheetTokens,
-  resolveDeclaration,
-} from "../helpers/css-tokens";
 
 const approvedIcon = {
   src: "/images/companies/astro.svg",
@@ -312,30 +308,38 @@ describe("Markdown-configurable company icons", () => {
     expect(experienceSchema.safeParse(missingAlt).success).toBe(false);
   });
 
-  it("ships a parseable local Astro SVG and preserves icon sizing/aspect ratio in the CSS contract", async () => {
+  it("ships a parseable local Astro SVG and preserves icon sizing/aspect ratio through utility classes", async () => {
     const svg = await readFile("public/images/companies/astro.svg", "utf8");
     const { document } = new JSDOM(svg, { contentType: "image/svg+xml" })
       .window;
     const root = document.documentElement;
-    const stylesheet = await readFile("src/styles/global.css", "utf8");
-    const tokens = readStylesheetTokens("src/styles/global.css");
-    const iconRules = stylesheet.match(/\.company-icon\s*\{([^}]+)\}/)?.[1];
-    const identityRules = stylesheet.match(
-      /\.company-identity\s*\{([^}]+)\}/,
-    )?.[1];
 
     expect(root.localName).toBe("svg");
     expect(root.getAttribute("viewBox")).toBe("0 0 64 64");
     expect(root.querySelectorAll("path").length).toBeGreaterThan(0);
-    // The icon sizing is token-driven; resolve it to the concrete approved
-    // geometry instead of pinning a literal length in the stylesheet.
-    expect(resolveDeclaration(iconRules ?? "", "width", tokens)).toBe("40px");
-    expect(resolveDeclaration(iconRules ?? "", "height", tokens)).toBe("40px");
-    expect(
-      resolveDeclaration(iconRules ?? "", "flex", tokens).replace(/\s+/g, " "),
-    ).toBe("0 0 40px");
-    expect(iconRules).toMatch(/object-fit:\s*contain/);
-    expect(identityRules).toMatch(/display:\s*flex/);
-    expect(identityRules).toMatch(/align-items:\s*center/);
+
+    // The icon and identity geometry are now expressed as Tailwind utilities
+    // on the rendered markup instead of global CSS rules.
+    const profile = await getEntry("profile", "profile");
+    if (!profile) throw new Error("Missing approved profile collection entry");
+    const entries = await getCollection("experience");
+    const html = await render(ExperienceHistory, {
+      experiences: entries,
+      profile: profile.data,
+    });
+    const { document: historyDocument } = new JSDOM(html).window;
+    const card = historyDocument.querySelector(".experience-card");
+    const icon = card?.querySelector(".company-icon");
+    const identity = card?.querySelector(".company-identity");
+
+    expect(icon?.classList.contains("size-10")).toBe(true);
+    expect(icon?.classList.contains("shrink-0")).toBe(true);
+    expect(icon?.classList.contains("object-contain")).toBe(true);
+    expect(icon?.getAttribute("width")).toBe("40");
+    expect(icon?.getAttribute("height")).toBe("40");
+    expect(identity?.classList.contains("flex")).toBe(true);
+    expect(identity?.classList.contains("min-w-0")).toBe(true);
+    expect(identity?.classList.contains("items-center")).toBe(true);
+    expect(identity?.classList.contains("gap-3")).toBe(true);
   });
 });

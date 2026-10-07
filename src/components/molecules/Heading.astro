@@ -12,13 +12,19 @@ type Props = {
 const { level, variant, class: className, ...rest } = Astro.props;
 
 const Tag = `h${level}` as `h${Level}`;
+
+const variantClasses = {
+  display: "m-0 text-display font-bold leading-display tracking-display",
+  section: "mb-6 text-ink text-24 font-bold leading-tight md:text-32",
+  card: "m-0 text-card font-bold leading-card",
+}[variant];
 ---
 
 <Tag
   data-molecule="heading"
   data-variant={variant}
   data-level={level}
-  class:list={[className]}
+  class:list={[variantClasses, className]}
   {...rest}
 >
   <slot />
