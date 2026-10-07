@@ -15,8 +15,8 @@ const lead = read(".opencode/agents/dev-lead.md");
 
 describe("integration gate governance", () => {
   it("versions the approved amendment and defines when integration applies", () => {
-    expect(constitution).toMatch(/\*\*Version\*\*: 1\.10\.0/);
-    expect(constitution).toMatch(/\*\*Last amended\*\*: 2026-10-06/);
+    expect(constitution).toMatch(/\*\*Version\*\*: 1\.11\.2/);
+    expect(constitution).toMatch(/\*\*Last amended\*\*: 2026-10-07/);
     expect(normalized(constitution)).toContain(
       "The integration gate applies to changes that affect page rendering, routing, content, styles, or client behavior; browser-complex components; and the integration suite or its tooling.",
     );
@@ -47,7 +47,9 @@ describe("integration gate governance", () => {
     );
     expect(qa).toContain("@axe-core/playwright");
     expect(qa).toContain("WCAG A/AA tags through 2.2");
-    expect(qa).toContain("including integration test authoring");
+    expect(qa).toContain(
+      "**Integration** tests with Playwright Test and Chromium when applicable.",
+    );
     expect(qa).toContain("pnpm test:integration");
     expect(lead).toContain("Also run `pnpm test:integration`");
     expect(lead).toContain(
@@ -57,8 +59,10 @@ describe("integration gate governance", () => {
       "Keep Vitest `axe-core` accessibility tests",
     );
     expect(constitution).toContain("`@axe-core/playwright` audits");
-    expect(agentsGuide).toContain("pnpm test:integration");
-    expect(agentsGuide).toContain("Markdown-only");
+    expect(normalized(agentsGuide)).toContain(
+      "verification gates in [Constitution §5]",
+    );
+    expect(agentsGuide).not.toContain("pnpm test:integration");
     expect(normalized(specsGuide)).toContain(
       "Integration applicability and the Markdown-only exception follow Constitution §§5–6.",
     );

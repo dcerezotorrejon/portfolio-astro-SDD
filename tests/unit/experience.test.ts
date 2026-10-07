@@ -67,14 +67,6 @@ describe("experience detail routes", () => {
       expect(body?.querySelectorAll(".technology-badge")).toHaveLength(
         technologies.length,
       );
-      expect(card?.getAttribute("style")).toMatch(
-        new RegExp(
-          `(?:^|;)\\s*view-transition-name:\\s*experience-${slug}\\s*(?:;|$)`,
-        ),
-      );
-      expect(header?.getAttribute("style") ?? "").not.toMatch(
-        /view-transition-name\s*:/,
-      );
       expect(header?.querySelectorAll("p")[0]?.textContent?.trim()).toBe(
         "Empresa de ejemplo",
       );
@@ -110,6 +102,15 @@ describe("experience detail routes", () => {
       expect(document.querySelectorAll("astro-island")).toHaveLength(0);
     },
   );
+
+  it("renders the detail main with my-8 vertical spacing", async () => {
+    const html = await renderExperience("puesto-ejemplo-2024");
+    const { document } = new JSDOM(html).window;
+    const main = document.querySelector<HTMLElement>("main");
+
+    expect(main).not.toBeNull();
+    expect(main?.classList.contains("my-8")).toBe(true);
+  });
 
   it("rejects duplicate route slugs from entries with distinct collection IDs", async () => {
     const [entry] = await getCollection("experience");

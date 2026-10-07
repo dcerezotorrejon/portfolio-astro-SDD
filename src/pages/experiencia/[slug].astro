@@ -39,11 +39,11 @@ const companyIcon = resolveCompanyIcon(experience);
 ---
 
 <SiteLayout title={seo.title} description={seo.description}>
-  <main class="site-container">
+  <main class="site-container my-8">
     <article
+      transition:name={`experience-transition-${slug}`}
       class="experience-card experience-detail-card"
       data-experience-slug={slug}
-      style={`view-transition-name: experience-${slug}`}
     >
       <header class="experience-detail-header">
         <Heading level={1} variant="display">
