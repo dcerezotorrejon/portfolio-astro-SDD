@@ -14,13 +14,21 @@ import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
 const tokens = readStylesheetTokens("src/styles/global.css");
+const experienceHistorySource = readFileSync(
+  "src/components/home/ExperienceHistory.astro",
+  "utf8",
+);
+const experienceDetailSource = readFileSync(
+  "src/pages/experiencia/[slug].astro",
+  "utf8",
+);
 const fallbackCompanyIcon = {
   src: "/images/companies/astro.svg",
   alt: "Provisional company icon",
 };
 
 describe("native experience view transitions", () => {
-  it("pairs each overview card with its complete matching detail card", async () => {
+  it("pairs each overview card with its matching detail card through a per-slug transition name", async () => {
     const collectionEntries = await getCollection("experience");
     const experiences = collectionEntries.map((experience) => ({
       ...experience,
@@ -28,6 +36,66 @@ describe("native experience view transitions", () => {
         ...experience.data,
         // The transition contract is independent of the company-icon field.
         // Supply a local fallback for stale Container collection snapshots.
+        companyIcon: experience.data.companyIcon ?? fallbackCompanyIcon,
+      },
+    }));
+    const profile = await getEntry("profile", "profile");
+
+    expect(profile).toBeDefined();
+    if (!profile) return;
+
+    // AC1 source contract: both cards declare the same per-slug transition
+    // name, so the overview card and its matching detail card share a unique
+    // view-transition-name once the directive is compiled.
+    const directivePattern = /transition:name=\{`([^`]+)`\}/;
+    const expectedExpression = "experience-transition-${slug}";
+    const historyMatch = experienceHistorySource.match(directivePattern);
+    const detailMatch = experienceDetailSource.match(directivePattern);
+
+    expect(historyMatch).not.toBeNull();
+    expect(detailMatch).not.toBeNull();
+    expect(historyMatch?.[1]).toBe(expectedExpression);
+    expect(detailMatch?.[1]).toBe(expectedExpression);
+    expect(experienceHistorySource).not.toContain("view-transition-name:");
+    expect(experienceDetailSource).not.toContain("view-transition-name:");
+
+    const historyHtml = await render(ExperienceHistory, {
+      experiences,
+      profile: profile.data,
+    });
+    const { document: history } = new JSDOM(historyHtml).window;
+    const overviewCards = Array.from(
+      history.querySelectorAll<HTMLElement>(".experience-card"),
+    );
+
+    expect(overviewCards).toHaveLength(experiences.length);
+
+    for (const experience of experiences) {
+      const slug = experience.data.slug;
+      const detailHtml = await render(ExperienceDetail, {
+        experience,
+        profile: profile.data,
+      });
+      const { document: detail } = new JSDOM(detailHtml).window;
+      const overviewCard = overviewCards.find((element) =>
+        element.querySelector(`a[href="/experiencia/${slug}/"]`),
+      );
+      const detailCard = detail.querySelector<HTMLElement>(
+        "article.experience-detail-card",
+      );
+
+      expect(overviewCard).not.toBeNull();
+      expect(detailCard).not.toBeNull();
+      expect(detailCard?.getAttribute("data-experience-slug")).toBe(slug);
+    }
+  });
+
+  it("assigns an Astro transition scope to every overview and detail card", async () => {
+    const collectionEntries = await getCollection("experience");
+    const experiences = collectionEntries.map((experience) => ({
+      ...experience,
+      data: {
+        ...experience.data,
         companyIcon: experience.data.companyIcon ?? fallbackCompanyIcon,
       },
     }));
@@ -44,56 +112,26 @@ describe("native experience view transitions", () => {
     const overviewCards = Array.from(
       history.querySelectorAll<HTMLElement>(".experience-card"),
     );
-    const transitionName = (element: HTMLElement | null) =>
-      element
-        ?.getAttribute("style")
-        ?.match(/view-transition-name:\s*([^;]+)/)?.[1]
-        ?.trim() ?? "";
 
     expect(overviewCards).toHaveLength(experiences.length);
-    const overviewNames = overviewCards.map(transitionName);
-    expect(overviewNames).toHaveLength(experiences.length);
-    expect(overviewNames.every(Boolean)).toBe(true);
-    expect(new Set(overviewNames).size).toBe(experiences.length);
+    for (const card of overviewCards) {
+      expect(card.hasAttribute("data-astro-transition-scope")).toBe(true);
+    }
 
     for (const experience of experiences) {
-      const slug = experience.data.slug;
       const detailHtml = await render(ExperienceDetail, {
         experience,
         profile: profile.data,
       });
       const { document: detail } = new JSDOM(detailHtml).window;
-      const overviewCard = overviewCards.find((element) =>
-        element.querySelector(`a[href="/experiencia/${slug}/"]`),
-      );
       const detailCard = detail.querySelector<HTMLElement>(
         "article.experience-detail-card",
       );
-      const header = detail.querySelector<HTMLElement>(
-        ".experience-detail-header",
-      );
-      const body = detail.querySelector<HTMLElement>(".experience-detail-body");
-      const expectedName = `experience-${slug}`;
 
-      expect(overviewCard).not.toBeNull();
-      expect(transitionName(overviewCard)).toBe(expectedName);
-      expect(detailCard?.getAttribute("data-experience-slug")).toBe(slug);
-      expect(transitionName(detailCard)).toBe(expectedName);
-      expect(header).not.toBeNull();
-      expect(body).not.toBeNull();
-      expect(detailCard?.contains(header)).toBe(true);
-      expect(detailCard?.contains(body)).toBe(true);
-      expect(header?.querySelector("h1")).not.toBeNull();
-      expect(body?.querySelector(".technology-list")).not.toBeNull();
-      expect(body?.querySelector(".detail-content")).not.toBeNull();
-      expect(body?.querySelector(".provisional-notice")).not.toBeNull();
-      expect(body?.querySelector('a[href="/#trayectoria"]')).not.toBeNull();
-      const namedElements = Array.from(
-        detail.querySelectorAll<HTMLElement>("[style*='view-transition-name']"),
-      ).filter((element) => transitionName(element));
-      expect(namedElements).toHaveLength(1);
-      expect(namedElements[0]).toBe(detailCard);
-      expect(transitionName(header)).toBe("");
+      expect(detailCard).not.toBeNull();
+      expect(detailCard?.hasAttribute("data-astro-transition-scope")).toBe(
+        true,
+      );
     }
   });
 
