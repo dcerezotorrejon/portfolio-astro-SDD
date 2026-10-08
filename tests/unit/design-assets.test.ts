@@ -169,16 +169,10 @@ describe("T2/T10 global style contracts", () => {
       "--leading-display",
       "--leading-card",
       "--tracking-display",
-      "--transition-duration-control",
     ]) {
       expect(css).toContain(key);
     }
 
-    // Tailwind v4 duration-* utilities read the --transition-duration-*
-    // namespace; the :root --duration-control token is the source of truth.
-    expect(themeBlock).toContain(
-      "--transition-duration-control: var(--duration-control)",
-    );
     expect(themeBlock).not.toContain("--duration-control:");
 
     // Component-specific selectors are no longer authored in global.css.

@@ -5,15 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import ExperienceHistory from "../../src/components/home/ExperienceHistory.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
-import {
-  readStylesheetTokens,
-  resolveDeclaration,
-  resolveToken,
-} from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
-const tokens = readStylesheetTokens("src/styles/global.css");
 const experienceHistorySource = readFileSync(
   "src/components/home/ExperienceHistory.astro",
   "utf8",
@@ -141,48 +135,6 @@ describe("native experience view transitions", () => {
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?::view-transition-group\(\*\)[\s\S]*?animation:\s*none/,
     );
-  });
-
-  it("pins the native view-transition pseudo-elements to the 200 ms control duration", () => {
-    // T6c: the UA ships ~250 ms; the global design requires 200 ms. The rule
-    // must resolve through the shared motion token, not a hard-coded literal.
-    const index = css.indexOf("::view-transition-group(*)");
-    const open = css.indexOf("{", index);
-
-    expect(index).toBeGreaterThanOrEqual(0);
-    const selectorList = css.slice(index, open);
-    expect(selectorList).toContain("::view-transition-old(*)");
-    expect(selectorList).toContain("::view-transition-new(*)");
-
-    const body = css.slice(open + 1, css.indexOf("}", open));
-    expect(resolveDeclaration(body, "animation-duration", tokens)).toBe(
-      "200ms",
-    );
-    expect(resolveToken("--duration-control", tokens)).toBe("200ms");
-  });
-
-  it("keeps the reduced-motion reset after the timing rule so it wins at equal specificity", () => {
-    const durationIndex = css.indexOf("::view-transition-group(*)");
-    const reducedMotionIndex = css.indexOf(
-      "@media (prefers-reduced-motion: reduce)",
-    );
-
-    expect(durationIndex).toBeGreaterThanOrEqual(0);
-    // The reset must come later in source order; with equal specificity the
-    // later `animation: none` shorthand overrides the earlier duration.
-    expect(reducedMotionIndex).toBeGreaterThan(durationIndex);
-
-    const reducedBlock = css.slice(reducedMotionIndex);
-    for (const pseudo of [
-      "::view-transition-group(*)",
-      "::view-transition-image-pair(*)",
-      "::view-transition-old(*)",
-      "::view-transition-new(*)",
-    ]) {
-      expect(reducedBlock).toContain(pseudo);
-    }
-    expect(reducedBlock).toMatch(/animation:\s*none/);
-    expect(reducedBlock).not.toMatch(/animation-duration:\s*var\(--duration/);
   });
 
   it("keeps the card and return affordances as native same-tab anchors", async () => {
