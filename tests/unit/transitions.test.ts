@@ -143,34 +143,23 @@ describe("native experience view transitions", () => {
     );
   });
 
-  it("pins the native view-transition pseudo-elements to the 200 ms control duration", () => {
-    // T6c: the UA ships ~250 ms; the global design requires 200 ms. The rule
-    // must resolve through the shared motion token, not a hard-coded literal.
-    const index = css.indexOf("::view-transition-group(*)");
-    const open = css.indexOf("{", index);
-
-    expect(index).toBeGreaterThanOrEqual(0);
-    const selectorList = css.slice(index, open);
-    expect(selectorList).toContain("::view-transition-old(*)");
-    expect(selectorList).toContain("::view-transition-new(*)");
-
-    const body = css.slice(open + 1, css.indexOf("}", open));
-    expect(resolveDeclaration(body, "animation-duration", tokens)).toBe(
-      "200ms",
+  it("uses the shared control-duration token without overriding the native view-transition timing", () => {
+    // 8bb0ecb intentionally removed the custom `::view-transition-*`
+    // `animation-duration` override, so the UA's native duration applies to
+    // shared-element transitions. The 200 ms control motion token remains the
+    // shared source of truth for component transitions.
+    expect(css).not.toMatch(
+      /::view-transition-[a-z-]+\(\*\)[^{]*\{[^}]*animation-duration/,
     );
     expect(resolveToken("--duration-control", tokens)).toBe("200ms");
   });
 
-  it("keeps the reduced-motion reset after the timing rule so it wins at equal specificity", () => {
-    const durationIndex = css.indexOf("::view-transition-group(*)");
+  it("keeps the reduced-motion reset for every view-transition pseudo-element", () => {
     const reducedMotionIndex = css.indexOf(
       "@media (prefers-reduced-motion: reduce)",
     );
 
-    expect(durationIndex).toBeGreaterThanOrEqual(0);
-    // The reset must come later in source order; with equal specificity the
-    // later `animation: none` shorthand overrides the earlier duration.
-    expect(reducedMotionIndex).toBeGreaterThan(durationIndex);
+    expect(reducedMotionIndex).toBeGreaterThanOrEqual(0);
 
     const reducedBlock = css.slice(reducedMotionIndex);
     for (const pseudo of [
@@ -181,7 +170,10 @@ describe("native experience view transitions", () => {
     ]) {
       expect(reducedBlock).toContain(pseudo);
     }
-    expect(reducedBlock).toMatch(/animation:\s*none/);
+    // The reset disables the animation outright and does not reintroduce a
+    // competing custom duration; with the timing rule removed there is no
+    // equal-specificity override left to win against.
+    expect(resolveDeclaration(reducedBlock, "animation", tokens)).toBe("none");
     expect(reducedBlock).not.toMatch(/animation-duration:\s*var\(--duration/);
   });
 

@@ -24,6 +24,7 @@ interface AgentFile {
   mode?: string;
   model?: string;
   permissions: PermissionRule[];
+  topLevelKeys: string[];
   body: string;
 }
 
@@ -47,6 +48,7 @@ function parseAgent(id: string, raw: string): AgentFile {
 
   const [, frontmatter, body] = match;
   const scalars: Record<string, string> = {};
+  const topLevelKeys: string[] = [];
   const permissions: PermissionRule[] = [];
   let inPermissions = false;
   let current: PermissionRule | undefined;
@@ -60,6 +62,7 @@ function parseAgent(id: string, raw: string): AgentFile {
       const pair = /^([A-Za-z0-9_]+):\s*(.*)$/.exec(stripped);
       if (!pair) continue;
       const [, key, value] = pair;
+      topLevelKeys.push(key);
       inPermissions = key === "permissions";
       if (!inPermissions) scalars[key] = unquote(value);
       continue;
@@ -83,6 +86,7 @@ function parseAgent(id: string, raw: string): AgentFile {
     mode: scalars.mode,
     model: scalars.model,
     permissions,
+    topLevelKeys,
     body: body.trim(),
   };
 }
@@ -168,6 +172,20 @@ const constitution = readFileSync(
 );
 const agentsGuide = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
 
+/** Valid top-level fields for an OpenCode V2 agent definition. */
+const validAgentFields = new Set([
+  "description",
+  "mode",
+  "model",
+  "system",
+  "permissions",
+  "steps",
+  "hidden",
+  "color",
+  "disabled",
+  "request",
+]);
+
 describe("custom agent definitions", () => {
   it("defines exactly the four workflow agents with descriptions", () => {
     expect([...agents.keys()].sort()).toEqual([
@@ -184,9 +202,9 @@ describe("custom agent definitions", () => {
 
   it("uses the approved OpenCode Go model and mode for each agent", () => {
     const expected = {
-      "spec-refiner": ["primary", "opencode-go/deepseek-v4-pro"],
-      "dev-lead": ["primary", "opencode-go/deepseek-v4-pro"],
-      dev: ["subagent", "opencode-go/kimi-k2.7-code"],
+      "spec-refiner": ["primary", "opencode-go/deepseek-v4.1-flash#high"],
+      "dev-lead": ["primary", "opencode-go/deepseek-v4.1-flash#high"],
+      dev: ["subagent", "opencode-go/deepseek-v4.1-flash"],
       qa: ["subagent", "opencode-go/deepseek-v4.1-flash"],
     };
 
@@ -194,6 +212,18 @@ describe("custom agent definitions", () => {
       const agent = agents.get(id)!;
       expect(agent.mode).toBe(mode);
       expect(agent.model).toBe(model);
+    }
+  });
+
+  it("uses only valid V2 agent frontmatter fields", () => {
+    for (const agent of agents.values()) {
+      const invalid = agent.topLevelKeys.filter(
+        (key) => !validAgentFields.has(key),
+      );
+      expect(
+        invalid,
+        `${agent.id} has invalid frontmatter field(s): ${invalid.join(", ")}`,
+      ).toEqual([]);
     }
   });
 
@@ -221,16 +251,47 @@ describe("custom agent definitions", () => {
   });
 
   it("preserves the role-specific write boundaries and ordered Dev/QA policies", () => {
-    expect(permissionTuples(agents.get("spec-refiner")!)).toEqual([
+    const specRefiner = agents.get("spec-refiner")!;
+    expect(permissionTuples(specRefiner)).toEqual([
       ["edit", "**", "deny"],
       ["edit", "specs/*/spec.md", "allow"],
+      ["edit", "specs/_template/**", "deny"],
       ["subagent", "*", "deny"],
     ]);
+    expect(
+      effectivePermission(specRefiner, "edit", "specs/_template/spec.md"),
+    ).toBe("deny");
 
     const dev = agents.get("dev")!;
+    const devTuples = permissionTuples(dev);
+    devTuples.forEach((tuple, index) => {
+      expect(
+        [tuple, devTuples[index + 1]],
+        `dev rule ${index} must not cancel a broad deny with a broad allow`,
+      ).not.toEqual([
+        ["edit", "**", "deny"],
+        ["edit", "**", "allow"],
+      ]);
+    });
     expect(effectivePermission(dev, "edit", "docs/constitution.md")).toBe(
       "deny",
     );
+    expect(effectivePermission(dev, "edit", "AGENTS.md")).toBe("deny");
+    expect(effectivePermission(dev, "edit", ".opencode/agents/dev.md")).toBe(
+      "deny",
+    );
+    expect(
+      effectivePermission(
+        dev,
+        "edit",
+        "specs/023-agent-reasoning-variants/spec.md",
+      ),
+    ).toBe("deny");
+    expect(
+      effectivePermission(dev, "edit", "tests/integration/navigation.spec.ts"),
+    ).toBe("deny");
+    // `specs/README.md` is allow only when its dedicated allow rule is
+    // configured, so its effective value is intentionally not asserted here.
     expect(
       effectivePermission(dev, "edit", "src/components/FloatingNav.tsx"),
     ).toBe("allow");
@@ -290,6 +351,12 @@ describe("custom agent definitions", () => {
     expect(effectivePermission(qa, "edit", "src/lib/navigation.ts")).toBe(
       "deny",
     );
+    expect(effectivePermission(qa, "edit", "specs/_template/spec.md")).toBe(
+      "deny",
+    );
+    expect(effectivePermission(qa, "edit", "specs/_template/tasks.md")).toBe(
+      "deny",
+    );
     expectPromptFragments("qa", [
       "Edit only assigned tests, this spec's assigned task evidence, and the narrowly authorized acceptance checkboxes in the assigned current spec.",
       "constrain test edits to named test files",
@@ -310,12 +377,13 @@ describe("custom agent definitions", () => {
         effectivePermission(agent, "shell", "git branch --show-current"),
       ).toBe("allow");
       for (const command of [
-        "git branch feature-example",
-        "git checkout other-branch",
-        "git switch other-branch",
-        "git merge other-branch",
-        "git commit -m message",
-        "git push origin feature-example",
+        "git -C . commit -m x",
+        "git  commit -m x",
+        "git push origin main",
+        "git merge main",
+        "git switch other",
+        "git checkout other",
+        "git branch new",
       ]) {
         expect(effectivePermission(agent, "shell", command), command).toBe(
           "deny",
@@ -481,6 +549,19 @@ describe("shared and role-specific workflow guidance", () => {
     expect(agentsGuide).not.toContain("Dev MUST");
   });
 
+  it("lists the exact per-agent model selector and reasoning variant in AGENTS.md", () => {
+    const guide = agentsGuide.replace(/\s+/g, " ");
+    expect(guide).toContain(
+      "- `spec-refiner`: `opencode-go/deepseek-v4.1-flash#high`",
+    );
+    expect(guide).toContain(
+      "- `dev-lead`: `opencode-go/deepseek-v4.1-flash#high`",
+    );
+    expect(guide).toContain("- `dev`: `opencode-go/deepseek-v4.1-flash`");
+    expect(guide).toContain("- `qa`: `opencode-go/deepseek-v4.1-flash`");
+    expect(guide).toContain("select the model's `high` reasoning variant");
+  });
+
   it("requires explicit post-push maintainer confirmation for Lead merge and forbids Dev/QA integration", () => {
     expectPromptFragments("dev-lead", [
       "every task has QA approval and recorded evidence",
@@ -493,21 +574,17 @@ describe("shared and role-specific workflow guidance", () => {
     ]);
     for (const id of ["dev", "qa"]) {
       expectPromptFragments(id, ["do not merge, commit, or push."]);
-      expect(agents.get(id)!.permissions).toContainEqual({
-        action: "shell",
-        resource: "git merge *",
-        effect: "deny",
-      });
-      expect(agents.get(id)!.permissions).toContainEqual({
-        action: "shell",
-        resource: "git commit *",
-        effect: "deny",
-      });
-      expect(agents.get(id)!.permissions).toContainEqual({
-        action: "shell",
-        resource: "git push *",
-        effect: "deny",
-      });
+      const agent = agents.get(id)!;
+      for (const command of [
+        "git merge main",
+        "git commit -m x",
+        "git push origin main",
+      ]) {
+        expect(
+          effectivePermission(agent, "shell", command),
+          `${id} must deny: ${command}`,
+        ).toBe("deny");
+      }
     }
     expect(agentsGuide).not.toMatch(/Lead (?:cannot|must not) merge/i);
   });
