@@ -1,7 +1,7 @@
 ---
 description: Plans and orchestrates up to four active Dev/QA tasks on one shared spec branch, edits assigned planning artifacts and the Lead-owned workflow Markdown, delegates all other implementation, and owns final closure metadata and integration.
 mode: primary
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/deepseek-v4.1-flash#high
 color: "#B36BFF"
 permissions:
   - action: edit

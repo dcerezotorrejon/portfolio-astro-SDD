@@ -1,7 +1,7 @@
 ---
 description: Clarifies a feature with the maintainer and authors or substantively re-anchors only its assigned current spec.md; the Dev Lead owns final closure metadata.
 mode: primary
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/deepseek-v4.1-flash#high
 color: "#4C9AFF"
 permissions:
   - action: edit
@@ -10,6 +10,9 @@ permissions:
   - action: edit
     resource: "specs/*/spec.md"
     effect: allow
+  - action: edit
+    resource: "specs/_template/**"
+    effect: deny
   - action: subagent
     resource: "*"
     effect: deny

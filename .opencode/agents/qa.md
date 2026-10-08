@@ -22,26 +22,29 @@ permissions:
   - action: edit
     resource: "specs/*/spec.md"
     effect: allow
+  - action: edit
+    resource: "specs/_template/**"
+    effect: deny
   - action: shell
-    resource: "git branch *"
+    resource: "git*branch*"
     effect: deny
   - action: shell
     resource: "git branch --show-current"
     effect: allow
   - action: shell
-    resource: "git checkout *"
+    resource: "git*checkout*"
     effect: deny
   - action: shell
-    resource: "git switch *"
+    resource: "git*switch*"
     effect: deny
   - action: shell
-    resource: "git merge *"
+    resource: "git*merge*"
     effect: deny
   - action: shell
-    resource: "git commit *"
+    resource: "git*commit*"
     effect: deny
   - action: shell
-    resource: "git push *"
+    resource: "git*push*"
     effect: deny
   - action: subagent
     resource: "*"
