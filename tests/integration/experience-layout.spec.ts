@@ -36,6 +36,7 @@ const cases: LayoutCase[] = [
 
 interface LayoutMeasurement {
   headerDirection: string;
+  headerAlignItems: string;
   headerRect: Rect;
   iconRect: Rect;
   iconObjectFit: string;
@@ -107,6 +108,7 @@ async function measure(
 
     return {
       headerDirection: style(header, "flex-direction"),
+      headerAlignItems: style(header, "align-items"),
       headerRect: rect(header),
       iconRect: rect(icon),
       iconObjectFit: style(icon, "object-fit"),
@@ -146,6 +148,35 @@ function expectButtonRightAligned(m: LayoutMeasurement): void {
   expect(Math.abs(m.buttonRight - m.buttonRowRight)).toBeLessThanOrEqual(1);
 }
 
+test.describe("display heading size (R8/AC8)", () => {
+  const displayHeadings = [
+    { name: "home name", path: "/", selector: "#profile-name" },
+    {
+      name: "detail role",
+      path: "/experiencia/babel-senior-frontend-engineer/",
+      selector: ".experience-detail-header h1",
+    },
+  ];
+
+  for (const { name, path, selector } of displayHeadings) {
+    for (const width of [1024, 390]) {
+      test(`${name} h1 renders at 32px at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        const heading = page.locator(selector);
+        await expect(heading).toBeVisible();
+
+        // The display variant is a fixed 32px (2rem). The previous responsive
+        // clamp peaked at 44px, so this must not grow with the viewport.
+        const fontSize = await heading.evaluate(
+          (element) => getComputedStyle(element).fontSize,
+        );
+        expect(fontSize).toBe("32px");
+      });
+    }
+  }
+});
+
 for (const layoutCase of cases) {
   test.describe(`experience layout — ${layoutCase.name}`, () => {
     for (const width of [1024, 601]) {
@@ -165,6 +196,14 @@ for (const layoutCase of cases) {
         expect(m.iconRect.right).toBeLessThanOrEqual(m.textRect.x + 1);
         expect(m.iconRect.y).toBeLessThan(m.textRect.bottom);
         expect(m.textRect.y).toBeLessThan(m.iconRect.bottom);
+
+        // Vertical centering (R7/AC7): the header centers its items on the
+        // cross axis, so the text block's vertical center matches the icon's
+        // vertical center rather than being top-aligned.
+        expect(m.headerAlignItems).toBe("center");
+        const iconCenter = (m.iconRect.y + m.iconRect.bottom) / 2;
+        const textCenter = (m.textRect.y + m.textRect.bottom) / 2;
+        expect(Math.abs(iconCenter - textCenter)).toBeLessThanOrEqual(1);
 
         expectTextBlockOrder(m);
         expectDescriptionGap(m);

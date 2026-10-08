@@ -132,7 +132,7 @@ describe("Heading molecule semantic level", () => {
 
 describe("Heading molecule tokens", () => {
   it("resolves the display/section/card tokens to the delivered values", () => {
-    expect(token("--heading-display-size")).toBe("clamp(2rem, 5vw, 2.75rem)");
+    expect(token("--heading-display-size")).toBe("2rem");
     expect(token("--heading-display-weight")).toBe("700");
     expect(token("--heading-display-leading")).toBe("1.2");
     expect(token("--heading-display-tracking")).toBe("-0.025em");
