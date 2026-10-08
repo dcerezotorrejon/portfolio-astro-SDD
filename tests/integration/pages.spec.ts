@@ -14,7 +14,7 @@ test("home and every content-derived experience detail load directly", async ({
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       experience.role,
     );
-    await expect(page.locator(".company-identity")).toContainText(
+    await expect(page.locator(".company-name")).toContainText(
       experience.company,
     );
   }

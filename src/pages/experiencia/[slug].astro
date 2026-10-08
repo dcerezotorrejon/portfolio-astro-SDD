@@ -42,33 +42,35 @@ const companyIcon = resolveCompanyIcon(experience);
   <main class="site-container my-8">
     <article
       transition:name={`experience-transition-${slug}`}
-      class="experience-card experience-detail-card w-full rounded-card border border-border bg-surface p-6"
+      class="experience-card experience-detail-card w-full rounded-card border border-border bg-surface p-6 flex flex-col gap-5"
       data-experience-slug={slug}
     >
-      <header class="experience-detail-header">
-        <Heading level={1} variant="display">
-          {role}
-        </Heading>
-        <p class="company-identity flex min-w-0 items-center gap-3">
-          <img
-            class="company-icon size-10 shrink-0 object-contain"
-            src={companyIcon.src}
-            alt={companyIcon.alt}
-            width="40"
-            height="40"
-          />
-          <span>{company}</span>
-        </p>
-        <p>{formatDateRange(startDate, endDate)}</p>
+      <header class="experience-detail-header flex flex-col gap-4 min-[601px]:flex-row min-[601px]:items-center">
+        <img
+          class="company-icon w-full h-auto min-[601px]:size-32 min-[601px]:aspect-square min-[601px]:shrink-0 object-contain"
+          src={companyIcon.src}
+          alt={companyIcon.alt}
+          width="128"
+          height="128"
+        />
+        <div class="experience-detail-text flex flex-col">
+          <Heading level={1} variant="display">
+            {role}
+          </Heading>
+          <p class="company-name">{company}</p>
+          <p class="experience-period">{formatDateRange(startDate, endDate)}</p>
+        </div>
       </header>
       <div class="experience-detail-body">
         <TechnologyBadges technologies={technologies} />
         <div class="detail-content">
           <Content />
         </div>
-        <Button variant="primary" href="/#trayectoria">
-          {profile.backLabel}
-        </Button>
+        <div class="flex justify-end">
+          <Button variant="primary" href="/#trayectoria">
+            {profile.backLabel}
+          </Button>
+        </div>
       </div>
     </article>
   </main>

@@ -96,19 +96,39 @@ describe("experience detail routes", () => {
       expect(body?.querySelectorAll(".technology-badge")).toHaveLength(
         technologies.length,
       );
-      expect(header?.querySelectorAll("p")[0]?.textContent?.trim()).toBe(
+      expect(header?.querySelector("h1")?.textContent?.trim()).toBe(role);
+      expect(header?.querySelector(".company-name")?.textContent?.trim()).toBe(
         company,
       );
       const companyIcon =
         header?.querySelector<HTMLImageElement>(".company-icon");
       expect(companyIcon?.getAttribute("src")).toBe(icon.src);
       expect(companyIcon?.getAttribute("alt")).toBe(icon.alt);
-      expect(companyIcon?.getAttribute("width")).toBe("40");
-      expect(companyIcon?.getAttribute("height")).toBe("40");
+      expect(companyIcon?.getAttribute("width")).toBe("128");
+      expect(companyIcon?.getAttribute("height")).toBe("128");
       expect(companyIcon?.hasAttribute("loading")).toBe(false);
-      expect(header?.querySelectorAll("p")[1]?.textContent?.trim()).toBe(
-        dateRange,
+      expect(
+        header?.querySelector(".experience-period")?.textContent?.trim(),
+      ).toBe(dateRange);
+
+      const headerChildren = Array.from(header?.children ?? []);
+      const textBlock = headerChildren.find((child) =>
+        child.classList.contains("experience-detail-text"),
       );
+      const textChildren = Array.from(textBlock?.children ?? []);
+
+      expect(headerChildren[0]?.classList.contains("company-icon")).toBe(true);
+      expect(textBlock).toBeDefined();
+      expect(textChildren[0]?.localName).toBe("h1");
+      expect(textChildren[1]?.classList.contains("company-name")).toBe(true);
+      expect(textChildren[2]?.classList.contains("experience-period")).toBe(
+        true,
+      );
+
+      const buttonContainer = returnLink?.parentElement;
+      expect(buttonContainer?.classList.contains("flex")).toBe(true);
+      expect(buttonContainer?.classList.contains("justify-end")).toBe(true);
+
       expect(
         Array.from(document.querySelectorAll(".technology-badge"), (badge) =>
           badge.textContent?.trim(),

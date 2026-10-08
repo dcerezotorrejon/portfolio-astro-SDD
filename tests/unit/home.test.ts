@@ -125,15 +125,15 @@ describe("home page", () => {
         loading: "lazy",
         src: "/images/companies/babel.svg",
         alt: "Logotipo de Babel Sistemas de Información",
-        width: "40",
-        height: "40",
+        width: "128",
+        height: "128",
       },
       {
         loading: "lazy",
         src: "/images/companies/nttdata.svg",
         alt: "Logotipo de NTTData Europe & LATAM",
-        width: "40",
-        height: "40",
+        width: "128",
+        height: "128",
       },
     ]);
     expect(
@@ -145,9 +145,9 @@ describe("home page", () => {
 
     const getCardContent = (card: HTMLElement) => ({
       role: card.querySelector("h3")?.textContent?.trim(),
-      company: card.querySelector("p")?.textContent?.trim(),
-      dateRange: card.querySelectorAll("p")[1]?.textContent?.trim(),
-      summary: card.querySelectorAll("p")[2]?.textContent?.trim(),
+      company: card.querySelector(".company-name")?.textContent?.trim(),
+      dateRange: card.querySelector(".experience-period")?.textContent?.trim(),
+      summary: card.querySelector(".experience-summary")?.textContent?.trim(),
       technologies: Array.from(
         card.querySelectorAll(".technology-badge"),
         (badge) => badge.textContent?.trim(),
@@ -194,6 +194,27 @@ describe("home page", () => {
           "Más información sobre Lead Engineer en NTTData Europe & LATAM (2017)",
       },
     ]);
+
+    for (const card of cards) {
+      const header = card.querySelector(".experience-card-header");
+      const headerChildren = Array.from(header?.children ?? []);
+      const textBlock = headerChildren.find((child) =>
+        child.classList.contains("experience-card-text"),
+      );
+      const textChildren = Array.from(textBlock?.children ?? []);
+
+      expect(headerChildren[0]?.classList.contains("company-icon")).toBe(true);
+      expect(textBlock).toBeDefined();
+      expect(textChildren[0]?.localName).toBe("h3");
+      expect(textChildren[1]?.classList.contains("company-name")).toBe(true);
+      expect(textChildren[2]?.classList.contains("experience-period")).toBe(
+        true,
+      );
+
+      const buttonContainer = card.querySelector("a")?.parentElement;
+      expect(buttonContainer?.classList.contains("flex")).toBe(true);
+      expect(buttonContainer?.classList.contains("justify-end")).toBe(true);
+    }
   });
 
   it("renders both sections in document order with the requested navigation island", async () => {

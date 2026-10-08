@@ -37,32 +37,38 @@ const { experiences, profile } = Astro.props;
       return (
         <article
           transition:name={`experience-transition-${slug}`}
-          class="experience-card w-full rounded-card border border-border bg-surface p-6"
+          class="experience-card w-full rounded-card border border-border bg-surface p-6 flex flex-col gap-5"
         >
-          <Heading level={3} variant="card">
-            {role}
-          </Heading>
-          <p class="company-identity flex min-w-0 items-center gap-3">
+          <header class="experience-card-header flex flex-col gap-4 min-[601px]:flex-row min-[601px]:items-center">
             <img
               loading="lazy"
-              class="company-icon size-10 shrink-0 object-contain"
+              class="company-icon w-full h-auto min-[601px]:size-32 min-[601px]:aspect-square min-[601px]:shrink-0 object-contain"
               src={companyIcon.src}
               alt={companyIcon.alt}
-              width="40"
-              height="40"
+              width="128"
+              height="128"
             />
-            <span>{company}</span>
-          </p>
-          <p>{formatDateRange(startDate, endDate)}</p>
-          <p>{summary}</p>
+            <div class="experience-card-text flex flex-col">
+              <Heading level={3} variant="card">
+                {role}
+              </Heading>
+              <p class="company-name">{company}</p>
+              <p class="experience-period">
+                {formatDateRange(startDate, endDate)}
+              </p>
+            </div>
+          </header>
+          <p class="experience-summary">{summary}</p>
           <TechnologyBadges technologies={technologies} />
-          <Button
-            variant="primary"
-            href={`/experiencia/${slug}/`}
-            aria-label={`${profile.moreInfoLabel} sobre ${role} en ${company} (${startYear})`}
-          >
-            {profile.moreInfoLabel}
-          </Button>
+          <div class="flex justify-end">
+            <Button
+              variant="primary"
+              href={`/experiencia/${slug}/`}
+              aria-label={`${profile.moreInfoLabel} sobre ${role} en ${company} (${startYear})`}
+            >
+              {profile.moreInfoLabel}
+            </Button>
+          </div>
         </article>
       );
     })}

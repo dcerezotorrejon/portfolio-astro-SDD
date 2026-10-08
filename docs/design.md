@@ -88,7 +88,7 @@ style variant never implies a tag: choose the semantic level and the visual
 variant independently. Three variants exist, driven by the `--heading-*` token
 group:
 
-- **`display`** — the page's hero heading: `clamp(2rem, 5vw, 2.75rem)`, weight
+- **`display`** — the page's hero heading: `2rem` (32px), weight
   700, line-height 1.2, letter-spacing -0.025em and no margin.
 - **`section`** — section headings: 24 px below 768 px and 32 px at or above
   768 px, weight 700, line-height 1.25, dark ink and a 24 px bottom gap.
