@@ -12,26 +12,26 @@ import { render } from "../helpers/render";
 
 const approvedIcon = {
   src: "/images/companies/astro.svg",
-  alt: "Icono provisional de Astro para Empresa de ejemplo",
+  alt: "Acme",
 };
 
 const replacementIcon = {
   src: "/images/companies/replacement.svg",
-  alt: "Icono provisional reemplazable de Empresa de ejemplo",
+  alt: "Acme replacement",
 };
 
 function validExperience(icon = approvedIcon) {
   return {
-    slug: "puesto-ejemplo-2024",
-    role: "Puesto de ejemplo",
-    company: "Empresa de ejemplo",
+    slug: "sample-role",
+    role: "Software Engineer",
+    company: "Acme Corp",
     companyIcon: icon,
     startDate: "2024-01-01",
-    summary: "Descripción de ejemplo de las responsabilidades del puesto",
+    summary: "Sample summary for a generic role",
     technologies: ["Astro", "Tailwind CSS"],
     seo: {
-      title: "Puesto de ejemplo | Portfolio profesional",
-      description: "Descripción provisional de ejemplo",
+      title: "Software Engineer | Portfolio profesional",
+      description: "Sample description for a generic role",
     },
   };
 }
@@ -47,8 +47,8 @@ type IconSourceEntry = {
  * Markdown `rendered.metadata.frontmatter` copy. Either may be omitted.
  */
 function iconSourceEntry({
-  id = "puesto-ejemplo-2024.md",
-  slug = "puesto-ejemplo-2024",
+  id = "sample-role.md",
+  slug = "sample-role",
   normalized,
   frontmatter,
 }: {
@@ -67,6 +67,7 @@ function iconSourceEntry({
 function expectCompanyIconNearCompany(
   identity: Element | null,
   expectedIcon: { src: string; alt: string },
+  expectedCompany: string,
 ): void {
   expect(identity).not.toBeNull();
   const image = identity?.querySelector("img");
@@ -77,9 +78,25 @@ function expectCompanyIconNearCompany(
   expect(image?.getAttribute("alt")?.trim()).not.toBe("");
   expect(image?.getAttribute("width")).toBe("40");
   expect(image?.getAttribute("height")).toBe("40");
-  expect(company?.textContent?.trim()).toBe("Empresa de ejemplo");
+  expect(company?.textContent?.trim()).toBe(expectedCompany);
   expect(image?.parentElement).toBe(company?.parentElement);
 }
+
+const expectedRealIcons: Record<string, { src: string; alt: string }> = {
+  "babel-senior-frontend-engineer": {
+    src: "/images/companies/babel.svg",
+    alt: "Logotipo de Babel Sistemas de Información",
+  },
+  "nttdata-lead-engineer": {
+    src: "/images/companies/nttdata.svg",
+    alt: "Logotipo de NTTData Europe & LATAM",
+  },
+};
+
+const expectedRealContent: Record<string, string> = {
+  "babel-senior-frontend-engineer": "Liderazgo de Arquitectura Frontend",
+  "nttdata-lead-engineer": "Progresión Técnica",
+};
 
 describe("resolveCompanyIcon helper", () => {
   it("prefers a valid normalized data icon over the rendered frontmatter copy", () => {
@@ -109,8 +126,8 @@ describe("resolveCompanyIcon helper", () => {
     try {
       resolveCompanyIcon(
         iconSourceEntry({
-          id: "puesto-sin-icono.md",
-          slug: "puesto-sin-icono",
+          id: "role-without-icon.md",
+          slug: "role-without-icon",
           normalized: undefined,
           frontmatter: undefined,
         }),
@@ -121,9 +138,9 @@ describe("resolveCompanyIcon helper", () => {
 
     expect(caught).toBeInstanceOf(Error);
     expect((caught as Error).message).toContain(
-      'entry id "puesto-sin-icono.md"',
+      'entry id "role-without-icon.md"',
     );
-    expect((caught as Error).message).toContain('slug "puesto-sin-icono"');
+    expect((caught as Error).message).toContain('slug "role-without-icon"');
   });
 
   it("rejects a malformed normalized icon instead of falling back to the rendered copy", () => {
@@ -146,28 +163,18 @@ describe("resolveCompanyIcon helper", () => {
 });
 
 describe("Markdown-configurable company icons", () => {
-  it("resolves the real collection entries when persisted normalized data omits the icon", async () => {
+  it("resolves the real collection entries to their configured icons", async () => {
     const entries = await getCollection("experience");
 
     expect(entries).toHaveLength(2);
     for (const entry of entries) {
-      const rendered = (
-        entry as unknown as {
-          rendered?: {
-            metadata?: { frontmatter?: { companyIcon?: unknown } };
-          };
-        }
-      ).rendered;
-      const renderedIcon = rendered?.metadata?.frontmatter?.companyIcon;
-
-      if (entry.data.companyIcon === undefined) {
-        expect(renderedIcon).toEqual(approvedIcon);
-      }
-      expect(resolveCompanyIcon(entry)).toEqual(approvedIcon);
+      const expectedIcon = expectedRealIcons[entry.data.slug];
+      expect(expectedIcon).toBeDefined();
+      expect(resolveCompanyIcon(entry)).toEqual(expectedIcon);
     }
   });
 
-  it("renders the same resolved Markdown icon beside the unchanged company name on home and its complete detail card", async () => {
+  it("renders the same resolved Markdown icon beside the company name on home and its complete detail card", async () => {
     const entries = await getCollection("experience");
     const profile = await getEntry("profile", "profile");
     if (!profile) throw new Error("Missing approved profile collection entry");
@@ -184,11 +191,9 @@ describe("Markdown-configurable company icons", () => {
     expect(cards).toHaveLength(entries.length);
 
     for (const entry of entries) {
-      // The helper resolves the icon from normalized data or the Markdown
-      // rendered frontmatter, so the stale store's missing `data.companyIcon`
-      // no longer blocks rendering.
       const resolvedIcon = resolveCompanyIcon(entry);
-      expect(resolvedIcon).toEqual(approvedIcon);
+      const expectedIcon = expectedRealIcons[entry.data.slug];
+      expect(resolvedIcon).toEqual(expectedIcon);
 
       const card = cards.find(
         (candidate) =>
@@ -200,6 +205,7 @@ describe("Markdown-configurable company icons", () => {
       expectCompanyIconNearCompany(
         card?.querySelector(".company-identity") ?? null,
         resolvedIcon,
+        entry.data.company,
       );
 
       const detailHtml = await render(ExperienceDetail, {
@@ -215,15 +221,11 @@ describe("Markdown-configurable company icons", () => {
       expectCompanyIconNearCompany(
         detailCard?.querySelector(".company-identity") ?? null,
         resolvedIcon,
+        entry.data.company,
       );
       expect(
-        detailCard?.contains(
-          detailCard?.querySelector(".company-identity") ?? null,
-        ),
-      ).toBe(true);
-      expect(
         detailCard?.querySelector(".detail-content")?.textContent,
-      ).toContain("Información ampliada de ejemplo");
+      ).toContain(expectedRealContent[entry.data.slug]);
     }
   });
 
@@ -231,14 +233,14 @@ describe("Markdown-configurable company icons", () => {
     const entries = await getCollection("experience");
     const profile = await getEntry("profile", "profile");
     if (!profile) throw new Error("Missing approved profile collection entry");
-    const recentEntry = entries.find(
-      (entry) => entry.data.slug === "puesto-ejemplo-2024",
+    const babelEntry = entries.find(
+      (entry) => entry.data.slug === "babel-senior-frontend-engineer",
     );
-    if (!recentEntry)
-      throw new Error("Missing recent experience collection entry");
+    if (!babelEntry)
+      throw new Error("Missing babel experience collection entry");
     const replacedEntry = {
-      ...recentEntry,
-      data: { ...recentEntry.data, companyIcon: replacementIcon },
+      ...babelEntry,
+      data: { ...babelEntry.data, companyIcon: replacementIcon },
     };
 
     expect(
@@ -257,12 +259,13 @@ describe("Markdown-configurable company icons", () => {
       card
         .querySelector("a")
         ?.getAttribute("href")
-        ?.includes("puesto-ejemplo-2024"),
+        ?.includes("babel-senior-frontend-engineer"),
     );
 
     expectCompanyIconNearCompany(
       replacedCard?.querySelector(".company-identity") ?? null,
       replacementIcon,
+      babelEntry.data.company,
     );
 
     const detailHtml = await render(ExperienceDetail, {
@@ -274,6 +277,7 @@ describe("Markdown-configurable company icons", () => {
     expectCompanyIconNearCompany(
       detailDocument.querySelector(".experience-detail-card .company-identity"),
       replacementIcon,
+      babelEntry.data.company,
     );
   });
 

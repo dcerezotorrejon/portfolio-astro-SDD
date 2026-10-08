@@ -7,19 +7,20 @@ import { describe, expect, it } from "vitest";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import { getContainer } from "../helpers/render";
 
-const approvedDescription =
-  "Información ampliada de ejemplo sobre las responsabilidades y el contexto del puesto. Este contenido no representa una experiencia laboral real";
-
 const routeMetadata = [
   {
-    slug: "puesto-ejemplo-2024",
+    slug: "babel-senior-frontend-engineer",
     title:
-      "Puesto de ejemplo (2024) | Nombre Apellidos | Portfolio profesional",
+      "Senior Software Engineer (Frontend) (2022) | Daniel Cerezo Torrejón | Portfolio profesional",
+    description:
+      "Arquitectura Frontend desde cero en Iberia.com con React, TypeScript y Clean Architecture como Senior Software Engineer.",
   },
   {
-    slug: "puesto-ejemplo-2022",
+    slug: "nttdata-lead-engineer",
     title:
-      "Puesto de ejemplo (2022) | Nombre Apellidos | Portfolio profesional",
+      "Lead Engineer (2017) | Daniel Cerezo Torrejón | Portfolio profesional",
+    description:
+      "Progresión hasta Lead Engineer en Iberia.com: liderazgo técnico y migración de módulos legacy.",
   },
 ];
 
@@ -40,7 +41,7 @@ async function renderExperience(slug: string): Promise<string> {
 describe("experience detail SEO", () => {
   it.each(routeMetadata)(
     "renders unique Spanish metadata and canonical URL for $slug",
-    async ({ slug, title }) => {
+    async ({ slug, title, description }) => {
       const html = await renderExperience(slug);
       const { document } = new JSDOM(html).window;
       const descriptions = document.querySelectorAll(
@@ -51,9 +52,7 @@ describe("experience detail SEO", () => {
       expect(document.documentElement.lang).toBe("es");
       expect(document.title).toBe(title);
       expect(descriptions).toHaveLength(1);
-      expect(descriptions[0]?.getAttribute("content")).toBe(
-        approvedDescription,
-      );
+      expect(descriptions[0]?.getAttribute("content")).toBe(description);
       expect(canonicals).toHaveLength(1);
       expect(canonicals[0]?.getAttribute("href")).toBe(
         `https://example.com/experiencia/${slug}/`,

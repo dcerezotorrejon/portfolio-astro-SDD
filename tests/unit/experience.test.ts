@@ -6,9 +6,6 @@ import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
 import { assertUniqueExperienceSlugs } from "../../src/content/parsers/content";
 import { render } from "../helpers/render";
 
-const approvedExpandedDescription =
-  "Información ampliada de ejemplo sobre las responsabilidades y el contexto del puesto. Este contenido no representa una experiencia laboral real";
-
 async function renderExperience(slug: string): Promise<string> {
   const experiences = await getCollection("experience");
   const experience = experiences.find((entry) => entry.data.slug === slug);
@@ -24,18 +21,54 @@ async function renderExperience(slug: string): Promise<string> {
 describe("experience detail routes", () => {
   it.each([
     {
-      slug: "puesto-ejemplo-2024",
-      dateRange: "enero de 2024 – actualidad",
-      technologies: ["Astro", "Tailwind CSS"],
+      slug: "babel-senior-frontend-engineer",
+      role: "Senior Software Engineer (Frontend)",
+      company: "Babel Sistemas de Información",
+      icon: {
+        src: "/images/companies/babel.svg",
+        alt: "Logotipo de Babel Sistemas de Información",
+      },
+      dateRange: "febrero de 2022 – actualidad",
+      technologies: [
+        "React",
+        "TypeScript",
+        "Zustand",
+        "Stencil.js",
+        "Angular",
+        "AngularJS",
+      ],
+      contentSnippet: "Liderazgo de Arquitectura Frontend",
     },
     {
-      slug: "puesto-ejemplo-2022",
-      dateRange: "enero de 2022 – diciembre de 2023",
-      technologies: ["React", "TypeScript"],
+      slug: "nttdata-lead-engineer",
+      role: "Lead Engineer",
+      company: "NTTData Europe & LATAM",
+      icon: {
+        src: "/images/companies/nttdata.svg",
+        alt: "Logotipo de NTTData Europe & LATAM",
+      },
+      dateRange: "julio de 2017 – enero de 2022",
+      technologies: [
+        "TypeScript",
+        "JavaScript",
+        "Angular",
+        "AngularJS",
+        "jQuery",
+        "Webpack",
+      ],
+      contentSnippet: "Progresión Técnica",
     },
   ])(
     "renders matching collection content for $slug",
-    async ({ slug, dateRange, technologies }) => {
+    async ({
+      slug,
+      role,
+      company,
+      icon,
+      dateRange,
+      technologies,
+      contentSnippet,
+    }) => {
       const html = await renderExperience(slug);
       const { document } = new JSDOM(html).window;
       const header = document.querySelector<HTMLElement>(
@@ -46,14 +79,11 @@ describe("experience detail routes", () => {
       );
       const body = card?.querySelector<HTMLElement>(".experience-detail-body");
       const description = body?.querySelector(".detail-content");
-      const notice = body?.querySelector(".provisional-notice");
       const returnLink = body?.querySelector('a[href="/#trayectoria"]');
 
       expect(document.documentElement.lang).toBe("es");
       expect(document.querySelectorAll("h1")).toHaveLength(1);
-      expect(document.querySelector("h1")?.textContent?.trim()).toBe(
-        "Puesto de ejemplo",
-      );
+      expect(document.querySelector("h1")?.textContent?.trim()).toBe(role);
       expect(card?.getAttribute("data-experience-slug")).toBe(slug);
       expect(document.querySelectorAll(".experience-card")).toHaveLength(1);
       expect(card?.tagName).toBe("ARTICLE");
@@ -62,22 +92,17 @@ describe("experience detail routes", () => {
       expect(body).not.toBeNull();
       expect(card?.contains(body ?? null)).toBe(true);
       expect(body?.contains(description ?? null)).toBe(true);
-      expect(body?.contains(notice ?? null)).toBe(true);
       expect(body?.contains(returnLink ?? null)).toBe(true);
       expect(body?.querySelectorAll(".technology-badge")).toHaveLength(
         technologies.length,
       );
       expect(header?.querySelectorAll("p")[0]?.textContent?.trim()).toBe(
-        "Empresa de ejemplo",
+        company,
       );
       const companyIcon =
         header?.querySelector<HTMLImageElement>(".company-icon");
-      expect(companyIcon?.getAttribute("src")).toBe(
-        "/images/companies/astro.svg",
-      );
-      expect(companyIcon?.getAttribute("alt")).toBe(
-        "Icono provisional de Astro para Empresa de ejemplo",
-      );
+      expect(companyIcon?.getAttribute("src")).toBe(icon.src);
+      expect(companyIcon?.getAttribute("alt")).toBe(icon.alt);
       expect(companyIcon?.getAttribute("width")).toBe("40");
       expect(companyIcon?.getAttribute("height")).toBe("40");
       expect(companyIcon?.hasAttribute("loading")).toBe(false);
@@ -91,10 +116,8 @@ describe("experience detail routes", () => {
       ).toEqual(technologies);
       expect(
         document.querySelector(".detail-content")?.textContent?.trim(),
-      ).toBe(approvedExpandedDescription);
-      expect(document.querySelector(".provisional-notice")?.textContent).toBe(
-        "Contenido provisional de ejemplo",
-      );
+      ).toContain(contentSnippet);
+      expect(document.querySelector(".provisional-notice")).toBeNull();
       expect(
         document.querySelector('a[href="/#trayectoria"]')?.textContent?.trim(),
       ).toBe("Volver a la trayectoria");
@@ -104,7 +127,7 @@ describe("experience detail routes", () => {
   );
 
   it("renders the detail main with my-8 vertical spacing", async () => {
-    const html = await renderExperience("puesto-ejemplo-2024");
+    const html = await renderExperience("babel-senior-frontend-engineer");
     const { document } = new JSDOM(html).window;
     const main = document.querySelector<HTMLElement>("main");
 

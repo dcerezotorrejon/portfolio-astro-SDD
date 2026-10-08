@@ -10,11 +10,13 @@ describe("home page SEO", () => {
     const { document } = new JSDOM(html).window;
 
     expect(document.documentElement.lang).toBe("es");
-    expect(document.title).toBe("Nombre Apellidos | Portfolio profesional");
+    expect(document.title).toBe(
+      "Daniel Cerezo Torrejón | Senior Frontend Engineer | Portfolio profesional",
+    );
 
     const description = document.querySelector('meta[name="description"]');
     expect(description?.getAttribute("content")).toBe(
-      "Presentación y trayectoria profesional de Nombre Apellidos. Contenido provisional de ejemplo",
+      "Presentación y trayectoria profesional de Daniel Cerezo Torrejón, Senior Frontend Engineer & Software Architect.",
     );
     expect(document.querySelectorAll('meta[name="description"]')).toHaveLength(
       1,

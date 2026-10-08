@@ -27,6 +27,13 @@ export const companyIconSchema = z.object({
   alt: nonEmptyString,
 });
 
+const localProfileImagePath = z
+  .string()
+  .regex(
+    /^\/images\/[a-z0-9-]+\.(svg|png|jpe?g|webp)$/,
+    "Must be a local image path under /images/",
+  );
+
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString.max(160, "Must be at most 160 characters"),
@@ -35,9 +42,9 @@ const seoSchema = z.object({
 export const profileSchema = z.object({
   name: nonEmptyString,
   headline: nonEmptyString,
-  notice: nonEmptyString,
+  about: nonEmptyString,
   image: z.object({
-    src: z.literal("/images/profile-placeholder.svg"),
+    src: localProfileImagePath,
     alt: nonEmptyString,
   }),
   socials: z.array(
