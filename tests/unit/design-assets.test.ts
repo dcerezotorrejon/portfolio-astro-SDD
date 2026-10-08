@@ -173,6 +173,9 @@ describe("T2/T10 global style contracts", () => {
       expect(css).toContain(key);
     }
 
+    // 8bb0ecb removed the custom `--transition-duration-control` @theme entry,
+    // so the raw motion token stays declared in `:root` and is not
+    // re-declared inside the generated-namespace block.
     expect(themeBlock).not.toContain("--duration-control:");
 
     // Component-specific selectors are no longer authored in global.css.

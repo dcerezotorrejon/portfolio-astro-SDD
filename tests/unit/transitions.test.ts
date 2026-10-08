@@ -5,9 +5,15 @@ import { describe, expect, it } from "vitest";
 
 import ExperienceHistory from "../../src/components/home/ExperienceHistory.astro";
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
+import {
+  readStylesheetTokens,
+  resolveDeclaration,
+  resolveToken,
+} from "../helpers/css-tokens";
 import { render } from "../helpers/render";
 
 const css = readFileSync("src/styles/global.css", "utf8");
+const tokens = readStylesheetTokens("src/styles/global.css");
 const experienceHistorySource = readFileSync(
   "src/components/home/ExperienceHistory.astro",
   "utf8",
@@ -135,6 +141,40 @@ describe("native experience view transitions", () => {
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?::view-transition-group\(\*\)[\s\S]*?animation:\s*none/,
     );
+  });
+
+  it("uses the shared control-duration token without overriding the native view-transition timing", () => {
+    // 8bb0ecb intentionally removed the custom `::view-transition-*`
+    // `animation-duration` override, so the UA's native duration applies to
+    // shared-element transitions. The 200 ms control motion token remains the
+    // shared source of truth for component transitions.
+    expect(css).not.toMatch(
+      /::view-transition-[a-z-]+\(\*\)[^{]*\{[^}]*animation-duration/,
+    );
+    expect(resolveToken("--duration-control", tokens)).toBe("200ms");
+  });
+
+  it("keeps the reduced-motion reset for every view-transition pseudo-element", () => {
+    const reducedMotionIndex = css.indexOf(
+      "@media (prefers-reduced-motion: reduce)",
+    );
+
+    expect(reducedMotionIndex).toBeGreaterThanOrEqual(0);
+
+    const reducedBlock = css.slice(reducedMotionIndex);
+    for (const pseudo of [
+      "::view-transition-group(*)",
+      "::view-transition-image-pair(*)",
+      "::view-transition-old(*)",
+      "::view-transition-new(*)",
+    ]) {
+      expect(reducedBlock).toContain(pseudo);
+    }
+    // The reset disables the animation outright and does not reintroduce a
+    // competing custom duration; with the timing rule removed there is no
+    // equal-specificity override left to win against.
+    expect(resolveDeclaration(reducedBlock, "animation", tokens)).toBe("none");
+    expect(reducedBlock).not.toMatch(/animation-duration:\s*var\(--duration/);
   });
 
   it("keeps the card and return affordances as native same-tab anchors", async () => {

@@ -24,11 +24,13 @@ constitution.
 
 Agent frontmatter is the source of configured model defaults:
 
-- `dev-lead` and `spec-refiner`: `opencode-go/deepseek-v4-pro`
-- `dev`: `opencode-go/kimi-k2.7-code`
+- `spec-refiner`: `opencode-go/deepseek-v4.1-flash#high`
+- `dev-lead`: `opencode-go/deepseek-v4.1-flash#high`
+- `dev`: `opencode-go/deepseek-v4.1-flash`
 - `qa`: `opencode-go/deepseek-v4.1-flash`
 
-No reasoning variant is explicitly selected in those defaults; the Auto Router
+`spec-refiner` and `dev-lead` select the model's `high` reasoning variant via the
+`#variant` selector suffix; `dev` and `qa` select no variant. The Auto Router
 variants in `opencode.json` remain unchanged.
 
 ## Workflow

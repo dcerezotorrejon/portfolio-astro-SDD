@@ -1,12 +1,9 @@
 ---
 description: Implements exactly one assigned task on the shared spec branch, writes and validates the task's unit tests, without self-validation, task branches, commits, or pushes.
 mode: subagent
-model: opencode-go/kimi-k2.7-code
+model: opencode-go/deepseek-v4.1-flash
 color: "#3FB950"
 permissions:
-  - action: edit
-    resource: "**"
-    effect: deny
   - action: edit
     resource: "**"
     effect: allow
@@ -44,25 +41,25 @@ permissions:
     resource: ".opencode/agents/*.md"
     effect: deny
   - action: shell
-    resource: "git branch *"
+    resource: "git*branch*"
     effect: deny
   - action: shell
     resource: "git branch --show-current"
     effect: allow
   - action: shell
-    resource: "git checkout *"
+    resource: "git*checkout*"
     effect: deny
   - action: shell
-    resource: "git switch *"
+    resource: "git*switch*"
     effect: deny
   - action: shell
-    resource: "git merge *"
+    resource: "git*merge*"
     effect: deny
   - action: shell
-    resource: "git commit *"
+    resource: "git*commit*"
     effect: deny
   - action: shell
-    resource: "git push *"
+    resource: "git*push*"
     effect: deny
   - action: subagent
     resource: "*"
