@@ -65,6 +65,12 @@ semantics stay the same.
 - R6: Replace the placeholder company SVGs with the maintainer's real logos
   (`public/images/companies/babel.svg`, `public/images/companies/nttdata.svg`),
   and delete the now-unused `public/images/companies/astro.svg`.
+- R7: In the desktop (> 600px) header, the icon and the text block are vertically
+  centered (CSS `align-items: center`), so the text block is centered relative to
+  the 128px icon rather than top-aligned.
+- R8: The `display` heading variant (used by the home name and the experience
+  detail role, both `h1`) renders at 32px (2rem), replacing the responsive
+  `clamp(2rem, 5vw, 2.75rem)` (which reached 44px).
 
 ## Acceptance criteria
 
@@ -77,6 +83,10 @@ semantics stay the same.
 - [x] AC5: Both action buttons are right-aligned.
 - [x] AC6: Heading levels are preserved (`h3` card, `h1` detail) and all quality
       gates pass (lint, format, build, unit, SEO, accessibility, integration).
+- [x] AC7: On desktop, the header's icon and text block are vertically centered
+      (computed `align-items: center`, text block centered relative to the icon).
+- [x] AC8: The `display` heading (home name and detail role, both `h1`) renders
+      at 32px (2rem).
 
 ## Verification
 
