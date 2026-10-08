@@ -16,7 +16,7 @@ async function renderExperience(slug: string): Promise<string> {
 }
 
 describe("experience detail accessibility", () => {
-  it.each(["puesto-ejemplo-2024", "puesto-ejemplo-2022"])(
+  it.each(["babel-senior-frontend-engineer", "nttdata-lead-engineer"])(
     "has no axe violations for %s",
     async (slug) => {
       const html = await renderExperience(slug);

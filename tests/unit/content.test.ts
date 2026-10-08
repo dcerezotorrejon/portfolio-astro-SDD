@@ -12,19 +12,24 @@ import {
 } from "../../src/content/parsers/content";
 
 const approvedProfile = {
-  name: "Nombre Apellidos",
-  headline: "Un breve titular sobre mi perfil profesional",
-  notice: "Contenido provisional de ejemplo",
+  name: "Daniel Cerezo Torrejón",
+  headline: "Senior Frontend Engineer & Software Architect",
+  about:
+    "Senior Frontend Engineer & Software Architect con +8 años de experiencia en plataformas e-commerce de alto tráfico (Iberia.com). Especializado en diseñar arquitecturas Frontend desde cero con React, TypeScript y Clean Architecture, liderando la migración desde plataformas legacy a tecnologías de vanguardia. Apasionado de la cultura DevOps y la infraestructura Linux (Docker, CI/CD, Homelab).",
   image: {
     src: "/images/profile-placeholder.svg",
-    alt: "Imagen de perfil provisional",
+    alt: "Fotografía de Daniel Cerezo Torrejón",
   },
   socials: [
-    { platform: "github", label: "GitHub", url: "https://github.com/" },
+    {
+      platform: "github",
+      label: "GitHub",
+      url: "https://github.com/dcerezotorrejon",
+    },
     {
       platform: "linkedin",
       label: "LinkedIn",
-      url: "https://www.linkedin.com/",
+      url: "https://www.linkedin.com/in/dcerezotorrejon",
     },
   ],
   historyHeading: "Trayectoria profesional",
@@ -35,18 +40,21 @@ const approvedProfile = {
     { id: "trayectoria", label: "Trayectoria" },
   ],
   seo: {
-    title: "Nombre Apellidos | Portfolio profesional",
+    title:
+      "Daniel Cerezo Torrejón | Senior Frontend Engineer | Portfolio profesional",
     description:
-      "Presentación y trayectoria profesional de Nombre Apellidos. Contenido provisional de ejemplo",
+      "Presentación y trayectoria profesional de Daniel Cerezo Torrejón, Senior Frontend Engineer & Software Architect.",
   },
 } satisfies Parameters<typeof profileSchema.parse>[0];
 
-const approvedDescription =
-  "Información ampliada de ejemplo sobre las responsabilidades y el contexto del puesto. Este contenido no representa una experiencia laboral real";
+const babelIcon = {
+  src: "/images/companies/babel.svg",
+  alt: "Logotipo de Babel Sistemas de Información",
+};
 
-const approvedCompanyIcon = {
-  src: "/images/companies/astro.svg",
-  alt: "Icono provisional de Astro para Empresa de ejemplo",
+const nttdataIcon = {
+  src: "/images/companies/nttdata.svg",
+  alt: "Logotipo de NTTData Europe & LATAM",
 };
 
 function experience(
@@ -60,42 +68,60 @@ function experience(
 }
 
 describe("portfolio content schemas", () => {
-  it("accepts the approved provisional profile and employment samples", () => {
+  it("accepts the approved profile and real employment samples", () => {
     expect(profileSchema.parse(approvedProfile)).toMatchObject(approvedProfile);
 
-    const recent = experienceSchema.parse({
-      slug: "puesto-ejemplo-2024",
-      role: "Puesto de ejemplo",
-      company: "Empresa de ejemplo",
-      companyIcon: approvedCompanyIcon,
-      startDate: "2024-01-01",
-      summary: "Descripción de ejemplo de las responsabilidades del puesto",
-      technologies: ["Astro", "Tailwind CSS"],
+    const babel = experienceSchema.parse({
+      slug: "babel-senior-frontend-engineer",
+      role: "Senior Software Engineer (Frontend)",
+      company: "Babel Sistemas de Información",
+      companyIcon: babelIcon,
+      startDate: "2022-02-01",
+      summary:
+        "Trabajo en la modernización de la web de Iberia.com y participo en iniciativas donde pongo en práctica Clean Architecture, React, TypeScript y React Compiler.",
+      technologies: [
+        "React",
+        "TypeScript",
+        "Zustand",
+        "Stencil.js",
+        "Angular",
+        "AngularJS",
+      ],
       seo: {
         title:
-          "Puesto de ejemplo (2024) | Nombre Apellidos | Portfolio profesional",
-        description: approvedDescription,
+          "Senior Software Engineer (Frontend) (2022) | Daniel Cerezo Torrejón | Portfolio profesional",
+        description:
+          "Arquitectura Frontend desde cero en Iberia.com con React, TypeScript y Clean Architecture como Senior Software Engineer.",
       },
     });
-    const earlier = experienceSchema.parse({
-      slug: "puesto-ejemplo-2022",
-      role: "Puesto de ejemplo",
-      company: "Empresa de ejemplo",
-      companyIcon: approvedCompanyIcon,
-      startDate: "2022-01-01",
-      endDate: "2023-12-01",
-      summary: "Descripción de ejemplo de las responsabilidades del puesto",
-      technologies: ["React", "TypeScript"],
+    const nttdata = experienceSchema.parse({
+      slug: "nttdata-lead-engineer",
+      role: "Lead Engineer",
+      company: "NTTData Europe & LATAM",
+      companyIcon: nttdataIcon,
+      startDate: "2017-07-01",
+      endDate: "2022-01-31",
+      summary:
+        "De Solutions Assistant a Lead Engineer en Iberia.com, coordinando la arquitectura de contenidos de Oracle WebCenter Sites y la migración de módulos legacy hacia TypeScript y Angular.",
+      technologies: [
+        "TypeScript",
+        "JavaScript",
+        "Angular",
+        "AngularJS",
+        "jQuery",
+        "Webpack",
+      ],
       seo: {
         title:
-          "Puesto de ejemplo (2022) | Nombre Apellidos | Portfolio profesional",
-        description: approvedDescription,
+          "Lead Engineer (2017) | Daniel Cerezo Torrejón | Portfolio profesional",
+        description:
+          "Progresión hasta Lead Engineer en Iberia.com: liderazgo técnico y migración de módulos legacy.",
       },
     });
 
-    expect(recent.startDate.toISOString()).toBe("2024-01-01T00:00:00.000Z");
-    expect(recent.endDate).toBeUndefined();
-    expect(earlier.endDate?.toISOString()).toBe("2023-12-01T00:00:00.000Z");
+    expect(babel.startDate.toISOString()).toBe("2022-02-01T00:00:00.000Z");
+    expect(babel.endDate).toBeUndefined();
+    expect(nttdata.endDate?.toISOString()).toBe("2022-01-31T00:00:00.000Z");
   });
 
   it("enforces a 160-character maximum on the shared SEO description", () => {
@@ -110,6 +136,34 @@ describe("portfolio content schemas", () => {
 
     expect(profileSchema.safeParse(atLimit).success).toBe(true);
     expect(profileSchema.safeParse(overLimit).success).toBe(false);
+  });
+
+  it("accepts local profile image paths and rejects remote, non-/images/, or traversal paths", () => {
+    const withSrc = (src: string) =>
+      profileSchema.safeParse({
+        ...approvedProfile,
+        image: { ...approvedProfile.image, src },
+      });
+
+    for (const src of [
+      "/images/profile-placeholder.svg",
+      "/images/me.png",
+      "/images/me.jpg",
+      "/images/me.jpeg",
+      "/images/me.webp",
+    ]) {
+      expect(withSrc(src).success, `Expected ${src} to be accepted`).toBe(true);
+    }
+
+    for (const src of [
+      "https://example.com/me.png",
+      "/avatar/me.png",
+      "/images/../secret.png",
+    ]) {
+      expect(withSrc(src).success, `Expected ${src} to be rejected`).toBe(
+        false,
+      );
+    }
   });
 
   it("allows profile copy and social destinations to be replaced without schema changes", () => {
@@ -145,10 +199,10 @@ describe("portfolio content schemas", () => {
     }
     expect(
       experienceSchema.safeParse({
-        slug: "puesto-ejemplo",
+        slug: "sample-role",
         role: " ",
-        company: "Empresa",
-        companyIcon: approvedCompanyIcon,
+        company: "Acme",
+        companyIcon: babelIcon,
         startDate: "2024-01-01",
         summary: "Resumen",
         technologies: ["Astro"],
@@ -159,10 +213,10 @@ describe("portfolio content schemas", () => {
 
   it("requires a valid start date, accepts a missing end date, and rejects reversed ranges", () => {
     const withoutStartDate: Record<string, unknown> = {
-      slug: "puesto-ejemplo",
-      role: "Puesto",
-      company: "Empresa",
-      companyIcon: approvedCompanyIcon,
+      slug: "sample-role",
+      role: "Rol",
+      company: "Acme",
+      companyIcon: babelIcon,
       startDate: "2024-01-01",
       summary: "Resumen",
       technologies: ["Astro"],
@@ -172,10 +226,10 @@ describe("portfolio content schemas", () => {
     expect(experienceSchema.safeParse(withoutStartDate).success).toBe(false);
 
     const openRole = experienceSchema.safeParse({
-      slug: "puesto-actual",
-      role: "Puesto",
-      company: "Empresa",
-      companyIcon: approvedCompanyIcon,
+      slug: "current-role",
+      role: "Rol",
+      company: "Acme",
+      companyIcon: babelIcon,
       startDate: "2024-01-01",
       summary: "Resumen",
       technologies: ["Astro"],
@@ -186,10 +240,10 @@ describe("portfolio content schemas", () => {
 
     expect(
       experienceSchema.safeParse({
-        slug: "puesto-invalido",
-        role: "Puesto",
-        company: "Empresa",
-        companyIcon: approvedCompanyIcon,
+        slug: "invalid-range",
+        role: "Rol",
+        company: "Acme",
+        companyIcon: babelIcon,
         startDate: "2024-01-01",
         endDate: "2023-12-31",
         summary: "Resumen",
@@ -202,9 +256,9 @@ describe("portfolio content schemas", () => {
 
 describe("experience content helpers", () => {
   it("orders a newly added dated entry newest-first without mutating the source", () => {
-    const older = experience("puesto-ejemplo-2022", "2022-01-01");
-    const recent = experience("puesto-ejemplo-2024", "2024-01-01");
-    const added = experience("puesto-nuevo-2025", "2025-03-15");
+    const older = experience("sample-role-2022", "2022-01-01");
+    const recent = experience("sample-role-2024", "2024-01-01");
+    const added = experience("sample-role-2025", "2025-03-15");
     const entries = [older, recent, added];
 
     const ordered = sortExperiences(entries);
@@ -217,10 +271,10 @@ describe("experience content helpers", () => {
   it("rejects repeated route slugs even when loader IDs are distinct filenames", () => {
     expect(() =>
       assertUniqueExperienceSlugs([
-        { id: "puesto-uno-2024.md", data: { slug: "puesto-ejemplo" } },
-        { id: "puesto-dos-2023.md", data: { slug: "puesto-ejemplo" } },
+        { id: "role-one-2024.md", data: { slug: "sample-role" } },
+        { id: "role-two-2023.md", data: { slug: "sample-role" } },
       ]),
-    ).toThrow(/puesto-uno-2024\.md.*puesto-dos-2023\.md/);
+    ).toThrow(/role-one-2024\.md.*role-two-2023\.md/);
   });
 
   it("supports both flat and collection-shaped slug records", () => {
