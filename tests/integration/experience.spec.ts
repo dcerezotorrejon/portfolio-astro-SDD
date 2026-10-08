@@ -23,7 +23,7 @@ test("every experience entry opens its matching detail and returns to the list",
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       experience.role,
     );
-    await expect(page.locator(".company-identity")).toContainText(
+    await expect(page.locator(".company-name")).toContainText(
       experience.company,
     );
     await page.getByRole("link", { name: /volver/i }).click();

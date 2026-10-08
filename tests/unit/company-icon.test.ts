@@ -11,7 +11,7 @@ import { experienceSchema } from "../../src/content/parsers/content-schema";
 import { render } from "../helpers/render";
 
 const approvedIcon = {
-  src: "/images/companies/astro.svg",
+  src: "/images/companies/babel.svg",
   alt: "Acme",
 };
 
@@ -64,22 +64,21 @@ function iconSourceEntry({
   };
 }
 
-function expectCompanyIconNearCompany(
-  identity: Element | null,
+function expectCompanyIconInHeader(
+  header: Element | null,
   expectedIcon: { src: string; alt: string },
   expectedCompany: string,
 ): void {
-  expect(identity).not.toBeNull();
-  const image = identity?.querySelector("img");
-  const company = identity?.querySelector("span");
+  expect(header).not.toBeNull();
+  const image = header?.querySelector("img.company-icon");
+  const company = header?.querySelector(".company-name");
 
   expect(image?.getAttribute("src")).toBe(expectedIcon.src);
   expect(image?.getAttribute("alt")).toBe(expectedIcon.alt);
   expect(image?.getAttribute("alt")?.trim()).not.toBe("");
-  expect(image?.getAttribute("width")).toBe("40");
-  expect(image?.getAttribute("height")).toBe("40");
+  expect(image?.getAttribute("width")).toBe("128");
+  expect(image?.getAttribute("height")).toBe("128");
   expect(company?.textContent?.trim()).toBe(expectedCompany);
-  expect(image?.parentElement).toBe(company?.parentElement);
 }
 
 const expectedRealIcons: Record<string, { src: string; alt: string }> = {
@@ -202,8 +201,8 @@ describe("Markdown-configurable company icons", () => {
       );
 
       expect(card).toBeDefined();
-      expectCompanyIconNearCompany(
-        card?.querySelector(".company-identity") ?? null,
+      expectCompanyIconInHeader(
+        card?.querySelector(".experience-card-header") ?? null,
         resolvedIcon,
         entry.data.company,
       );
@@ -218,8 +217,8 @@ describe("Markdown-configurable company icons", () => {
       );
 
       expect(detailCard).not.toBeNull();
-      expectCompanyIconNearCompany(
-        detailCard?.querySelector(".company-identity") ?? null,
+      expectCompanyIconInHeader(
+        detailCard?.querySelector(".experience-detail-header") ?? null,
         resolvedIcon,
         entry.data.company,
       );
@@ -262,8 +261,8 @@ describe("Markdown-configurable company icons", () => {
         ?.includes("babel-senior-frontend-engineer"),
     );
 
-    expectCompanyIconNearCompany(
-      replacedCard?.querySelector(".company-identity") ?? null,
+    expectCompanyIconInHeader(
+      replacedCard?.querySelector(".experience-card-header") ?? null,
       replacementIcon,
       babelEntry.data.company,
     );
@@ -274,8 +273,10 @@ describe("Markdown-configurable company icons", () => {
     });
     const { document: detailDocument } = new JSDOM(detailHtml).window;
 
-    expectCompanyIconNearCompany(
-      detailDocument.querySelector(".experience-detail-card .company-identity"),
+    expectCompanyIconInHeader(
+      detailDocument.querySelector(
+        ".experience-detail-card .experience-detail-header",
+      ),
       replacementIcon,
       babelEntry.data.company,
     );
@@ -312,17 +313,19 @@ describe("Markdown-configurable company icons", () => {
     expect(experienceSchema.safeParse(missingAlt).success).toBe(false);
   });
 
-  it("ships a parseable local Astro SVG and preserves icon sizing/aspect ratio through utility classes", async () => {
-    const svg = await readFile("public/images/companies/astro.svg", "utf8");
+  it("ships parseable local company SVGs and preserves icon sizing/aspect ratio through utility classes", async () => {
+    const svg = await readFile("public/images/companies/babel.svg", "utf8");
     const { document } = new JSDOM(svg, { contentType: "image/svg+xml" })
       .window;
     const root = document.documentElement;
 
     expect(root.localName).toBe("svg");
-    expect(root.getAttribute("viewBox")).toBe("0 0 64 64");
+    expect(root.getAttribute("viewBox")).toMatch(
+      /^0 0 \d+(\.\d+)? \d+(\.\d+)?$/,
+    );
     expect(root.querySelectorAll("path").length).toBeGreaterThan(0);
 
-    // The icon and identity geometry are now expressed as Tailwind utilities
+    // The icon and header geometry are now expressed as Tailwind utilities
     // on the rendered markup instead of global CSS rules.
     const profile = await getEntry("profile", "profile");
     if (!profile) throw new Error("Missing approved profile collection entry");
@@ -334,16 +337,18 @@ describe("Markdown-configurable company icons", () => {
     const { document: historyDocument } = new JSDOM(html).window;
     const card = historyDocument.querySelector(".experience-card");
     const icon = card?.querySelector(".company-icon");
-    const identity = card?.querySelector(".company-identity");
+    const header = card?.querySelector(".experience-card-header");
 
-    expect(icon?.classList.contains("size-10")).toBe(true);
-    expect(icon?.classList.contains("shrink-0")).toBe(true);
-    expect(icon?.classList.contains("object-contain")).toBe(true);
-    expect(icon?.getAttribute("width")).toBe("40");
-    expect(icon?.getAttribute("height")).toBe("40");
-    expect(identity?.classList.contains("flex")).toBe(true);
-    expect(identity?.classList.contains("min-w-0")).toBe(true);
-    expect(identity?.classList.contains("items-center")).toBe(true);
-    expect(identity?.classList.contains("gap-3")).toBe(true);
+    expect(icon?.className).toContain("min-[601px]:size-32");
+    expect(icon?.className).toContain("min-[601px]:aspect-square");
+    expect(icon?.className).toContain("object-contain");
+    expect(icon?.className).toContain("w-full");
+    expect(icon?.className).toContain("h-auto");
+    expect(icon?.getAttribute("width")).toBe("128");
+    expect(icon?.getAttribute("height")).toBe("128");
+    expect(header?.classList.contains("flex")).toBe(true);
+    expect(header?.classList.contains("flex-col")).toBe(true);
+    expect(header?.className).toContain("min-[601px]:flex-row");
+    expect(header?.classList.contains("gap-4")).toBe(true);
   });
 });
