@@ -157,7 +157,7 @@
   --card-surface: var(--color-surface);
 
   /* Heading (display/section/card variants; semantic level is independent) */
-  --heading-display-size: clamp(2rem, 5vw, 2.75rem);
+  --heading-display-size: 2rem;
   --heading-display-weight: var(--type-weight-bold);
   --heading-display-leading: 1.2;
   --heading-display-tracking: -0.025em;
