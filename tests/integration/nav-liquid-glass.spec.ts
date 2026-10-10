@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { withBase } from "./helpers/site";
 
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -97,7 +98,7 @@ async function focusViaKeyboard(page: Page, target: Locator): Promise<void> {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  await page.goto(withBase("/"));
   await expect(
     page.getByRole("navigation", { name: "Navegación por secciones" }),
   ).toHaveAttribute("data-positioned", "true");
@@ -399,7 +400,7 @@ test.describe("fallbacks", () => {
       await route.fulfill({ response, body: rewritten });
     });
 
-    await page.goto("/");
+    await page.goto(withBase("/"));
     await expect(
       page.getByRole("navigation", { name: "Navegación por secciones" }),
     ).toHaveAttribute("data-positioned", "true");
