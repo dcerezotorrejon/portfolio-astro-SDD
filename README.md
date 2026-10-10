@@ -176,13 +176,18 @@ Chromium and runs the repository quality gates — `pnpm lint`, `pnpm format:che
 `pnpm build`, `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration` —
 before publishing; any gate failure prevents deployment.
 
-GitHub Pages must be enabled once with the GitHub Actions build type. With the
-GitHub CLI:
+Before the first deployment, a repository administrator or maintainer must enable
+GitHub Pages in **Settings → Pages → Build and deployment → Source → GitHub Actions**.
+Alternatively, use the GitHub CLI authenticated with an account authorized to
+configure Pages:
 
 ```sh
 gh api --method POST /repos/dcerezotorrejon/portfolio-astro-SDD/pages -f build_type=workflow
 ```
 
 If the Pages site already exists, use `--method PUT` instead of `--method POST`.
-The workflow also enables Pages on its first run through `actions/configure-pages`
-with `enablement: true`.
+The workflow uses `actions/configure-pages` with the default `GITHUB_TOKEN` to
+configure the existing site, not to enable it. Automatic enablement requires a
+separately privileged token; the workflow deliberately does not use one. If the
+action reports `Get Pages site failed` / `Not Found`, complete the one-time setup
+above before deploying again.

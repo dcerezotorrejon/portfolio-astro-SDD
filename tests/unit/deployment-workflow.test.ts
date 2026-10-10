@@ -268,12 +268,13 @@ describe("GitHub Pages deployment workflow", () => {
     }
   });
 
-  it("enables Pages and uploads dist only after all gates pass", () => {
+  it("configures existing Pages and uploads dist only after all gates pass", () => {
     const configureIndex = indexOfUses("actions/configure-pages@v5");
     const uploadIndex = indexOfUses("actions/upload-pages-artifact@v3");
 
     expect(configureIndex).toBeGreaterThan(indexOfRun("pnpm test:integration"));
-    expect(withOptions(steps[configureIndex]).enablement).toBe("true");
+    expect(withOptions(steps[configureIndex]).enablement).toBeUndefined();
+    expect(withOptions(steps[configureIndex]).token).toBeUndefined();
     expect(uploadIndex).toBeGreaterThan(configureIndex);
     expect(asString(withOptions(steps[uploadIndex]).path)).toBe("./dist");
   });
