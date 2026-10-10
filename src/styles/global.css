@@ -30,6 +30,9 @@
   --leading-display: var(--heading-display-leading);
   --leading-card: var(--heading-card-leading);
   --tracking-display: var(--heading-display-tracking);
+
+  /* Control motion (feeds the duration-* namespace, e.g. duration-control) */
+  --transition-duration-control: var(--duration-control);
 }
 
 /* The Open Sans @font-face is emitted from SiteLayout.astro so its src can

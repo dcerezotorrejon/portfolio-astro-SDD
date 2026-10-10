@@ -184,10 +184,15 @@ describe("T2/T10 global style contracts", () => {
       expect(css).toContain(key);
     }
 
-    // 8bb0ecb removed the custom `--transition-duration-control` @theme entry,
-    // so the raw motion token stays declared in `:root` and is not
-    // re-declared inside the generated-namespace block.
+    // The raw motion token (`--duration-control: 200ms`) stays declared in
+    // `:root`; the theme block only registers it in Tailwind's generated
+    // `--transition-duration-*` namespace so the `duration-control` utility is
+    // emitted. Re-declaring the raw `--duration-control:` token inside the
+    // generated-namespace block must not happen.
     expect(themeBlock).not.toContain("--duration-control:");
+    expect(themeBlock).toMatch(
+      /--transition-duration-control\s*:\s*var\(--duration-control\)/,
+    );
 
     // Component-specific selectors are no longer authored in global.css.
     for (const selector of [

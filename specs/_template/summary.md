@@ -11,11 +11,6 @@
 
 - `functionOrComponentName` — what changed.
 
-## Related specs
-
-- `[NNN]-[feature-slug]` — how this spec relates to it (added, modified, depends
-  on). State "None." when there are none.
-
 ## Notes
 
 Anything worth remembering for future work on this feature.
