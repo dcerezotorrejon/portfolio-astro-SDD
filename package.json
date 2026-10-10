@@ -15,8 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest",
-    "test:run": "vitest run",
-    "test:a11y": "vitest run tests/a11y",
+    "test:run": "astro sync && vitest run",
+    "test:a11y": "astro sync && vitest run tests/a11y",
     "test:integration": "pnpm build && playwright test"
   },
   "dependencies": {
