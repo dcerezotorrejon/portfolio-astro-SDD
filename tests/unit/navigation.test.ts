@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getActiveSectionIndex,
+  hasReachedActivation,
   prefersReducedMotion,
   scrollToSection,
 } from "../../src/components/home/FloatingNav/helpers/navigation";
@@ -109,6 +110,27 @@ describe("getActiveSectionIndex (section-start activation)", () => {
     expect(getActiveSectionIndex(list, 100, 1)).toBe(1);
     expect(getActiveSectionIndex(list, 120)).toBe(1);
     expect(getActiveSectionIndex(list, 120, 5)).toBe(2);
+  });
+});
+
+describe("hasReachedActivation (indicator hold release threshold)", () => {
+  it("treats a top at or above the 16px inset plus 1px tolerance as reached", () => {
+    expect(hasReachedActivation(0)).toBe(true);
+    expect(hasReachedActivation(16)).toBe(true);
+    expect(hasReachedActivation(16.4)).toBe(true);
+    expect(hasReachedActivation(17)).toBe(true);
+  });
+
+  it("treats a top past the tolerance band as not reached", () => {
+    expect(hasReachedActivation(17.1)).toBe(false);
+    expect(hasReachedActivation(300)).toBe(false);
+  });
+
+  it("honors a custom activation offset and tolerance", () => {
+    expect(hasReachedActivation(101, 100, 0)).toBe(false);
+    expect(hasReachedActivation(101, 100, 1)).toBe(true);
+    expect(hasReachedActivation(120, 120)).toBe(true);
+    expect(hasReachedActivation(126, 120, 5)).toBe(false);
   });
 });
 
