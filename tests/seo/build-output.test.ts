@@ -54,7 +54,6 @@ describe("built output base-prefixed URLs", () => {
         "/fonts/open-sans-latin.woff2",
         "/icons/github.svg#icon",
         "/icons/linkedin.svg#icon",
-        "/images/profile-placeholder.svg",
         "/images/companies/babel.svg",
         "/images/companies/nttdata.svg",
       ];
@@ -62,6 +61,9 @@ describe("built output base-prefixed URLs", () => {
       for (const ref of requiredHomeRefs) {
         expect(home, ref).toContain(`${base}${ref}`);
       }
+
+      // 024 routes the profile image through astro:assets (hashed name under _astro).
+      expect(home).toContain(`${base}/_astro/profile-photo`);
 
       // No root-absolute asset reference may omit the base on any built page.
       const htmlFiles = await collectHtmlFiles("dist");
