@@ -198,8 +198,28 @@ task entry, and marks only verified acceptance checkboxes in `spec.md`.
 ## Final gate report
 
 - Owner: QA records the Lead's final results; Lead runs and owns the decision.
-- Scope: complete increment relative to `main` @ `1552b36` (committed, staged,
-  unstaged, untracked).
+- Scope: complete `027-deploy-github-pages` increment relative to feature base
+  `1552b36`, merged with `main` @ `30eff37` into HEAD `010f754`.
 - Required gates: `pnpm lint`, `pnpm format:check`, `pnpm build`, `pnpm test:run`,
   `pnpm test:a11y`, `pnpm test:integration`.
-- Report: _pending_
+- Report: **Final gates PASS** — 2026-10-10, branch `spec/027-deploy-github-pages`
+  @ `010f754` (merge of `main` @ `30eff37` into feature head `32c02c1`; feature
+  base `1552b36`). Scope verified: the complete increment relative to base
+  `1552b36` — `astro.config.mjs`, `src/lib/base-url.ts`,
+  `src/layouts/SiteLayout.astro`, `src/styles/global.css`,
+  `src/components/atoms/Icon.astro`,
+  `src/components/home/ProfileIntroduction.astro`,
+  `src/components/home/ExperienceHistory.astro`,
+  `src/pages/experiencia/[slug].astro`, `playwright.config.ts`,
+  `.github/workflows/deploy.yml`, `README.md`, and the `tests/**` changes —
+  integrated with `main` @ `30eff37`.
+  - `pnpm lint` → PASS.
+  - `pnpm format:check` → PASS.
+  - `pnpm build` → PASS (3 pages + sitemap).
+  - `pnpm test:run` → PASS (29 files / 185 tests).
+  - `pnpm test:a11y` → PASS (4 files / 5 tests).
+  - `pnpm test:integration` → PASS (24 tests, clean port). Integration is
+    applicable: the increment changes routing/rendering/config and the
+    integration suite tooling.
+  - Result: all applicable gates pass; no defects. (Results supplied by the Dev
+    Lead, who runs and owns the final feature gates.)

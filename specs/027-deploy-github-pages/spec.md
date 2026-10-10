@@ -1,7 +1,7 @@
 # GitHub Pages Deployment
 
 - **Spec ID**: `027-deploy-github-pages`
-- **Status**: draft
+- **Status**: done
 - **Last updated**: 2026-10-10
 
 > Keep this increment's spec anchored to code while it is active. On closure
@@ -103,7 +103,7 @@ this spec defines only the increment's requirements and acceptance criteria.
 - [x] AC5: `.github/workflows/deploy.yml` exists and is valid YAML; it triggers on `push` to `main`, installs with pnpm and the frozen lockfile, installs Chromium, runs the R5 gates (including `pnpm test:integration`), enables Pages with `actions/configure-pages` and `enablement: true`, uploads `dist/`, and deploys with `actions/deploy-pages`.
 - [x] AC6: The README documents the deployed URL and the one-time `gh` Pages activation command.
 - [x] AC7: No `CNAME` file exists at the repository root or in `public/`.
-- [ ] AC8: The full applicable gate set passes: `pnpm lint`, `pnpm format:check`, `pnpm build`, `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration`.
+- [x] AC8: The full applicable gate set passes: `pnpm lint`, `pnpm format:check`, `pnpm build`, `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration`.
 
 ## Verification
 
