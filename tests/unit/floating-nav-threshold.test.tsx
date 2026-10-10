@@ -338,4 +338,156 @@ describe("FloatingNav section-start threshold", () => {
       "0",
     );
   });
+
+  function stubSmoothScroll(...ids: string[]) {
+    for (const id of ids) {
+      const section = document.getElementById(id) as HTMLElement;
+      section.scrollIntoView = vi.fn();
+    }
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false })),
+    );
+  }
+
+  it("holds the activated target across in-flight scroll measurements until it reaches the inset", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    render(<FloatingNav sections={domOrderSections} />);
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+
+    stubSmoothScroll("contacto");
+    fireEvent.click(navLink("Contacto"));
+    // Optimistic selection: the indicator moves immediately on activation.
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(screen.getByRole("navigation")).toHaveAttribute(
+      "data-active-index",
+      "2",
+    );
+
+    // The smooth scroll is mid-flight: "contacto" is still far below the
+    // inset. Measurements during this window must not revert to the origin.
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Inicio")).not.toHaveAttribute("aria-current");
+
+    // A second in-flight measurement keeps holding the target.
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(screen.getByRole("navigation")).toHaveAttribute(
+      "data-active-index",
+      "2",
+    );
+  });
+
+  it("keeps the hold past 17.1px, releases it at 17px, then lets geometry govern again", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    render(<FloatingNav sections={domOrderSections} />);
+    flushFrame();
+
+    stubSmoothScroll("contacto");
+    fireEvent.click(navLink("Contacto"));
+
+    // 17.1 px misses the 16 + 1 threshold: the hold still pins "contacto"
+    // even though geometry alone would fall back to "inicio".
+    setTop("contacto", 17.1);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Inicio")).not.toHaveAttribute("aria-current");
+
+    // 17 px reaches the inset: the hold releases and geometry keeps "contacto".
+    setTop("contacto", 17);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+
+    // The hold is gone, so geometry drives again: scrolling away from the
+    // target restores the origin section.
+    setTop("contacto", 400);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Contacto")).not.toHaveAttribute("aria-current");
+  });
+
+  it("releases the hold on wheel so geometry takes over immediately", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    render(<FloatingNav sections={domOrderSections} />);
+    flushFrame();
+
+    stubSmoothScroll("contacto");
+    fireEvent.click(navLink("Contacto"));
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+
+    // A user wheel takes over from the programmatic scroll: geometry (still
+    // at the origin) governs and the indicator returns to "inicio".
+    act(() => window.dispatchEvent(new Event("wheel")));
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Contacto")).not.toHaveAttribute("aria-current");
+  });
+
+  it("releases the hold on a scroll keydown but ignores non-scroll keys", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    render(<FloatingNav sections={domOrderSections} />);
+    flushFrame();
+
+    stubSmoothScroll("contacto");
+    fireEvent.click(navLink("Contacto"));
+
+    // A non-scroll key must not disturb the hold.
+    act(() =>
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab" })),
+    );
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+
+    // A scroll key (Enter/PageDown/Home/End/Space/arrows) releases it.
+    act(() =>
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown" })),
+    );
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Contacto")).not.toHaveAttribute("aria-current");
+  });
+
+  it("retargets an active hold to a newly activated section", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    render(<FloatingNav sections={domOrderSections} />);
+    flushFrame();
+
+    stubSmoothScroll("trayectoria", "contacto");
+    fireEvent.click(navLink("Trayectoria"));
+    expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
+
+    // Activate a different section while the first hold is still in flight.
+    fireEvent.click(navLink("Contacto"));
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+
+    // Subsequent in-flight measurements keep the newest target, not the
+    // previous one.
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    setTop("contacto", 600);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Contacto")).toHaveAttribute("aria-current", "location");
+    expect(navLink("Trayectoria")).not.toHaveAttribute("aria-current");
+  });
 });

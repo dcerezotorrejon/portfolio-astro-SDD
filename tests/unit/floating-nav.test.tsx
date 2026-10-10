@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { act, cleanup, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { JSDOM } from "jsdom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -503,5 +509,40 @@ describe("FloatingNav", () => {
     unmount();
 
     expect(observerInstances[0]?.disconnected).toBe(true);
+  });
+
+  it("does not hold on a reduced-motion activation, leaving geometry in charge", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    render(<FloatingNav sections={initialSections} />);
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+
+    const trayectoria = document.getElementById("trayectoria") as HTMLElement;
+    const scrollIntoView = vi.fn();
+    trayectoria.scrollIntoView = scrollIntoView;
+    const pushState = vi.spyOn(window.history, "pushState");
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: true })),
+    );
+
+    // Reduced motion falls through to the native anchor: no interception and
+    // no optimistic selection (so no hold is set).
+    fireEvent.click(navLink("Trayectoria"));
+    expect(pushState).not.toHaveBeenCalled();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
+
+    // Geometry still governs in both directions without a hold.
+    setTop("trayectoria", 16);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
+
+    setTop("trayectoria", 300);
+    act(() => window.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(navLink("Inicio")).toHaveAttribute("aria-current", "location");
   });
 });
