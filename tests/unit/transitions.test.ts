@@ -78,7 +78,9 @@ describe("native experience view transitions", () => {
       });
       const { document: detail } = new JSDOM(detailHtml).window;
       const overviewCard = overviewCards.find((element) =>
-        element.querySelector(`a[href="/experiencia/${slug}/"]`),
+        element.querySelector(
+          `a[href="/portfolio-astro-SDD/experiencia/${slug}/"]`,
+        ),
       );
       const detailCard = detail.querySelector<HTMLElement>(
         "article.experience-detail-card",
@@ -204,10 +206,10 @@ describe("native experience view transitions", () => {
     const { document: history } = new JSDOM(historyHtml).window;
     const { document: detail } = new JSDOM(detailHtml).window;
     const cardLink = history.querySelector<HTMLAnchorElement>(
-      `a[href="/experiencia/${entry.data.slug}/"]`,
+      `a[href="/portfolio-astro-SDD/experiencia/${entry.data.slug}/"]`,
     );
     const returnLink = detail.querySelector<HTMLAnchorElement>(
-      'a[href="/#trayectoria"]',
+      'a[href="/portfolio-astro-SDD/#trayectoria"]',
     );
 
     expect(cardLink?.getAttribute("target")).toBeNull();

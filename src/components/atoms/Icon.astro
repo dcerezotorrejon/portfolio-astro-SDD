@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import { withBase } from "../../lib/base-url";
 import { iconMap, type IconName } from "./iconMap";
 
 type Props = {
@@ -8,10 +9,11 @@ type Props = {
 } & Omit<HTMLAttributes<"svg">, "class">;
 
 const { name, class: className, ...rest } = Astro.props;
+const href = withBase(iconMap[name]);
 ---
 
 <svg class:list={["icon size-4", className]} {...rest}>
-  <use href={iconMap[name]} />
+  <use href={href} />
 </svg>
 
 <style>

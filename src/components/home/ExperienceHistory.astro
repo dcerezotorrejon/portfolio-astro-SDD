@@ -10,6 +10,7 @@ import {
 import TechnologyBadges from "./TechnologyBadges.astro";
 import Heading from "../../components/molecules/Heading.astro";
 import Button from "../../components/molecules/Button.astro";
+import { withBase } from "../../lib/base-url";
 
 interface ExperienceRecord {
   data: ExperienceData;
@@ -43,7 +44,7 @@ const { experiences, profile } = Astro.props;
             <img
               loading="lazy"
               class="company-icon w-full h-auto min-[601px]:size-32 min-[601px]:aspect-square min-[601px]:shrink-0 object-contain"
-              src={companyIcon.src}
+              src={withBase(companyIcon.src)}
               alt={companyIcon.alt}
               width="128"
               height="128"
@@ -63,7 +64,7 @@ const { experiences, profile } = Astro.props;
           <div class="flex justify-end">
             <Button
               variant="primary"
-              href={`/experiencia/${slug}/`}
+              href={withBase(`/experiencia/${slug}/`)}
               aria-label={`${profile.moreInfoLabel} sobre ${role} en ${company} (${startYear})`}
             >
               {profile.moreInfoLabel}

@@ -238,13 +238,13 @@ describe("T9 rendered primary actions", () => {
         className: "icon size-4 text-white",
         ariaHidden: "true",
         focusable: "false",
-        href: "/icons/github.svg#icon",
+        href: "/portfolio-astro-SDD/icons/github.svg#icon",
       },
       {
         className: "icon size-4 text-white",
         ariaHidden: "true",
         focusable: "false",
-        href: "/icons/linkedin.svg#icon",
+        href: "/portfolio-astro-SDD/icons/linkedin.svg#icon",
       },
     ]);
     // No inline color overrides on the rendered buttons.
@@ -279,7 +279,9 @@ describe("T9 rendered primary actions", () => {
       );
 
       expect(returnLinks).toHaveLength(1);
-      expect(returnLinks[0]?.getAttribute("href")).toBe("/#trayectoria");
+      expect(returnLinks[0]?.getAttribute("href")).toBe(
+        "/portfolio-astro-SDD/#trayectoria",
+      );
       // The rendered markup carries no hardcoded colors or portfolio data.
       expect(returnLinks[0]?.hasAttribute("style")).toBe(false);
       expect(returnLinks[0]?.querySelector("svg")).toBeNull();

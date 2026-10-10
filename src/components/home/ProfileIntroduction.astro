@@ -3,6 +3,7 @@ import type { ProfileData } from "../../content/parsers/content-schema";
 import Heading from "../../components/molecules/Heading.astro";
 import Button from "../../components/molecules/Button.astro";
 import Icon from "../../components/atoms/Icon.astro";
+import { withBase } from "../../lib/base-url";
 
 interface Props {
   profile: ProfileData;
@@ -18,7 +19,7 @@ const { profile } = Astro.props;
 >
   <img
     class="profile-image aspect-square w-[min(200px,100%)] shrink-0 self-center rounded-card object-cover md:w-[240px] md:self-auto"
-    src={profile.image.src}
+    src={withBase(profile.image.src)}
     alt={profile.image.alt}
     width="240"
     height="240"

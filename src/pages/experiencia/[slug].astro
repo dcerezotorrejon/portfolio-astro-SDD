@@ -11,6 +11,7 @@ import {
   resolveCompanyIcon,
 } from "../../content/parsers/content";
 import type { ProfileData } from "../../content/parsers/content-schema";
+import { withBase } from "../../lib/base-url";
 
 interface Props {
   experience: CollectionEntry<"experience">;
@@ -48,7 +49,7 @@ const companyIcon = resolveCompanyIcon(experience);
       <header class="experience-detail-header flex flex-col gap-4 min-[601px]:flex-row min-[601px]:items-center">
         <img
           class="company-icon w-full h-auto min-[601px]:size-32 min-[601px]:aspect-square min-[601px]:shrink-0 object-contain"
-          src={companyIcon.src}
+          src={withBase(companyIcon.src)}
           alt={companyIcon.alt}
           width="128"
           height="128"
@@ -67,7 +68,7 @@ const companyIcon = resolveCompanyIcon(experience);
           <Content />
         </div>
         <div class="flex justify-end">
-          <Button variant="primary" href="/#trayectoria">
+          <Button variant="primary" href={withBase("/#trayectoria")}>
             {profile.backLabel}
           </Button>
         </div>

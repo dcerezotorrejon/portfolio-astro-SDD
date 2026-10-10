@@ -3,13 +3,15 @@ import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
+import { BASE, SITE } from "./src/lib/base-url.ts";
 
-// TODO: replace with the real production domain before deploying.
-export const site = "https://example.com";
+export const site = SITE;
+export const base = BASE;
 
 // https://astro.build/config
 export default defineConfig({
   site,
+  base,
   integrations: [sitemap(), react({ compiler: true })],
   vite: {
     plugins: [tailwindcss()],

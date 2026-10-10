@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { withBase } from "./helpers/site";
 
 interface LayoutSelectors {
   card: string;
@@ -16,21 +17,21 @@ interface LayoutCase extends LayoutSelectors {
 const cases: LayoutCase[] = [
   {
     name: "home card",
-    path: "/",
+    path: withBase("/"),
     card: "#trayectoria .experience-card",
     header: ".experience-card-header",
     text: ".experience-card-text",
     description: ".experience-summary",
-    button: 'a[href^="/experiencia/"]',
+    button: `a[href^="${withBase("/experiencia/")}"]`,
   },
   {
     name: "detail page",
-    path: "/experiencia/babel-senior-frontend-engineer/",
+    path: withBase("/experiencia/babel-senior-frontend-engineer/"),
     card: "article.experience-detail-card",
     header: ".experience-detail-header",
     text: ".experience-detail-text",
     description: ".experience-detail-body",
-    button: 'a[href="/#trayectoria"]',
+    button: `a[href="${withBase("/#trayectoria")}"]`,
   },
 ];
 
@@ -150,10 +151,10 @@ function expectButtonRightAligned(m: LayoutMeasurement): void {
 
 test.describe("display heading size (R8/AC8)", () => {
   const displayHeadings = [
-    { name: "home name", path: "/", selector: "#profile-name" },
+    { name: "home name", path: withBase("/"), selector: "#profile-name" },
     {
       name: "detail role",
-      path: "/experiencia/babel-senior-frontend-engineer/",
+      path: withBase("/experiencia/babel-senior-frontend-engineer/"),
       selector: ".experience-detail-header h1",
     },
   ];

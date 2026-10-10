@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { basePath, withBase } from "./helpers/site";
 
 test("pointer and keyboard navigation track both sections and detail return", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto(withBase("/"));
 
   const navigation = page.getByRole("navigation", {
     name: "Navegación por secciones",
@@ -29,7 +30,7 @@ test("pointer and keyboard navigation track both sections and detail return", as
   await expect(profileSection).toBeInViewport();
   await expect(profileLink).toHaveAttribute("aria-current", "location");
 
-  await page.goto("/");
+  await page.goto(withBase("/"));
   await expect(navigation).toHaveAttribute("data-positioned", "true");
   await profileLink.focus();
   await page.keyboard.press("Enter");
@@ -58,7 +59,7 @@ test("pointer and keyboard navigation track both sections and detail return", as
 test("home → detail → home round-trip stays client-side without a full reload", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto(withBase("/"));
 
   // Seed a window-scoped marker after the initial document load. A full
   // document reload replaces `window` and clears the marker, while an
@@ -74,7 +75,7 @@ test("home → detail → home round-trip stays client-side without a full reloa
     .first()
     .getByRole("link");
   const detailHref = await detailLink.getAttribute("href");
-  expect(detailHref).toMatch(/^\/experiencia\/.+\/$/);
+  expect(detailHref).toMatch(new RegExp(`^${basePath}/experiencia/.+/$`));
 
   await detailLink.click();
   await expect(page).toHaveURL(new RegExp(`${detailHref}$`));

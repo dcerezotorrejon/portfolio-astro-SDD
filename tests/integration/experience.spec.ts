@@ -1,20 +1,23 @@
 import { expect, test } from "@playwright/test";
 import { experiences } from "./helpers/content";
+import { withBase } from "./helpers/site";
 
 test("every experience entry opens its matching detail and returns to the list", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto(withBase("/"));
   const section = page.locator("#trayectoria");
   for (const experience of experiences) {
     const card = section.locator("article").filter({
-      has: page.locator(`a[href="/experiencia/${experience.slug}/"]`),
+      has: page.locator(
+        `a[href="${withBase(`/experiencia/${experience.slug}/`)}"]`,
+      ),
     });
     await expect(card).toBeVisible();
     const link = card.getByRole("link");
     await expect(link).toHaveAttribute(
       "href",
-      `/experiencia/${experience.slug}/`,
+      withBase(`/experiencia/${experience.slug}/`),
     );
     await link.click();
     await expect(page).toHaveURL(

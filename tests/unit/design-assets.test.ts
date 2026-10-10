@@ -57,15 +57,26 @@ describe("T2 local design assets", () => {
     );
   });
 
-  it("declares a local, non-blocking Open Sans variable face with Spanish Latin coverage", () => {
-    const fontFace = css.match(/@font-face\s*\{([^}]*)\}/s)?.[1] ?? "";
+  it("declares a local, non-blocking Open Sans variable face with Spanish Latin coverage under the deployment base", async () => {
+    // Plain CSS cannot read the build-time base, so the @font-face is emitted
+    // from SiteLayout.astro with the base-prefixed URL baked in.
+    expect(css).not.toMatch(/@font-face\s*\{/);
+
+    const homeHtml = await render(Home);
+    const { document } = new JSDOM(homeHtml).window;
+    const fontFaceStyle =
+      Array.from(document.querySelectorAll("style"))
+        .map((style) => style.textContent ?? "")
+        .find((text) => text.includes("@font-face")) ?? "";
+    const fontFace =
+      fontFaceStyle.match(/@font-face\s*\{([^}]*)\}/s)?.[1] ?? "";
 
     expect(fontFace).not.toBe("");
     expect(fontFace).toMatch(/font-family:\s*["']Open Sans["']/);
     expect(fontFace).toMatch(/font-weight:\s*400\s+700/);
     expect(fontFace).toMatch(/font-display:\s*swap/);
     expect(fontFace).toMatch(
-      /src:\s*url\(["']?\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
+      /src:\s*url\(["']?\/portfolio-astro-SDD\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
     );
     expect(fontFace).toMatch(/unicode-range:[\s\S]*U\+0000-00FF/);
     expect(fontFace).not.toMatch(/https?:|\/\//i);

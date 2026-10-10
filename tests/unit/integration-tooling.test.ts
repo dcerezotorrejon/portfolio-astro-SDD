@@ -14,7 +14,12 @@ describe("Playwright/Vitest separation and managed browser runner", () => {
     expect(config).toContain('name: "chromium"');
     expect(config).toContain("reuseExistingServer: false");
     expect(config).toContain("--strictPort");
-    expect(config).toContain('baseURL: "http://127.0.0.1:4321"');
+    expect(config).toContain(
+      'baseURL: "http://127.0.0.1:4321/portfolio-astro-SDD"',
+    );
+    expect(config).toContain(
+      'url: "http://127.0.0.1:4321/portfolio-astro-SDD"',
+    );
     expect(config).toContain('ASTRO_PREVIEW_BACKGROUND: "1"');
     expect(config).toContain('signal: "SIGTERM"');
     expect(config).toContain("timeout: 5_000");
