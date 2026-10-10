@@ -310,7 +310,7 @@ export default function FloatingNav({
 
   return (
     <nav
-      className="floating-nav group fixed inset-x-0 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-[min(360px,calc(100%-32px))] rounded-pill border border-[rgb(15_20_25/8%)] bg-surface p-1 shadow-[0_4px_20px_rgb(15_20_25/14%)] data-[focus-obscured=true]:pointer-events-none data-[focus-obscured=true]:opacity-0"
+      className="floating-nav group fixed inset-x-0 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-[min(360px,calc(100%-32px))] rounded-pill border border-[rgb(15_20_25/8%)] nav-glass p-1 shadow-[0_4px_20px_rgb(15_20_25/14%)] data-[focus-obscured=true]:pointer-events-none data-[focus-obscured=true]:opacity-0"
       aria-label={ariaLabel}
       data-active-index={activeIndex}
       data-positioned={isPositioned ? "true" : "false"}
