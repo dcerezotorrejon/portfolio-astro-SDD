@@ -1,7 +1,7 @@
 # Navigator indicator selection during in-page scrolling
 
 - **Spec ID**: `025-nav-indicator-sync`
-- **Status**: in progress
+- **Status**: done
 - **Last updated**: 2026-10-10
 
 > Keep this increment's spec anchored to code while it is active. On closure
@@ -77,22 +77,22 @@ scrolling by the user must still drive the indicator from real geometry.
 
 ## Acceptance criteria
 
-- [ ] AC1: On activating "Trayectoria" from the top, the "Trayectoria" link is
+- [x] AC1: On activating "Trayectoria" from the top, the "Trayectoria" link is
       current (`aria-current="location"`), the navigator active index is the
       target index, and the indicator has started its transition before the page
       scroll has reached the target.
-- [ ] AC2: During that scroll — from the activation until the target section
+- [x] AC2: During that scroll — from the activation until the target section
       reaches the 16 px inset — the navigator never reverts to "Inicio"; once
       the scroll settles on the target, the selection is still "Trayectoria".
-- [ ] AC3: After the same activation, a manual scroll performed before reaching
+- [x] AC3: After the same activation, a manual scroll performed before reaching
       the target makes the indicator follow real geometry again (for example, it
       returns to "Inicio" when scrolled back to the top).
-- [ ] AC4: Activating a different section while the first hold is active
+- [x] AC4: Activating a different section while the first hold is active
       retargets the selection and indicator to the second section.
-- [ ] AC5: With `prefers-reduced-motion: reduce`, activating a section selects
+- [x] AC5: With `prefers-reduced-motion: reduce`, activating a section selects
       it, the page positions without smooth animation, and the indicator shows
       the target state.
-- [ ] AC6: Existing activation rules are unchanged: downward and upward inset
+- [x] AC6: Existing activation rules are unchanged: downward and upward inset
       crossings, tie-to-later resolution, and pre-paint fragment selection all
       behave as before.
 
