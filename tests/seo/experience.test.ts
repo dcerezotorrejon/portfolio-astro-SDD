@@ -5,7 +5,10 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
+import { base, site } from "../../astro.config.mjs";
 import { getContainer } from "../helpers/render";
+
+const canonicalBase = `${site}${base}`;
 
 const routeMetadata = [
   {
@@ -34,7 +37,7 @@ async function renderExperience(slug: string): Promise<string> {
   const container = await getContainer();
   return container.renderToString(ExperienceDetail, {
     props: { experience, profile: profile.data },
-    request: new Request(`https://example.com/experiencia/${slug}/`),
+    request: new Request(new URL(`${base}/experiencia/${slug}/`, site)),
   });
 }
 
@@ -55,7 +58,7 @@ describe("experience detail SEO", () => {
       expect(descriptions[0]?.getAttribute("content")).toBe(description);
       expect(canonicals).toHaveLength(1);
       expect(canonicals[0]?.getAttribute("href")).toBe(
-        `https://example.com/experiencia/${slug}/`,
+        `${canonicalBase}/experiencia/${slug}/`,
       );
     },
   );
@@ -74,7 +77,7 @@ describe("experience detail SEO", () => {
         expect(document.title).toBe(title);
         expect(
           document.querySelector('link[rel="canonical"]')?.getAttribute("href"),
-        ).toBe(`https://example.com/experiencia/${slug}/`);
+        ).toBe(`${canonicalBase}/experiencia/${slug}/`);
         expect(
           document
             .querySelector("[data-experience-slug]")
@@ -83,7 +86,7 @@ describe("experience detail SEO", () => {
         expect(document.querySelector(".floating-nav")).toBeNull();
         expect(document.querySelectorAll("astro-island")).toHaveLength(0);
         expect(sitemap).toContain(
-          `<loc>https://example.com/experiencia/${slug}/</loc>`,
+          `<loc>${canonicalBase}/experiencia/${slug}/</loc>`,
         );
       }
     },

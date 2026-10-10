@@ -83,14 +83,14 @@ describe("home page", () => {
         className: "icon size-4 text-white",
         hidden: "true",
         focusable: "false",
-        symbol: "/icons/github.svg#icon",
+        symbol: "/portfolio-astro-SDD/icons/github.svg#icon",
         visibleLabel: "GitHub",
       },
       {
         className: "icon size-4 text-white",
         hidden: "true",
         focusable: "false",
-        symbol: "/icons/linkedin.svg#icon",
+        symbol: "/portfolio-astro-SDD/icons/linkedin.svg#icon",
         visibleLabel: "LinkedIn",
       },
     ]);
@@ -137,14 +137,14 @@ describe("home page", () => {
     ).toEqual([
       {
         loading: "lazy",
-        src: "/images/companies/babel.svg",
+        src: "/portfolio-astro-SDD/images/companies/babel.svg",
         alt: "Logotipo de Babel Sistemas de Información",
         width: "128",
         height: "128",
       },
       {
         loading: "lazy",
-        src: "/images/companies/nttdata.svg",
+        src: "/portfolio-astro-SDD/images/companies/nttdata.svg",
         alt: "Logotipo de NTTData Europe & LATAM",
         width: "128",
         height: "128",
@@ -153,8 +153,8 @@ describe("home page", () => {
     expect(
       cards.map((card) => card.querySelector("a")?.getAttribute("href")),
     ).toEqual([
-      "/experiencia/babel-senior-frontend-engineer/",
-      "/experiencia/nttdata-lead-engineer/",
+      "/portfolio-astro-SDD/experiencia/babel-senior-frontend-engineer/",
+      "/portfolio-astro-SDD/experiencia/nttdata-lead-engineer/",
     ]);
 
     const getCardContent = (card: HTMLElement) => ({

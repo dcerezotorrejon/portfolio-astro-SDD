@@ -17,6 +17,9 @@
   --radius-pill: var(--radius-pill);
   --radius-card: var(--radius-card);
 
+  /* Blur radius (feeds the backdrop-blur-* namespace) */
+  --blur-nav: var(--nav-glass-blur);
+
   /* Type size (text-* utilities) */
   --text-24: var(--type-size-24);
   --text-32: var(--type-size-32);
@@ -29,18 +32,8 @@
   --tracking-display: var(--heading-display-tracking);
 }
 
-@font-face {
-  font-family: "Open Sans";
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url("/fonts/open-sans-latin.woff2") format("woff2");
-  /* Latin subset covers Spanish's accented letters and punctuation. */
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
-    U+2215, U+FEFF, U+FFFD;
-}
+/* The Open Sans @font-face is emitted from SiteLayout.astro so its src can
+   carry the configured deployment base (see src/lib/base-url.ts). */
 
 /* ==========================================================================
    Design tokens
@@ -208,6 +201,13 @@
   --nav-indicator-radius: var(--radius-pill);
   /* Shared primary blue keeps the active label at >= 4.5:1 contrast. */
   --nav-indicator-background: var(--color-button);
+  /* Liquid-glass navigator surface: the opaque surface (--color-surface,
+     #ffffff) at 70% alpha, inside the approved 0.55-0.85 subtlety range, plus
+     a backdrop blur. The opaque --nav-surface stays as the fallback when
+     backdrop-filter is unsupported or the visitor requests reduced
+     transparency. */
+  --nav-glass-surface: rgb(255 255 255 / 0.7);
+  --nav-glass-blur: 12px;
 }
 
 @layer base {
@@ -270,6 +270,31 @@
 @utility site-container {
   width: min(var(--content-width), calc(100% - 2 * var(--page-gutter)));
   margin-inline: auto;
+}
+
+/* Liquid-glass floating navigator surface: translucency plus a backdrop blur
+   only (no gradients, no motion). The base is the frosted surface; the two
+   branches restore the opaque --nav-surface when `backdrop-filter` is
+   unsupported or the visitor requests reduced transparency, so layout,
+   contrast and focus stay intact in every case. */
+@utility nav-glass {
+  background-color: var(--nav-glass-surface);
+  -webkit-backdrop-filter: blur(var(--nav-glass-blur));
+  backdrop-filter: blur(var(--nav-glass-blur));
+
+  @supports not (
+    (backdrop-filter: blur(0px)) or (-webkit-backdrop-filter: blur(0px))
+  ) {
+    background-color: var(--nav-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--nav-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .home-main {

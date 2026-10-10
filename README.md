@@ -5,9 +5,8 @@ introduces the profile and professional experience; each experience entry also h
 its own detail page. Profile and experience content is sourced from validated
 Markdown collections, while the site is statically rendered by default.
 
-> **Content and deployment are still provisional.** Replace the sample profile,
-> experience entries, social links, and `https://example.com` site URL before
-> publishing as a real portfolio.
+> **Content is still provisional.** Replace the sample profile, experience
+> entries, and social links before publishing as a real portfolio.
 
 ## Technology
 
@@ -159,6 +158,31 @@ See [`specs/README.md`](specs/README.md) for spec conventions and
 
 ## Site configuration
 
-The canonical site URL is configured as `site` in `astro.config.mjs` and is
-currently `https://example.com`. Set it to the production domain before deployment
-so canonical URLs and the sitemap use the correct origin.
+The canonical site URL is configured as
+`site = "https://dcerezotorrejon.github.io"` in `astro.config.mjs`, together with
+`base = "/portfolio-astro-SDD"`. The site is published at
+`https://dcerezotorrejon.github.io/portfolio-astro-SDD/`, so canonical URLs and
+the sitemap use that origin and base.
+
+## Deployment
+
+The site is published with GitHub Pages at
+`https://dcerezotorrejon.github.io/portfolio-astro-SDD/`.
+
+Deployment is automated by `.github/workflows/deploy.yml`, which triggers only on
+a `push` to `main`; a push to `main` is required to deploy a new build, and the
+feature branch stays unmerged until it is approved. The workflow installs
+Chromium and runs the repository quality gates — `pnpm lint`, `pnpm format:check`,
+`pnpm build`, `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration` —
+before publishing; any gate failure prevents deployment.
+
+GitHub Pages must be enabled once with the GitHub Actions build type. With the
+GitHub CLI:
+
+```sh
+gh api --method POST /repos/dcerezotorrejon/portfolio-astro-SDD/pages -f build_type=workflow
+```
+
+If the Pages site already exists, use `--method PUT` instead of `--method POST`.
+The workflow also enables Pages on its first run through `actions/configure-pages`
+with `enablement: true`.

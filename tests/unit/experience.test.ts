@@ -25,7 +25,7 @@ describe("experience detail routes", () => {
       role: "Senior Software Engineer (Frontend)",
       company: "Babel Sistemas de Información",
       icon: {
-        src: "/images/companies/babel.svg",
+        src: "/portfolio-astro-SDD/images/companies/babel.svg",
         alt: "Logotipo de Babel Sistemas de Información",
       },
       dateRange: "febrero de 2022 – actualidad",
@@ -44,7 +44,7 @@ describe("experience detail routes", () => {
       role: "Lead Engineer",
       company: "NTTData Europe & LATAM",
       icon: {
-        src: "/images/companies/nttdata.svg",
+        src: "/portfolio-astro-SDD/images/companies/nttdata.svg",
         alt: "Logotipo de NTTData Europe & LATAM",
       },
       dateRange: "julio de 2017 – enero de 2022",
@@ -79,7 +79,9 @@ describe("experience detail routes", () => {
       );
       const body = card?.querySelector<HTMLElement>(".experience-detail-body");
       const description = body?.querySelector(".detail-content");
-      const returnLink = body?.querySelector('a[href="/#trayectoria"]');
+      const returnLink = body?.querySelector(
+        'a[href="/portfolio-astro-SDD/#trayectoria"]',
+      );
 
       expect(document.documentElement.lang).toBe("es");
       expect(document.querySelectorAll("h1")).toHaveLength(1);
@@ -139,7 +141,9 @@ describe("experience detail routes", () => {
       ).toContain(contentSnippet);
       expect(document.querySelector(".provisional-notice")).toBeNull();
       expect(
-        document.querySelector('a[href="/#trayectoria"]')?.textContent?.trim(),
+        document
+          .querySelector('a[href="/portfolio-astro-SDD/#trayectoria"]')
+          ?.textContent?.trim(),
       ).toBe("Volver a la trayectoria");
       expect(document.querySelector(".floating-nav")).toBeNull();
       expect(document.querySelectorAll("astro-island")).toHaveLength(0);

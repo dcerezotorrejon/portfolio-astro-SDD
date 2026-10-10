@@ -57,15 +57,26 @@ describe("T2 local design assets", () => {
     );
   });
 
-  it("declares a local, non-blocking Open Sans variable face with Spanish Latin coverage", () => {
-    const fontFace = css.match(/@font-face\s*\{([^}]*)\}/s)?.[1] ?? "";
+  it("declares a local, non-blocking Open Sans variable face with Spanish Latin coverage under the deployment base", async () => {
+    // Plain CSS cannot read the build-time base, so the @font-face is emitted
+    // from SiteLayout.astro with the base-prefixed URL baked in.
+    expect(css).not.toMatch(/@font-face\s*\{/);
+
+    const homeHtml = await render(Home);
+    const { document } = new JSDOM(homeHtml).window;
+    const fontFaceStyle =
+      Array.from(document.querySelectorAll("style"))
+        .map((style) => style.textContent ?? "")
+        .find((text) => text.includes("@font-face")) ?? "";
+    const fontFace =
+      fontFaceStyle.match(/@font-face\s*\{([^}]*)\}/s)?.[1] ?? "";
 
     expect(fontFace).not.toBe("");
     expect(fontFace).toMatch(/font-family:\s*["']Open Sans["']/);
     expect(fontFace).toMatch(/font-weight:\s*400\s+700/);
     expect(fontFace).toMatch(/font-display:\s*swap/);
     expect(fontFace).toMatch(
-      /src:\s*url\(["']?\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
+      /src:\s*url\(["']?\/portfolio-astro-SDD\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
     );
     expect(fontFace).toMatch(/unicode-range:[\s\S]*U\+0000-00FF/);
     expect(fontFace).not.toMatch(/https?:|\/\//i);
@@ -248,7 +259,9 @@ describe("T2/T10 global style contracts", () => {
       "bottom-[calc(16px+env(safe-area-inset-bottom,0px))]",
     );
     expect(floatingNavSource).toContain("rounded-pill");
-    expect(floatingNavSource).toContain("bg-surface");
+    // The navigator now paints the liquid-glass surface utility; the opaque
+    // fallback lives inside that @utility (asserted in the glass test below).
+    expect(floatingNavSource).toContain("nav-glass");
 
     // Indicator transition and transform states are utility-driven.
     expect(floatingNavSource).toContain("transition-transform");
@@ -267,6 +280,54 @@ describe("T2/T10 global style contracts", () => {
     // Button molecule geometry still resolves to the 44px minimum target.
     expect(resolveToken("--button-min-target", tokens)).toBe("44px");
     expect(css).toMatch(/scroll-snap-type:\s*y proximity/);
+  });
+
+  it("applies a subtle, fallback-safe liquid-glass surface to the floating navigator only", () => {
+    // The frost is the opaque surface white at 70% alpha (within the approved
+    // 0.55-0.85 subtlety range), not a new palette hue.
+    expect(resolveToken("--nav-glass-surface", tokens)).toBe(
+      "rgb(255 255 255 / 0.7)",
+    );
+    expect(resolveToken("--nav-glass-blur", tokens)).toBe("12px");
+    // The opaque surface stays declared as the fallback source.
+    expect(tokens.base.get("--nav-surface")).toBe("var(--color-surface)");
+
+    // The blur is registered in Tailwind's --blur-* namespace.
+    expect(css).toMatch(
+      /@theme\s+inline\s*\{[\s\S]*?--blur-nav\s*:\s*var\(--nav-glass-blur\)/,
+    );
+
+    // One self-contained @utility owns the glass plus both opaque fallbacks.
+    expect(css).toContain("@utility nav-glass");
+    expect(css).toContain("backdrop-filter: blur(var(--nav-glass-blur))");
+    expect(css).toMatch(/@supports not[\s\S]*?backdrop-filter/);
+    expect(css).toContain("prefers-reduced-transparency: reduce");
+    const opaqueFallbacks = css.match(
+      /background-color:\s*var\(--nav-surface\)/g,
+    );
+
+    expect(opaqueFallbacks?.length ?? 0).toBeGreaterThanOrEqual(2);
+
+    // No component selector leaked back into global.css.
+    expect(css).not.toContain(".floating-nav");
+
+    // Non-navigator surfaces keep their opaque values (no glass elsewhere).
+    expect(resolveToken("--card-surface", tokens)).toBe("#ffffff");
+    expect(resolveToken("--badge-surface", tokens)).toBe("#ffffff");
+    expect(resolveToken("--button-secondary-background", tokens)).toBe(
+      "#ffffff",
+    );
+    expect(resolveToken("--color-surface", tokens)).toBe("#ffffff");
+    expect(resolveToken("--color-page", tokens)).toBe("#eff3f8");
+
+    // docs/design.md documents the liquid-glass criteria and reconciliation.
+    const design = readFileSync("docs/design.md", "utf8").toLowerCase();
+
+    expect(design).toContain("liquid-glass");
+    expect(design).toContain("translucent");
+    expect(design).toContain("backdrop blur");
+    expect(design).toContain("reduced transparency");
+    expect(design).toContain("no gradients");
   });
 
   it("keeps homepage fragment navigation instant and suppresses the pre-position indicator transition", () => {

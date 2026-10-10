@@ -8,6 +8,7 @@ import {
 
 import {
   getActiveSectionIndex,
+  hasReachedActivation,
   prefersReducedMotion,
   scrollToSection,
 } from "./helpers/navigation";
@@ -36,6 +37,13 @@ export default function FloatingNav({
   const [isFocusObscured, setIsFocusObscured] = useState(false);
   const [isPositioned, setIsPositioned] = useState(false);
   const activeSectionIdRef = useRef(activeSectionId);
+  // Set to the target of a programmatic activation while its smooth scroll is
+  // still in flight. Geometry keeps this section selected until it reaches the
+  // activation inset, so the indicator does not snap back to the origin.
+  const heldSectionIdRef = useRef<string | null>(null);
+  // Late-bound handle to the measurement scheduler, so the manual-input
+  // effect can request a re-measure without owning the frame slot itself.
+  const scheduleMeasureRef = useRef<() => void>(() => {});
   const navRef = useRef<HTMLElement>(null);
   const activeIndex = Math.max(
     0,
@@ -84,6 +92,28 @@ export default function FloatingNav({
         id: section.id,
         top: section.getBoundingClientRect().top,
       }));
+      const heldId = heldSectionIdRef.current;
+
+      if (heldId !== null) {
+        const heldTop = sectionStarts.find(({ id }) => id === heldId)?.top;
+
+        // Keep the activated target selected while it is still travelling to
+        // the inset; geometry must not pull the indicator back to the origin
+        // during the smooth scroll.
+        if (heldTop !== undefined && !hasReachedActivation(heldTop, 16, 1)) {
+          if (heldId !== activeSectionIdRef.current) {
+            activeSectionIdRef.current = heldId;
+            setActiveSectionId(heldId);
+          }
+
+          return;
+        }
+
+        // The target arrived (or vanished): release the hold and fall through
+        // to normal geometry, which selects the held section without flicker.
+        heldSectionIdRef.current = null;
+      }
+
       const nextIndex = getActiveSectionIndex(sectionStarts, 16, 1);
       const nextId = sectionStarts[nextIndex]?.id;
 
@@ -98,6 +128,8 @@ export default function FloatingNav({
         animationFrame = window.requestAnimationFrame(measure);
       }
     };
+
+    scheduleMeasureRef.current = scheduleMeasure;
 
     const resizeObserver =
       typeof ResizeObserver === "undefined"
@@ -125,6 +157,49 @@ export default function FloatingNav({
       }
     };
   }, [sections]);
+
+  // A user-initiated scroll before the activated target arrives takes over
+  // from the programmatic scroll: release the hold immediately and re-measure
+  // so geometry governs again (e.g. the indicator returns to "Inicio" when the
+  // user scrolls back to the top).
+  useEffect(() => {
+    const scrollKeys = new Set([
+      "ArrowUp",
+      "ArrowDown",
+      "PageUp",
+      "PageDown",
+      "Home",
+      "End",
+      " ",
+    ]);
+
+    const releaseHold = () => {
+      if (heldSectionIdRef.current === null) {
+        return;
+      }
+
+      heldSectionIdRef.current = null;
+      scheduleMeasureRef.current();
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (scrollKeys.has(event.key)) {
+        releaseHold();
+      }
+    };
+
+    window.addEventListener("wheel", releaseHold, { passive: true });
+    window.addEventListener("touchstart", releaseHold, { passive: true });
+    window.addEventListener("touchmove", releaseHold, { passive: true });
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("wheel", releaseHold);
+      window.removeEventListener("touchstart", releaseHold);
+      window.removeEventListener("touchmove", releaseHold);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   // Keep keyboard focus clear: if a focus-visible control outside the navigator
   // would be covered by the fixed navigator, hide the navigator until focus
@@ -228,13 +303,14 @@ export default function FloatingNav({
     event.preventDefault();
     window.history.pushState(null, "", `#${id}`);
     scrollToSection(id);
+    heldSectionIdRef.current = id;
     activeSectionIdRef.current = id;
     setActiveSectionId(id);
   };
 
   return (
     <nav
-      className="floating-nav group fixed inset-x-0 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-[min(360px,calc(100%-32px))] rounded-pill border border-[rgb(15_20_25/8%)] bg-surface p-1 shadow-[0_4px_20px_rgb(15_20_25/14%)] data-[focus-obscured=true]:pointer-events-none data-[focus-obscured=true]:opacity-0"
+      className="floating-nav group fixed inset-x-0 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] z-10 mx-auto w-[min(360px,calc(100%-32px))] rounded-pill border border-[rgb(15_20_25/8%)] nav-glass p-1 shadow-[0_4px_20px_rgb(15_20_25/14%)] data-[focus-obscured=true]:pointer-events-none data-[focus-obscured=true]:opacity-0"
       aria-label={ariaLabel}
       data-active-index={activeIndex}
       data-positioned={isPositioned ? "true" : "false"}

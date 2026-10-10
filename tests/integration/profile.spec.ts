@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { profile } from "./helpers/content";
+import { withBase } from "./helpers/site";
 
 /**
  * Aspect ratio of the committed master (`src/content/profile/profile-photo.jpg`,
@@ -25,7 +26,7 @@ test("profile identity, image, and social destinations match content", async ({
     OPTIMIZED_PROFILE_IMAGE.test(response.url()),
   );
 
-  await page.goto("/");
+  await page.goto(withBase("/"));
 
   await expect(
     page.getByRole("heading", { level: 1, name: profile.name }),
@@ -111,11 +112,11 @@ test("profile frame keeps its responsive square size", async ({ page }) => {
   };
 
   // Desktop Chrome viewport (>= md): 240 px wide square frame.
-  await page.goto("/");
+  await page.goto(withBase("/"));
   assertSquareFrame(await measure(), DESKTOP_FRAME_WIDTH);
 
   // Mobile: 200 px wide square frame.
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto(withBase("/"));
   assertSquareFrame(await measure(), MOBILE_FRAME_WIDTH);
 });
