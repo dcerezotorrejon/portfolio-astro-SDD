@@ -1,7 +1,7 @@
 # Subtle liquid-glass surface for the floating navigator
 
 - **Spec ID**: `026-nav-liquid-glass`
-- **Status**: in progress
+- **Status**: done
 - **Last updated**: 2026-10-10
 
 > Keep this increment's spec anchored to code while it is active. On closure
@@ -75,21 +75,21 @@ keep their current styling.
 
 ## Acceptance criteria
 
-- [ ] AC1: The floating navigator's computed background is translucent with
+- [x] AC1: The floating navigator's computed background is translucent with
       alpha in the 0.55–0.85 range and it applies a backdrop blur of at least
       8 px, while retaining the pill shape, border/highlight, and shadow.
-- [ ] AC2: Cards, badges, buttons, and the page background are unchanged (their
+- [x] AC2: Cards, badges, buttons, and the page background are unchanged (their
       computed styles match the current values; no glass effect is applied).
-- [ ] AC3: Active and inactive labels and the indicator meet at least 4.5:1
+- [x] AC3: Active and inactive labels and the indicator meet at least 4.5:1
       contrast against the composed navigator surface, and the keyboard focus
       outline stays clearly visible; the accessibility audit passes.
-- [ ] AC4: When `backdrop-filter` is unavailable and when reduced transparency
+- [x] AC4: When `backdrop-filter` is unavailable and when reduced transparency
       is requested, the navigator renders an opaque surface with the same
       layout, compliant contrast, and visible focus outline.
-- [ ] AC5: `docs/design.md` documents the navigator glass criteria and no longer
+- [x] AC5: `docs/design.md` documents the navigator glass criteria and no longer
       contradicts them (the opaque-surface and "no gradients" rules are
       reconciled for this surface).
-- [ ] AC6: Navigator placement, size, destinations, active-section logic, and
+- [x] AC6: Navigator placement, size, destinations, active-section logic, and
       indicator motion are unchanged.
 
 ## Verification
