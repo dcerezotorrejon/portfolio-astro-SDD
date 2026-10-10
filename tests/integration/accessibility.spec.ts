@@ -26,3 +26,27 @@ test("home and every content-derived detail page pass browser axe", async ({
     expect(results.violations, `axe violations on ${route}`).toEqual([]);
   }
 });
+
+test("aria-current follows the navigator selection and the page stays axe-clean after activation", async ({
+  page,
+}) => {
+  await page.goto(withBase("/"));
+
+  const navigation = page.getByRole("navigation", {
+    name: "Navegación por secciones",
+  });
+  const profileLink = navigation.getByRole("link", { name: "Inicio" });
+  const experienceLink = navigation.getByRole("link", {
+    name: "Trayectoria",
+  });
+
+  await expect(navigation).toHaveAttribute("data-positioned", "true");
+  await expect(profileLink).toHaveAttribute("aria-current", "location");
+
+  await experienceLink.click();
+  await expect(experienceLink).toHaveAttribute("aria-current", "location");
+  await expect(profileLink).not.toHaveAttribute("aria-current", "location");
+
+  const results = await new AxeBuilder({ page }).withTags(wcagTags).analyze();
+  expect(results.violations, "axe violations after activation").toEqual([]);
+});

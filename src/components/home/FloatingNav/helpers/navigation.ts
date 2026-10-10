@@ -35,6 +35,23 @@ export interface SectionStart {
 }
 
 /**
+ * Whether a section top has reached the activation inset.
+ *
+ * Mirrors the threshold used by `getActiveSectionIndex`: a top counts as
+ * arrived when it is at or above `activationOffset` plus the 1 px rounding
+ * tolerance (so a top of 16.4 px with the default values still qualifies).
+ * Kept as a separate pure helper so the indicator hold can be released at the
+ * exact same moment geometry would activate the section.
+ */
+export function hasReachedActivation(
+  top: number,
+  activationOffset = 16,
+  tolerance = 1,
+): boolean {
+  return top <= activationOffset + tolerance;
+}
+
+/**
  * Return the index of the active section under section-start activation.
  *
  * A section becomes active when its top reaches the activation offset (the
