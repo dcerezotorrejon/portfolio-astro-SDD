@@ -1,7 +1,7 @@
 # Design consistency corrections
 
 - **Spec ID**: `028-design-consistency`
-- **Status**: in progress
+- **Status**: done
 - **Last updated**: 2026-10-10
 
 > Keep this increment's spec anchored to code while it is active. On closure
@@ -61,12 +61,12 @@ shared design document.
 
 ## Acceptance criteria
 
-- [ ] AC1: The computed `transition-duration` of the floating navigator
+- [x] AC1: The computed `transition-duration` of the floating navigator
       indicator and of a primary button is 200 ms.
-- [ ] AC2: The unit contracts are updated to the corrected behavior and
+- [x] AC2: The unit contracts are updated to the corrected behavior and
       `pnpm test:run` passes.
-- [ ] AC3: Reduced motion still suppresses the transition (unchanged).
-- [ ] AC4: `docs/design.md` has no implementation-pending status and no
+- [x] AC3: Reduced motion still suppresses the transition (unchanged).
+- [x] AC4: `docs/design.md` has no implementation-pending status and no
       references to completed specifications, and its motion criteria match the
       rendered 200 ms.
 
