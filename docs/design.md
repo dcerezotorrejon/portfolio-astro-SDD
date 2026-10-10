@@ -1,7 +1,7 @@
 # Global design
 
 - **Status**: agreed design direction; implementation pending
-- **Last updated**: 2026-10-06
+- **Last updated**: 2026-10-10
 
 ## Scope and references
 
@@ -49,7 +49,11 @@ computed colors, dimensions, typography, responsive behavior or motion.
   paired with white labels.
 - **Button label — `#FFFFFF`:** Text and icons inside primary buttons.
 - **Secondary / ink — `#0F1419`:** Main text, headings and inactive navigator labels.
-- **Surface — `#FFFFFF`:** Cards and floating navigator.
+- **Surface — `#FFFFFF`:** Opaque card surfaces. The floating navigator derives a
+  subtle translucent _liquid-glass_ frost from this surface (approximately 70%
+  white) instead of filling it opaquely; when `backdrop-filter` is unavailable or
+  the visitor requests reduced transparency, the navigator falls back to this
+  opaque `#FFFFFF` surface.
 - **Page background — `#EFF3F8`:** Light page canvas.
 - **Border — `#CFD9DE`:** Subtle 1 px card and badge borders; not the sole
   interactive-state cue.
@@ -61,7 +65,8 @@ default; icons inside primary buttons use white to match their labels. Primary
 buttons use white labels and icons on `#0C7ABF` (approximately 4.61:1 contrast).
 Hover and pressed backgrounds
 must remain dark enough to keep white labels at 4.5:1 or better. The floating
-navigator uses a white surface with dark inactive labels and a `#0C7ABF` sliding
+navigator uses a subtle translucent, frosted (liquid-glass) light surface with
+dark inactive labels and a `#0C7ABF` sliding
 indicator with a white active label. Active styling follows the settled semantic
 selection (`aria-current`), not a persistent inline text color. Keep text and focus
 contrast compliant with the constitution; pale borders are decorative and must
@@ -142,8 +147,14 @@ the feature spec determines where it appears and which destinations it exposes.
 
 - Center horizontally and fix to the bottom.
 - Bottom clearance is 16 px plus the device's bottom safe-area inset.
-- Use a white pill surface, with one `#0C7ABF` sliding indicator behind the active
-  link. The active link label is white; inactive labels are dark ink. Update the
+- Use a subtle translucent frosted (liquid-glass) light pill surface with a
+  backdrop blur (approximately 12 px), keeping the fine border/highlight and the
+  shadow, with one `#0C7ABF` sliding indicator behind the active
+  link. The glass is translucency plus blur only: no gradients and no added
+  motion. When `backdrop-filter` is unsupported or the visitor requests reduced
+  transparency, render the same pill with the opaque white `#FFFFFF` surface so
+  the layout, the 4.5:1-or-better label contrast and the visible focus outline
+  are preserved. The active link label is white; inactive labels are dark ink. Update the
   label styling with the same current-section state as the indicator, including
   upward scrolling and reduced-motion changes. Selection must also be exposed
   programmatically.
@@ -167,7 +178,10 @@ the feature spec determines where it appears and which destinations it exposes.
 - Hover and pressed states must keep labels readable. Use the link/focus color
   for a clearly visible keyboard-focus outline; do not rely on color alone to
   distinguish focused or current controls.
-- No gradients, decorative entrance animations, or unrelated motion.
+- No gradients, decorative entrance animations, or unrelated motion. The
+  navigator's liquid-glass surface is translucency plus a backdrop blur, not a
+  gradient fill, and it introduces no motion; its opaque fallback keeps the
+  surface compliant where blur or translucency is unavailable.
 
 ## Design review and verification
 
