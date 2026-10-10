@@ -1,3 +1,4 @@
+import type { ImageMetadata } from "astro";
 import { z } from "astro/zod";
 
 const nonEmptyString = z.string().trim().min(1, "Must not be empty");
@@ -27,44 +28,38 @@ export const companyIconSchema = z.object({
   alt: nonEmptyString,
 });
 
-const localProfileImagePath = z
-  .string()
-  .regex(
-    /^\/images\/[a-z0-9-]+\.(svg|png|jpe?g|webp)$/,
-    "Must be a local image path under /images/",
-  );
-
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString.max(160, "Must be at most 160 characters"),
 });
 
-export const profileSchema = z.object({
-  name: nonEmptyString,
-  headline: nonEmptyString,
-  about: nonEmptyString,
-  image: z.object({
-    src: localProfileImagePath,
-    alt: nonEmptyString,
-  }),
-  socials: z.array(
-    z.object({
-      platform: z.enum(["github", "linkedin"]),
-      label: nonEmptyString,
-      url: safeHttpUrl,
+export const profileSchema = (image: () => z.ZodType) =>
+  z.object({
+    name: nonEmptyString,
+    headline: nonEmptyString,
+    about: nonEmptyString,
+    image: z.object({
+      src: image(),
+      alt: nonEmptyString,
     }),
-  ),
-  historyHeading: nonEmptyString,
-  moreInfoLabel: nonEmptyString,
-  backLabel: nonEmptyString,
-  navigation: z.array(
-    z.object({
-      id: z.enum(["inicio", "trayectoria"]),
-      label: nonEmptyString,
-    }),
-  ),
-  seo: seoSchema,
-});
+    socials: z.array(
+      z.object({
+        platform: z.enum(["github", "linkedin"]),
+        label: nonEmptyString,
+        url: safeHttpUrl,
+      }),
+    ),
+    historyHeading: nonEmptyString,
+    moreInfoLabel: nonEmptyString,
+    backLabel: nonEmptyString,
+    navigation: z.array(
+      z.object({
+        id: z.enum(["inicio", "trayectoria"]),
+        label: nonEmptyString,
+      }),
+    ),
+    seo: seoSchema,
+  });
 
 export const experienceSchema = z
   .object({
@@ -91,5 +86,30 @@ export const experienceSchema = z
     }
   });
 
-export type ProfileData = z.infer<typeof profileSchema>;
+export interface ProfileData {
+  name: string;
+  headline: string;
+  about: string;
+  image: {
+    src: ImageMetadata;
+    alt: string;
+  };
+  socials: Array<{
+    platform: "github" | "linkedin";
+    label: string;
+    url: string;
+  }>;
+  historyHeading: string;
+  moreInfoLabel: string;
+  backLabel: string;
+  navigation: Array<{
+    id: "inicio" | "trayectoria";
+    label: string;
+  }>;
+  seo: {
+    title: string;
+    description: string;
+  };
+}
+
 export type ExperienceData = z.infer<typeof experienceSchema>;

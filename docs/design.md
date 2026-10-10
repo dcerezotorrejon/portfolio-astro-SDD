@@ -1,6 +1,6 @@
 # Global design
 
-- **Status**: agreed design direction; implementation pending
+- **Status**: agreed design direction; implemented
 - **Last updated**: 2026-10-10
 
 ## Scope and references
@@ -195,7 +195,7 @@ criteria and verification methods: computed styles, responsive screenshots,
 keyboard and reduced-motion review, transition/indicator recordings where
 applicable, and same-origin font network inspection.
 
-The initial consumer is
-[004-portfolio-home](../specs/004-portfolio-home/spec.md), particularly AC7 and
-AC11–AC13. Its introduction composition, employment routes, transition identity,
-and section-selection/snap rules remain defined in that spec.
+The criteria above are self-contained in this document. The color, typography,
+token, layout, floating-navigation, and motion rules stated here are the shared
+bar that every consumer is measured against, so verification does not depend on
+any other specification.

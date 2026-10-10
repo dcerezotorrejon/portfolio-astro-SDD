@@ -146,14 +146,19 @@ describe("native experience view transitions", () => {
   });
 
   it("uses the shared control-duration token without overriding the native view-transition timing", () => {
-    // 8bb0ecb intentionally removed the custom `::view-transition-*`
-    // `animation-duration` override, so the UA's native duration applies to
-    // shared-element transitions. The 200 ms control motion token remains the
-    // shared source of truth for component transitions.
+    // The custom `::view-transition-*` `animation-duration` override stays
+    // removed, so the UA's native duration applies to shared-element
+    // transitions. The 200 ms control-motion token remains the shared source of
+    // truth for component transitions and is registered in Tailwind's
+    // `--transition-duration-*` namespace so the `duration-control` utility is
+    // emitted again.
     expect(css).not.toMatch(
       /::view-transition-[a-z-]+\(\*\)[^{]*\{[^}]*animation-duration/,
     );
     expect(resolveToken("--duration-control", tokens)).toBe("200ms");
+    expect(css).toMatch(
+      /@theme\s+inline\s*\{[\s\S]*?--transition-duration-control\s*:\s*var\(--duration-control\)/,
+    );
   });
 
   it("keeps the reduced-motion reset for every view-transition pseudo-element", () => {

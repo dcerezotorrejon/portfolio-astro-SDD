@@ -184,10 +184,15 @@ describe("T2/T10 global style contracts", () => {
       expect(css).toContain(key);
     }
 
-    // 8bb0ecb removed the custom `--transition-duration-control` @theme entry,
-    // so the raw motion token stays declared in `:root` and is not
-    // re-declared inside the generated-namespace block.
+    // The raw motion token (`--duration-control: 200ms`) stays declared in
+    // `:root`; the theme block only registers it in Tailwind's generated
+    // `--transition-duration-*` namespace so the `duration-control` utility is
+    // emitted. Re-declaring the raw `--duration-control:` token inside the
+    // generated-namespace block must not happen.
     expect(themeBlock).not.toContain("--duration-control:");
+    expect(themeBlock).toMatch(
+      /--transition-duration-control\s*:\s*var\(--duration-control\)/,
+    );
 
     // Component-specific selectors are no longer authored in global.css.
     for (const selector of [
@@ -229,14 +234,23 @@ describe("T2/T10 global style contracts", () => {
     const homeHtml = await render(Home);
     const { document } = new JSDOM(homeHtml).window;
     const image = document.querySelector(".profile-image");
+    const picture = document.querySelector("#inicio picture");
 
     expect(image).not.toBeNull();
     expect(image?.className).toMatch(/\baspect-square\b/);
-    expect(image?.className).toMatch(/w-\[min\(200px,100%\)\]/);
     expect(image?.className).toMatch(/\brounded-card\b/);
-    expect(image?.className).toMatch(/\bobject-cover\b/);
-    expect(image?.className).toMatch(/md:w-\[240px\]/);
+    expect(image?.className).toMatch(/\bobject-contain\b/);
+    expect(image?.className).toMatch(/\bbg-surface\b/);
+    expect(image?.className).toMatch(/\bw-full\b/);
     expect(image?.hasAttribute("style")).toBe(false);
+
+    // The <picture> wrapper is the flex item; it carries the sizing and
+    // positioning classes (Astro forwards `class` to the inner <img>).
+    expect(picture).not.toBeNull();
+    expect(picture?.className).toMatch(/\bshrink-0\b/);
+    expect(picture?.className).toMatch(/\bself-center\b/);
+    expect(picture?.className).toMatch(/w-\[min\(200px,100%\)\]/);
+    expect(picture?.className).toMatch(/md:w-\[240px\]/);
 
     // Desktop profile image width comes from its component token.
     expect(resolveToken("--profile-image-width-desktop", tokens)).toBe("240px");

@@ -19,3 +19,4 @@
 - [ ] Build (`pnpm build`)
 - [ ] Unit tests (`pnpm test:run`)
 - [ ] Accessibility (`pnpm test:a11y`)
+- [ ] Integration (`pnpm test:integration`) when applicable
