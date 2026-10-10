@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "astro/zod";
 
 import {
   experienceSchema,
@@ -11,13 +12,21 @@ import {
   sortExperiences,
 } from "../../src/content/parsers/content";
 
+// Faithful mock of Astro's `image()` helper for pure field validation: a plain
+// string schema without astro:assets resolution. `min(1)` mirrors Astro's
+// effective rejection of an empty/non-resolvable image path (its real
+// `image()` is `z.string().transform(...)`, which adds a fatal issue when the
+// path cannot be resolved).
+const imageMock = () => z.string().min(1);
+const profile = profileSchema(imageMock);
+
 const approvedProfile = {
   name: "Daniel Cerezo Torrejón",
   headline: "Senior Frontend Engineer & Software Architect",
   about:
     "Senior Frontend Engineer & Software Architect con +8 años de experiencia en plataformas e-commerce de alto tráfico (Iberia.com). Especializado en diseñar arquitecturas Frontend desde cero con React, TypeScript y Clean Architecture, liderando la migración desde plataformas legacy a tecnologías de vanguardia. Apasionado de la cultura DevOps y la infraestructura Linux (Docker, CI/CD, Homelab).",
   image: {
-    src: "/images/profile-placeholder.svg",
+    src: "./profile-photo.jpg",
     alt: "Fotografía de Daniel Cerezo Torrejón",
   },
   socials: [
@@ -45,7 +54,7 @@ const approvedProfile = {
     description:
       "Presentación y trayectoria profesional de Daniel Cerezo Torrejón, Senior Frontend Engineer & Software Architect.",
   },
-} satisfies Parameters<typeof profileSchema.parse>[0];
+};
 
 const babelIcon = {
   src: "/images/companies/babel.svg",
@@ -69,7 +78,7 @@ function experience(
 
 describe("portfolio content schemas", () => {
   it("accepts the approved profile and real employment samples", () => {
-    expect(profileSchema.parse(approvedProfile)).toMatchObject(approvedProfile);
+    expect(profile.parse(approvedProfile)).toMatchObject(approvedProfile);
 
     const babel = experienceSchema.parse({
       slug: "babel-senior-frontend-engineer",
@@ -134,40 +143,46 @@ describe("portfolio content schemas", () => {
       seo: { title: "Título", description: "x".repeat(161) },
     };
 
-    expect(profileSchema.safeParse(atLimit).success).toBe(true);
-    expect(profileSchema.safeParse(overLimit).success).toBe(false);
+    expect(profile.safeParse(atLimit).success).toBe(true);
+    expect(profile.safeParse(overLimit).success).toBe(false);
   });
 
-  it("accepts local profile image paths and rejects remote, non-/images/, or traversal paths", () => {
-    const withSrc = (src: string) =>
-      profileSchema.safeParse({
+  it("accepts a profile whose image.src is a relative path with non-empty alt", () => {
+    const result = profile.safeParse({
+      ...approvedProfile,
+      image: {
+        src: "./profile-photo.jpg",
+        alt: "Fotografía de Daniel Cerezo Torrejón",
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a missing or empty image.src and an empty alt", () => {
+    const withoutSrc: Record<string, unknown> = {
+      ...approvedProfile,
+      image: { alt: approvedProfile.image.alt },
+    };
+    expect(profile.safeParse(withoutSrc).success).toBe(false);
+
+    expect(
+      profile.safeParse({
         ...approvedProfile,
-        image: { ...approvedProfile.image, src },
-      });
+        image: { src: "", alt: approvedProfile.image.alt },
+      }).success,
+    ).toBe(false);
 
-    for (const src of [
-      "/images/profile-placeholder.svg",
-      "/images/me.png",
-      "/images/me.jpg",
-      "/images/me.jpeg",
-      "/images/me.webp",
-    ]) {
-      expect(withSrc(src).success, `Expected ${src} to be accepted`).toBe(true);
-    }
-
-    for (const src of [
-      "https://example.com/me.png",
-      "/avatar/me.png",
-      "/images/../secret.png",
-    ]) {
-      expect(withSrc(src).success, `Expected ${src} to be rejected`).toBe(
-        false,
-      );
-    }
+    expect(
+      profile.safeParse({
+        ...approvedProfile,
+        image: { src: "./profile-photo.jpg", alt: "" },
+      }).success,
+    ).toBe(false);
   });
 
   it("allows profile copy and social destinations to be replaced without schema changes", () => {
-    const replacement = profileSchema.parse({
+    const replacement = profile.parse({
       ...approvedProfile,
       name: "Ada Ejemplo",
       socials: approvedProfile.socials.map((social) =>
@@ -182,16 +197,16 @@ describe("portfolio content schemas", () => {
   });
 
   it("rejects empty required fields and unsafe or malformed social URLs", () => {
-    expect(
-      profileSchema.safeParse({ ...approvedProfile, name: "  " }).success,
-    ).toBe(false);
+    expect(profile.safeParse({ ...approvedProfile, name: "  " }).success).toBe(
+      false,
+    );
     for (const url of [
       "javascript:alert(1)",
       "ftp://example.com",
       "not a url",
     ]) {
       expect(
-        profileSchema.safeParse({
+        profile.safeParse({
           ...approvedProfile,
           socials: [{ ...approvedProfile.socials[0], url }],
         }).success,

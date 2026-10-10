@@ -25,14 +25,28 @@ describe("home page", () => {
     );
     expect(document.querySelector("#inicio .provisional-notice")).toBeNull();
 
-    const image = document.querySelector<HTMLImageElement>("#inicio img");
-    expect(image?.getAttribute("src")).toBe("/images/profile-placeholder.svg");
+    const image = document.querySelector<HTMLImageElement>(
+      "#inicio img.profile-image",
+    );
+    const src = image?.getAttribute("src");
+
     expect(image?.getAttribute("alt")).toBe(
       "Fotografía de Daniel Cerezo Torrejón",
     );
-    expect(image?.getAttribute("width")).toBe("240");
-    expect(image?.getAttribute("height")).toBe("240");
-    expect(image?.hasAttribute("loading")).toBe(false);
+    expect(image?.getAttribute("loading")).toBe("eager");
+    expect(image?.getAttribute("loading")).not.toBe("lazy");
+    expect(src).toBeTruthy();
+    expect(src).not.toBe("/images/profile-photo.jpg");
+    expect(src).not.toBe("/images/profile-placeholder.svg");
+    expect(image?.className).toContain("aspect-square");
+    expect(image?.className).toContain("object-contain");
+    expect(image?.className).toContain("bg-surface");
+    expect(image?.className).toContain("rounded-card");
+    expect(image?.className).toContain("w-full");
+
+    const frame = document.querySelector("#inicio picture");
+    expect(frame?.className).toContain("shrink-0");
+    expect(frame?.className).toContain("md:w-[240px]");
   });
 
   it("renders the approved social links with visible, unambiguous names", async () => {

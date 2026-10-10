@@ -42,7 +42,10 @@ export const profile = (() => {
   return {
     name: scalar(source, "name"),
     headline: scalar(source, "headline"),
-    image: scalar(source, "src"),
+    image: {
+      src: scalar(source, "src"),
+      alt: scalar(source, "alt"),
+    },
     socials,
   };
 })();
@@ -52,9 +55,17 @@ export const experiences = readdirSync(join(contentRoot, "experience"))
   .sort()
   .map((file) => {
     const source = readFrontmatter(join("experience", file));
+    const iconBlock = /^companyIcon:\s*\r?\n((?:[ \t]+.*\r?\n?)*)/m.exec(
+      source,
+    )?.[1];
+    if (!iconBlock) throw new Error(`Missing companyIcon content in ${file}`);
     return {
       slug: scalar(source, "slug"),
       role: scalar(source, "role"),
       company: scalar(source, "company"),
+      icon: {
+        src: scalar(iconBlock, "src"),
+        alt: scalar(iconBlock, "alt"),
+      },
     };
   });

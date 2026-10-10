@@ -218,14 +218,23 @@ describe("T2/T10 global style contracts", () => {
     const homeHtml = await render(Home);
     const { document } = new JSDOM(homeHtml).window;
     const image = document.querySelector(".profile-image");
+    const picture = document.querySelector("#inicio picture");
 
     expect(image).not.toBeNull();
     expect(image?.className).toMatch(/\baspect-square\b/);
-    expect(image?.className).toMatch(/w-\[min\(200px,100%\)\]/);
     expect(image?.className).toMatch(/\brounded-card\b/);
-    expect(image?.className).toMatch(/\bobject-cover\b/);
-    expect(image?.className).toMatch(/md:w-\[240px\]/);
+    expect(image?.className).toMatch(/\bobject-contain\b/);
+    expect(image?.className).toMatch(/\bbg-surface\b/);
+    expect(image?.className).toMatch(/\bw-full\b/);
     expect(image?.hasAttribute("style")).toBe(false);
+
+    // The <picture> wrapper is the flex item; it carries the sizing and
+    // positioning classes (Astro forwards `class` to the inner <img>).
+    expect(picture).not.toBeNull();
+    expect(picture?.className).toMatch(/\bshrink-0\b/);
+    expect(picture?.className).toMatch(/\bself-center\b/);
+    expect(picture?.className).toMatch(/w-\[min\(200px,100%\)\]/);
+    expect(picture?.className).toMatch(/md:w-\[240px\]/);
 
     // Desktop profile image width comes from its component token.
     expect(resolveToken("--profile-image-width-desktop", tokens)).toBe("240px");

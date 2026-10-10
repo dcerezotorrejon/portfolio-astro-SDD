@@ -1,4 +1,6 @@
 ---
+import { Picture } from "astro:assets";
+
 import type { ProfileData } from "../../content/parsers/content-schema";
 import Heading from "../../components/molecules/Heading.astro";
 import Button from "../../components/molecules/Button.astro";
@@ -16,12 +18,20 @@ const { profile } = Astro.props;
   id="inicio"
   aria-labelledby="profile-name"
 >
-  <img
-    class="profile-image aspect-square w-[min(200px,100%)] shrink-0 self-center rounded-card object-cover md:w-[240px] md:self-auto"
+  <Picture
+    pictureAttributes={{
+      class:
+        "shrink-0 self-center md:self-auto w-[min(200px,100%)] md:w-[240px]",
+    }}
+    class="profile-image aspect-square w-full rounded-card object-contain bg-surface"
     src={profile.image.src}
     alt={profile.image.alt}
-    width="240"
-    height="240"
+    formats={["avif", "webp"]}
+    widths={[200, 240, 400, 480]}
+    sizes="(max-width: 767px) 200px, 240px"
+    width={240}
+    loading="eager"
+    decoding="async"
   />
   <div class="profile-details min-w-0 text-left">
     <Heading level={1} variant="display" id="profile-name">

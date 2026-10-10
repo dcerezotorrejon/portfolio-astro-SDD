@@ -3,7 +3,7 @@ name: Daniel Cerezo Torrejón
 headline: Senior Frontend Engineer & Software Architect
 about: Senior Frontend Engineer & Software Architect con +8 años de experiencia en plataformas e-commerce de alto tráfico (Iberia.com). Especializado en diseñar arquitecturas Frontend desde cero con React, TypeScript y Clean Architecture, liderando la migración desde plataformas legacy a tecnologías de vanguardia. Apasionado de la cultura DevOps y la infraestructura Linux (Docker, CI/CD, Homelab).
 image:
-  src: /images/profile-placeholder.svg
+  src: ./profile-photo.jpg
   alt: Fotografía de Daniel Cerezo Torrejón
 socials:
   - platform: github

@@ -11,7 +11,7 @@ const profile = defineCollection({
     pattern: "profile.md",
     generateId: ({ entry }) => entry.replace(/\.md$/, ""),
   }),
-  schema: profileSchema,
+  schema: ({ image }) => profileSchema(image),
 });
 
 const experience = defineCollection({
