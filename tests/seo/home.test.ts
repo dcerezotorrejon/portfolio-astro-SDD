@@ -2,10 +2,12 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
 import Home from "../../src/pages/index.astro";
-import { base, site } from "../../astro.config.mjs";
+import { site } from "../../astro.config.mjs";
 import { render } from "../helpers/render";
 
-const homeUrl = new URL(`${base}/`, site);
+// Build the root route from a single leading slash so the root base (`/`) never
+// produces a `//` path (`new URL(`${base}/`, site)` would throw at the root).
+const homeUrl = new URL("/", site);
 
 describe("home page SEO", () => {
   it("uses the approved Spanish title and meta description", async () => {
@@ -33,7 +35,7 @@ describe("home page SEO", () => {
     const canonicals = document.querySelectorAll('link[rel="canonical"]');
     expect(canonicals).toHaveLength(1);
     expect(canonicals[0]?.getAttribute("href")).toBe(
-      "https://dcerezotorrejon.github.io/portfolio-astro-SDD/",
+      "https://portfolio.dcerezo.work/",
     );
   });
 });

@@ -10,8 +10,6 @@ import { resolveCompanyIcon } from "../../src/content/parsers/content";
 import { experienceSchema } from "../../src/content/parsers/content-schema";
 import { render } from "../helpers/render";
 
-const RENDER_BASE = "/portfolio-astro-SDD";
-
 const approvedIcon = {
   src: "/images/companies/babel.svg",
   alt: "Acme",
@@ -75,7 +73,7 @@ function expectCompanyIconInHeader(
   const image = header?.querySelector("img.company-icon");
   const company = header?.querySelector(".company-name");
 
-  expect(image?.getAttribute("src")).toBe(`${RENDER_BASE}${expectedIcon.src}`);
+  expect(image?.getAttribute("src")).toBe(expectedIcon.src);
   expect(image?.getAttribute("alt")).toBe(expectedIcon.alt);
   expect(image?.getAttribute("alt")?.trim()).not.toBe("");
   expect(image?.getAttribute("width")).toBe("128");
@@ -199,7 +197,7 @@ describe("Markdown-configurable company icons", () => {
       const card = cards.find(
         (candidate) =>
           candidate.querySelector("a")?.getAttribute("href") ===
-          `/portfolio-astro-SDD/experiencia/${entry.data.slug}/`,
+          `/experiencia/${entry.data.slug}/`,
       );
 
       expect(card).toBeDefined();

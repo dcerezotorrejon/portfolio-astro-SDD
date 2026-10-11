@@ -15,8 +15,8 @@ const expectedPaths = {
 
 describe("Icon atom", () => {
   it.each([
-    ["github", "/portfolio-astro-SDD/icons/github.svg#icon"],
-    ["linkedin", "/portfolio-astro-SDD/icons/linkedin.svg#icon"],
+    ["github", "/icons/github.svg#icon"],
+    ["linkedin", "/icons/linkedin.svg#icon"],
   ] as const)(
     "renders the %s map entry as an external SVG use",
     async (name, href) => {
