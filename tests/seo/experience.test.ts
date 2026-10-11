@@ -5,10 +5,13 @@ import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
 import ExperienceDetail from "../../src/pages/experiencia/[slug].astro";
-import { base, site } from "../../astro.config.mjs";
+import { site } from "../../astro.config.mjs";
 import { getContainer } from "../helpers/render";
 
-const canonicalBase = `${site}${base}`;
+// The site is served from the custom-domain root, so the canonical origin is
+// `site` with a single trailing slash. Joining `site` with `base` (`/`) and then
+// appending another slash would yield a `//` path.
+const siteRoot = `${site.replace(/\/+$/, "")}/`;
 
 const routeMetadata = [
   {
@@ -37,7 +40,8 @@ async function renderExperience(slug: string): Promise<string> {
   const container = await getContainer();
   return container.renderToString(ExperienceDetail, {
     props: { experience, profile: profile.data },
-    request: new Request(new URL(`${base}/experiencia/${slug}/`, site)),
+    // A single leading slash keeps the root-base path single-slashed.
+    request: new Request(new URL(`/experiencia/${slug}/`, site)),
   });
 }
 
@@ -58,7 +62,7 @@ describe("experience detail SEO", () => {
       expect(descriptions[0]?.getAttribute("content")).toBe(description);
       expect(canonicals).toHaveLength(1);
       expect(canonicals[0]?.getAttribute("href")).toBe(
-        `${canonicalBase}/experiencia/${slug}/`,
+        `${siteRoot}experiencia/${slug}/`,
       );
     },
   );
@@ -77,7 +81,7 @@ describe("experience detail SEO", () => {
         expect(document.title).toBe(title);
         expect(
           document.querySelector('link[rel="canonical"]')?.getAttribute("href"),
-        ).toBe(`${canonicalBase}/experiencia/${slug}/`);
+        ).toBe(`${siteRoot}experiencia/${slug}/`);
         expect(
           document
             .querySelector("[data-experience-slug]")
@@ -85,10 +89,9 @@ describe("experience detail SEO", () => {
         ).toBe(slug);
         expect(document.querySelector(".floating-nav")).toBeNull();
         expect(document.querySelectorAll("astro-island")).toHaveLength(0);
-        expect(sitemap).toContain(
-          `<loc>${canonicalBase}/experiencia/${slug}/</loc>`,
-        );
+        expect(sitemap).toContain(`<loc>${siteRoot}experiencia/${slug}/</loc>`);
       }
+      expect(sitemap).not.toContain("/portfolio-astro-SDD");
     },
   );
 });

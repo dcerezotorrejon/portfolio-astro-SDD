@@ -10,7 +10,7 @@ export default defineConfig({
   ],
   outputDir: "test-results",
   use: {
-    baseURL: "http://127.0.0.1:4321/portfolio-astro-SDD",
+    baseURL: "http://127.0.0.1:4321",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     ...devices["Desktop Chrome"],
@@ -20,7 +20,7 @@ export default defineConfig({
     command:
       "node ./node_modules/astro/bin/astro.mjs preview --host 127.0.0.1 --port 4321 --strictPort",
     env: { ASTRO_PREVIEW_BACKGROUND: "1" },
-    url: "http://127.0.0.1:4321/portfolio-astro-SDD",
+    url: "http://127.0.0.1:4321",
     reuseExistingServer: false,
     gracefulShutdown: { signal: "SIGTERM", timeout: 5_000 },
     timeout: 30_000,

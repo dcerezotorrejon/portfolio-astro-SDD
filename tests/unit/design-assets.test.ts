@@ -76,7 +76,7 @@ describe("T2 local design assets", () => {
     expect(fontFace).toMatch(/font-weight:\s*400\s+700/);
     expect(fontFace).toMatch(/font-display:\s*swap/);
     expect(fontFace).toMatch(
-      /src:\s*url\(["']?\/portfolio-astro-SDD\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
+      /src:\s*url\(["']?\/fonts\/open-sans-latin\.woff2["']?\)\s*format\(["']woff2["']\)/,
     );
     expect(fontFace).toMatch(/unicode-range:[\s\S]*U\+0000-00FF/);
     expect(fontFace).not.toMatch(/https?:|\/\//i);

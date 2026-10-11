@@ -159,15 +159,15 @@ See [`specs/README.md`](specs/README.md) for spec conventions and
 ## Site configuration
 
 The canonical site URL is configured as
-`site = "https://dcerezotorrejon.github.io"` in `astro.config.mjs`, together with
-`base = "/portfolio-astro-SDD"`. The site is published at
-`https://dcerezotorrejon.github.io/portfolio-astro-SDD/`, so canonical URLs and
-the sitemap use that origin and base.
+`site = "https://portfolio.dcerezo.work"` in `astro.config.mjs`, together with
+`base = "/"` (the domain root). The site is published at
+`https://portfolio.dcerezo.work/`, so canonical URLs and the sitemap use that
+origin at the root, with no deployment subpath.
 
 ## Deployment
 
 The site is published with GitHub Pages at
-`https://dcerezotorrejon.github.io/portfolio-astro-SDD/`.
+`https://portfolio.dcerezo.work/`.
 
 Deployment is automated by `.github/workflows/deploy.yml`, which triggers only on
 a `push` to `main`; a push to `main` is required to deploy a new build, and the
@@ -175,6 +175,20 @@ feature branch stays unmerged until it is approved. The workflow installs
 Chromium and runs the repository quality gates — `pnpm lint`, `pnpm format:check`,
 `pnpm build`, `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration` —
 before publishing; any gate failure prevents deployment.
+
+The custom domain depends on external settings that live outside the repository:
+
+- **DNS.** A `CNAME` record for the `portfolio` subdomain points to
+  `dcerezotorrejon.github.io`. This is already configured by the maintainer, and
+  no DNS automation runs from the repository.
+- **GitHub Pages custom domain.** The custom domain `portfolio.dcerezo.work` must
+  be set in **Settings → Pages**. The domain is configured only there — **no
+  `CNAME` file is committed to the repository** (and none is emitted into the
+  build output).
+- **Enforce HTTPS.** **Enforce HTTPS** must be enabled in **Settings → Pages**;
+  GitHub provisions the certificate automatically.
+- The former project-site URL relies on GitHub Pages' automatic redirect to the
+  configured custom domain, so no redirect artifact is added to the repository.
 
 Before the first deployment, a repository administrator or maintainer must enable
 GitHub Pages in **Settings → Pages → Build and deployment → Source → GitHub Actions**.
