@@ -24,14 +24,14 @@
 
 ## Functions / components changed
 
-- `src/lib/base-url.ts`: `SITE` changed to `https://portfolio.dcerezo.work` and
+- `src/lib/base-url.ts`: `SITE` changed to `https://portfolio.dcerezo.com` and
   `BASE` changed to `/` (domain root); doc comments rewritten for the root-base
   passthrough. `withBase` logic unchanged (it already normalizes `/` to an empty
   prefix).
 - `playwright.config.ts`: `use.baseURL` and `webServer.url` point at the root
   preview `http://127.0.0.1:4321` instead of the removed deployment subpath.
 - `README.md`: "Site configuration" and "Deployment" document the new origin,
-  root base, published URL `https://portfolio.dcerezo.work/`, and the external
+  root base, published URL `https://portfolio.dcerezo.com/`, and the external
   prerequisites (DNS `CNAME`, Pages custom-domain setting, enforced HTTPS,
   automatic redirect), with no committed `CNAME` file.
 - `tests/integration/helpers/site.ts`: explanatory comments updated for the root

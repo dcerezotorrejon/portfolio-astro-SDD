@@ -5,7 +5,7 @@ import { base, site } from "../../astro.config.mjs";
 
 describe("Astro site configuration", () => {
   it("targets the custom-domain origin with the root base path", () => {
-    expect(site).toBe("https://portfolio.dcerezo.work");
+    expect(site).toBe("https://portfolio.dcerezo.com");
     expect(base).toBe("/");
   });
 

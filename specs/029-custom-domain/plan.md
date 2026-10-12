@@ -8,11 +8,11 @@
 
 Move the deployment from a GitHub Pages **project site** with a subpath
 (`https://dcerezotorrejon.github.io/portfolio-astro-SDD/`) to the custom
-subdomain at the **domain root** (`https://portfolio.dcerezo.work/`). The change
+subdomain at the **domain root** (`https://portfolio.dcerezo.com/`). The change
 is configuration + test alignment + documentation, not a feature rewrite:
 
 1. **Single source of truth.** `src/lib/base-url.ts` holds `SITE` and `BASE`.
-   Update `SITE` to `https://portfolio.dcerezo.work` and `BASE` to `/`. Its
+   Update `SITE` to `https://portfolio.dcerezo.com` and `BASE` to `/`. Its
    `withBase` helper already normalizes a root base to an empty prefix, so
    site-root paths pass through unchanged. `astro.config.mjs` only re-exports
    `SITE`/`BASE`, so it needs no literal change.
@@ -36,7 +36,7 @@ is configuration + test alignment + documentation, not a feature rewrite:
 
 ## Approved decisions (maintainer)
 
-- Origin `https://portfolio.dcerezo.work`, base `/` (domain root).
+- Origin `https://portfolio.dcerezo.com`, base `/` (domain root).
 - The custom domain is registered **only** in GitHub Pages Settings; **no
   `CNAME` file** is committed to the repository or emitted into `dist/`.
 - The DNS `CNAME` record `portfolio` → `dcerezotorrejon.github.io` is **already
@@ -113,7 +113,7 @@ or component markup (components already route through `withBase`).
 - **Unit / component**: `tests/unit/**` asserts the new `SITE`/`BASE`, root-base
   `withBase` behavior, and root-relative component output.
 - **SEO**: `tests/seo/**` asserts one canonical per page and the sitemap under
-  `https://portfolio.dcerezo.work/`, plus root-resolved assets/internal links.
+  `https://portfolio.dcerezo.com/`, plus root-resolved assets/internal links.
 - **Accessibility**: `tests/a11y/**` unchanged; run via `pnpm test:a11y`.
 - **Integration**: `pnpm test:integration` against the root preview.
 - **Gates** (Constitution §6): for the code/config/test change set run

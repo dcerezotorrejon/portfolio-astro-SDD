@@ -159,15 +159,15 @@ See [`specs/README.md`](specs/README.md) for spec conventions and
 ## Site configuration
 
 The canonical site URL is configured as
-`site = "https://portfolio.dcerezo.work"` in `astro.config.mjs`, together with
+`site = "https://portfolio.dcerezo.com"` in `astro.config.mjs`, together with
 `base = "/"` (the domain root). The site is published at
-`https://portfolio.dcerezo.work/`, so canonical URLs and the sitemap use that
+`https://portfolio.dcerezo.com/`, so canonical URLs and the sitemap use that
 origin at the root, with no deployment subpath.
 
 ## Deployment
 
 The site is published with GitHub Pages at
-`https://portfolio.dcerezo.work/`.
+`https://portfolio.dcerezo.com/`.
 
 Deployment is automated by `.github/workflows/deploy.yml`, which triggers only on
 a `push` to `main`; a push to `main` is required to deploy a new build, and the
@@ -181,7 +181,7 @@ The custom domain depends on external settings that live outside the repository:
 - **DNS.** A `CNAME` record for the `portfolio` subdomain points to
   `dcerezotorrejon.github.io`. This is already configured by the maintainer, and
   no DNS automation runs from the repository.
-- **GitHub Pages custom domain.** The custom domain `portfolio.dcerezo.work` must
+- **GitHub Pages custom domain.** The custom domain `portfolio.dcerezo.com` must
   be set in **Settings → Pages**. The domain is configured only there — **no
   `CNAME` file is committed to the repository** (and none is emitted into the
   build output).

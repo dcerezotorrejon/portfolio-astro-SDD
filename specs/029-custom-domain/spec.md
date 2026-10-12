@@ -21,7 +21,7 @@ single source of truth, `src/lib/base-url.ts`, re-exported by
 assertions, the SEO tests, and the Playwright integration harness.
 
 The maintainer wants the site served from the custom subdomain
-`https://portfolio.dcerezo.work` at the **domain root**. Moving from a project
+`https://portfolio.dcerezo.com` at the **domain root**. Moving from a project
 site with a subpath to a root-served custom domain changes the canonical origin
 and removes the base path from every generated URL, so the configuration, the
 tests that assert those URLs, and the deployment documentation must be re-aligned
@@ -32,8 +32,8 @@ that same setting.
 
 ## Goals
 
-- Serve the site at `https://portfolio.dcerezo.work` from the domain root.
-- Make `site = "https://portfolio.dcerezo.work"` and `base = "/"` the single
+- Serve the site at `https://portfolio.dcerezo.com` from the domain root.
+- Make `site = "https://portfolio.dcerezo.com"` and `base = "/"` the single
   configured origin and base path, with no deployment subpath remaining.
 - Keep canonical URLs, the sitemap, and all site-root asset/page references
   consistent with the new origin and root base.
@@ -57,16 +57,16 @@ that same setting.
 ## Requirements
 
 - **R1 — Configured origin and base**: The deployment origin is
-  `https://portfolio.dcerezo.work` and the base path is `/`. Both are defined in
+  `https://portfolio.dcerezo.com` and the base path is `/`. Both are defined in
   the single source of truth `src/lib/base-url.ts` (`SITE` and `BASE`) and
   re-exported by `astro.config.mjs` as `site` and `base`.
 - **R2 — Root-served URLs**: With the root base, `withBase` leaves site-root
   paths unchanged (no `""`/`/portfolio-astro-SDD` prefix is introduced), and
   built pages contain no `/portfolio-astro-SDD` segment.
 - **R3 — Canonical URLs**: Every built page emits exactly one `<link
-rel="canonical">` whose URL is under `https://portfolio.dcerezo.work/`.
+rel="canonical">` whose URL is under `https://portfolio.dcerezo.com/`.
 - **R4 — Sitemap**: The generated sitemap lists page URLs under
-  `https://portfolio.dcerezo.work/`, including the root page.
+  `https://portfolio.dcerezo.com/`, including the root page.
 - **R5 — Assets and internal links**: Every site-root asset reference and
   internal page link in the built output resolves at the domain root.
 - **R6 — Integration harness**: The Playwright configuration and the integration
@@ -85,14 +85,14 @@ rel="canonical">` whose URL is under `https://portfolio.dcerezo.work/`.
 
 ## Acceptance criteria
 
-- [x] AC1: `SITE`/`site` equals `https://portfolio.dcerezo.work` and
+- [x] AC1: `SITE`/`site` equals `https://portfolio.dcerezo.com` and
       `BASE`/`base` equals `/` (R1).
 - [x] AC2: `withBase` returns site-root paths unchanged under the root base, and
       no `/portfolio-astro-SDD` segment appears in built pages (R2).
 - [x] AC3: Every built page has exactly one canonical URL under
-      `https://portfolio.dcerezo.work/` (R3).
+      `https://portfolio.dcerezo.com/` (R3).
 - [x] AC4: The generated sitemap lists only URLs under
-      `https://portfolio.dcerezo.work/`, including the root page (R4).
+      `https://portfolio.dcerezo.com/`, including the root page (R4).
 - [x] AC5: Site-root asset and internal-link references in the built output
       resolve at the domain root (R5).
 - [x] AC6: The Playwright config and integration helper target the root preview,

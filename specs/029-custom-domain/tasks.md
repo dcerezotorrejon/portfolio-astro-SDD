@@ -32,7 +32,7 @@ because both tasks write to this shared `tasks.md` evidence file.
 
 **Dev implementation files (exact ownership):**
 
-- `src/lib/base-url.ts` — set `SITE = "https://portfolio.dcerezo.work"` and
+- `src/lib/base-url.ts` — set `SITE = "https://portfolio.dcerezo.com"` and
   `BASE = "/"`; update the doc comments to the root-base behavior.
 - `playwright.config.ts` — `use.baseURL` and `webServer.url` to
   `http://127.0.0.1:4321` (root preview).
@@ -104,8 +104,8 @@ and record the latest results plus approval/defects below.
   - `pnpm test:integration` — **pass** (applicable: routing/config/test
     tooling): 35 tests.
 - **Built-output spot checks**: home canonical
-  `https://portfolio.dcerezo.work/`; detail canonical
-  `https://portfolio.dcerezo.work/experiencia/<slug>/`; `dist/sitemap-0.xml`
+  `https://portfolio.dcerezo.com/`; detail canonical
+  `https://portfolio.dcerezo.com/experiencia/<slug>/`; `dist/sitemap-0.xml`
   lists exactly the three root URLs under the new origin; no
   `/portfolio-astro-SDD` anywhere under `dist/`; no `dist/CNAME`.
 - **Status**: **Approved.** All applicable gates pass; AC1–AC7 and AC9 are
@@ -127,7 +127,7 @@ and record the latest results plus approval/defects below.
 **Dev implementation files (exact ownership):**
 
 - `README.md` — update the "Site configuration" and "Deployment" sections to the
-  new origin `https://portfolio.dcerezo.work`, root base `/`, and published URL;
+  new origin `https://portfolio.dcerezo.com`, root base `/`, and published URL;
   document the external prerequisites: the DNS `CNAME` record
   (`portfolio` → `dcerezotorrejon.github.io`, already configured), the GitHub
   Pages custom-domain setting, and enforced HTTPS; state that no `CNAME` file is
@@ -152,9 +152,9 @@ committing a `CNAME` file.
   `git branch --show-current`); the `README.md` change is present uncommitted in
   the working tree alongside the T1 code/test changes.
 - **Content review (R8/AC8)**: verified against `README.md`:
-  - new origin `site = "https://portfolio.dcerezo.work"` (line 162), root base
+  - new origin `site = "https://portfolio.dcerezo.com"` (line 162), root base
     `base = "/"` described as the domain root (line 163), published URL
-    `https://portfolio.dcerezo.work/` (lines 164 and 170).
+    `https://portfolio.dcerezo.com/` (lines 164 and 170).
   - external prerequisites all present (lines 179–191): DNS `CNAME` record
     `portfolio` → `dcerezotorrejon.github.io` already configured (lines 181–183);
     Pages custom-domain setting in **Settings → Pages** (lines 184–187);

@@ -35,7 +35,7 @@ describe("home page SEO", () => {
     const canonicals = document.querySelectorAll('link[rel="canonical"]');
     expect(canonicals).toHaveLength(1);
     expect(canonicals[0]?.getAttribute("href")).toBe(
-      "https://portfolio.dcerezo.work/",
+      "https://portfolio.dcerezo.com/",
     );
   });
 });

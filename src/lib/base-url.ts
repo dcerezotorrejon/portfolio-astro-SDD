@@ -3,13 +3,13 @@
  * `astro.config.mjs` and the render-time `withBase` helper.
  *
  * The site is served from the custom-domain root at
- * `https://portfolio.dcerezo.work`, so `BASE` is `/` and `withBase` returns
+ * `https://portfolio.dcerezo.com`, so `BASE` is `/` and `withBase` returns
  * site-root paths unchanged because the normalized base is empty. `withBase`
  * deliberately does not read `import.meta.env.BASE_URL`: the base is derived
  * from the same `BASE` constant that `astro.config.mjs` exports as `base`,
  * keeping the render context and the built output consistent.
  */
-export const SITE = "https://portfolio.dcerezo.work";
+export const SITE = "https://portfolio.dcerezo.com";
 
 export const BASE = "/";
 
