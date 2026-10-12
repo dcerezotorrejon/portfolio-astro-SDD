@@ -20,7 +20,7 @@
 ## Functions / components changed
 
 - **`src/styles/global.css`** — Removed the `html.home-page { scroll-snap-type: y
-  proximity; }` rule and the `#inicio, #trayectoria { scroll-snap-align: start; }`
+proximity; }` rule and the `#inicio, #trayectoria { scroll-snap-align: start; }`
   rule, so the home page exposes no snap points. Kept
   `html { scroll-padding-block-start: var(--space-16); }` for fragment jumps.
 - **`src/layouts/SiteLayout.astro` / `src/pages/index.astro`** — Removed the
