@@ -284,7 +284,9 @@ describe("T2/T10 global style contracts", () => {
 
     // Button molecule geometry still resolves to the 44px minimum target.
     expect(resolveToken("--button-min-target", tokens)).toBe("44px");
-    expect(css).toMatch(/scroll-snap-type:\s*y proximity/);
+    // Home scrolling is fully free: no scroll snapping anywhere in global.css.
+    expect(css).not.toMatch(/scroll-snap-type/);
+    expect(css).not.toMatch(/scroll-snap-align/);
   });
 
   it("applies a subtle, fallback-safe liquid-glass surface to the floating navigator only", () => {
@@ -336,18 +338,11 @@ describe("T2/T10 global style contracts", () => {
   });
 
   it("keeps homepage fragment navigation instant and suppresses the pre-position indicator transition", () => {
-    const homePage = cssRule("html.home-page");
-
-    // Regression guard: `scroll-behavior: smooth` on `html.home-page` leaked
-    // into cross-document fragment navigation (e.g. returning from a detail
-    // page to "/#trayectoria") and produced a visible load-time scroll
-    // animation. The homepage rule must not declare `scroll-behavior` at all;
-    // proximity snap is retained separately.
-    expect(homePage).toMatch(/scroll-snap-type:\s*y proximity/);
-    expect(homePage).not.toMatch(/scroll-behavior/);
-    expect(css).not.toMatch(
-      /html\.home-page[\s\S]{0,120}?scroll-behavior:\s*smooth/,
-    );
+    // The homepage mediates no scrolling: no scroll snapping and no
+    // `scroll-behavior`, so fragment navigation and user scrolling stay free.
+    expect(css).not.toMatch(/scroll-snap-type/);
+    expect(css).not.toMatch(/scroll-snap-align/);
+    expect(css).not.toMatch(/scroll-behavior/);
 
     // The indicator must not animate before the navigator has measured and
     // painted the active section: `data-positioned` flips to "true" after the
@@ -355,6 +350,12 @@ describe("T2/T10 global style contracts", () => {
     expect(floatingNavSource).toContain(
       "group-data-[positioned=false]:transition-none",
     );
+
+    // docs/design.md reconciles its motion criteria: smooth scrolling is no
+    // longer presented as active behavior.
+    const design = readFileSync("docs/design.md", "utf8");
+
+    expect(design).not.toMatch(/Smooth-scroll|smooth scrolling/i);
   });
 
   it("preserves the scroll inset, reduced-motion overrides and un-themed decorations", () => {

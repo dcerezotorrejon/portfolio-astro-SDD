@@ -19,11 +19,7 @@ assertUniqueExperienceSlugs(experienceEntries);
 const experiences = sortExperiences(experienceEntries);
 ---
 
-<SiteLayout
-  title={profile.seo.title}
-  description={profile.seo.description}
-  isHome
->
+<SiteLayout title={profile.seo.title} description={profile.seo.description}>
   <main class="site-container home-main">
     <ProfileIntroduction profile={profile} />
     <ExperienceHistory experiences={experiences} profile={profile} />

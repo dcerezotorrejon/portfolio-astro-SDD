@@ -225,10 +225,6 @@
     scroll-padding-block-start: var(--space-16);
   }
 
-  html.home-page {
-    scroll-snap-type: y proximity;
-  }
-
   body {
     min-width: 320px;
     margin: 0;
@@ -306,13 +302,6 @@
   padding-block-end: calc(
     var(--home-end-scroll-space) + env(safe-area-inset-bottom, 0px)
   );
-}
-
-#inicio,
-#trayectoria {
-  /* The single 16 px start inset comes from html scroll-padding-block-start;
-     adding scroll-margin here would stack a second inset (32 px total). */
-  scroll-snap-align: start;
 }
 
 @media (min-width: 768px) {

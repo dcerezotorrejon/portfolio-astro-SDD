@@ -3,8 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getActiveSectionIndex,
-  hasReachedActivation,
-  prefersReducedMotion,
   scrollToSection,
 } from "../../src/components/home/FloatingNav/helpers/navigation";
 
@@ -113,59 +111,9 @@ describe("getActiveSectionIndex (section-start activation)", () => {
   });
 });
 
-describe("hasReachedActivation (indicator hold release threshold)", () => {
-  it("treats a top at or above the 16px inset plus 1px tolerance as reached", () => {
-    expect(hasReachedActivation(0)).toBe(true);
-    expect(hasReachedActivation(16)).toBe(true);
-    expect(hasReachedActivation(16.4)).toBe(true);
-    expect(hasReachedActivation(17)).toBe(true);
-  });
-
-  it("treats a top past the tolerance band as not reached", () => {
-    expect(hasReachedActivation(17.1)).toBe(false);
-    expect(hasReachedActivation(300)).toBe(false);
-  });
-
-  it("honors a custom activation offset and tolerance", () => {
-    expect(hasReachedActivation(101, 100, 0)).toBe(false);
-    expect(hasReachedActivation(101, 100, 1)).toBe(true);
-    expect(hasReachedActivation(120, 120)).toBe(true);
-    expect(hasReachedActivation(126, 120, 5)).toBe(false);
-  });
-});
-
-describe("prefersReducedMotion", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("reflects the reduce media query in both directions", () => {
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: true })),
-    );
-    expect(prefersReducedMotion()).toBe(true);
-
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: false })),
-    );
-    expect(prefersReducedMotion()).toBe(false);
-    expect(window.matchMedia).toHaveBeenCalledWith(
-      "(prefers-reduced-motion: reduce)",
-    );
-  });
-
-  it("returns false when matchMedia is unavailable", () => {
-    vi.stubGlobal("matchMedia", undefined);
-    expect(prefersReducedMotion()).toBe(false);
-  });
-});
-
 describe("scrollToSection", () => {
   afterEach(() => {
     document.getElementById("target")?.remove();
-    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
@@ -177,37 +125,13 @@ describe("scrollToSection", () => {
   }
 
   it("returns false for a missing target without scrolling", () => {
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: false })),
-    );
     expect(scrollToSection("missing")).toBe(false);
   });
 
-  it("smooth-scrolls an existing target to the block start", () => {
+  it("scrolls instantly to the block start for an existing target", () => {
     const target = makeTarget();
     const scrollIntoView = vi.fn();
     target.scrollIntoView = scrollIntoView;
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: false })),
-    );
-
-    expect(scrollToSection("target")).toBe(true);
-    expect(scrollIntoView).toHaveBeenCalledWith({
-      block: "start",
-      behavior: "smooth",
-    });
-  });
-
-  it("scrolls immediately under reduced motion", () => {
-    const target = makeTarget();
-    const scrollIntoView = vi.fn();
-    target.scrollIntoView = scrollIntoView;
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: true })),
-    );
 
     expect(scrollToSection("target")).toBe(true);
     expect(scrollIntoView).toHaveBeenCalledWith({
@@ -222,10 +146,6 @@ describe("scrollToSection", () => {
       configurable: true,
       value: undefined,
     });
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn(() => ({ matches: false })),
-    );
 
     expect(scrollToSection("target")).toBe(false);
   });
