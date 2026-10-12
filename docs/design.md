@@ -169,11 +169,12 @@ the feature spec determines where it appears and which destinations it exposes.
 ## Interaction and motion
 
 - Shared-element transitions and sliding indicators use a 200 ms duration.
-  Smooth-scroll distance/timing remains browser-controlled.
+  In-page activation jumps directly to the target section without animating the
+  scroll.
 - Retarget interrupted indicator animations to the latest active section;
   settled selection must not oscillate or stop between links.
-- On reduced motion, disable shared-element animation, indicator movement, and
-  smooth scrolling; navigation and selection changes remain functional.
+- On reduced motion, disable shared-element animation and indicator movement;
+  navigation and selection changes remain functional.
 - Unsupported view transitions fall back to normal page navigation.
 - Hover and pressed states must keep labels readable. Use the link/focus color
   for a clearly visible keyboard-focus outline; do not rely on color alone to

@@ -6,10 +6,9 @@ import { withBase } from "../lib/base-url";
 interface Props {
   title: string;
   description: string;
-  isHome?: boolean;
 }
 
-const { title, description, isHome = false } = Astro.props;
+const { title, description } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
 // The font URL must carry the configured base in the emitted CSS. Plain CSS
@@ -27,7 +26,7 @@ const fontFaceCss = `@font-face {
 ---
 
 <!doctype html>
-<html lang="es" class:list={{ "home-page": isHome }}>
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />

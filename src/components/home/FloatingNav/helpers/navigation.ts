@@ -1,17 +1,7 @@
-/** Whether the user has requested reduced motion in the current environment. */
-export function prefersReducedMotion(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
 /**
- * Scroll the section with `id` to the viewport start inset, animating unless
- * the user prefers reduced motion. Returns `false` when the target is missing
- * or `scrollIntoView` is unavailable, so callers can keep the native anchor
- * behavior as a fallback.
+ * Jump the section with `id` to the viewport start inset, without animating the
+ * scroll. Returns `false` when the target is missing or `scrollIntoView` is
+ * unavailable, so callers can keep the native anchor behavior as a fallback.
  */
 export function scrollToSection(id: string): boolean {
   const target = document.getElementById(id);
@@ -20,10 +10,7 @@ export function scrollToSection(id: string): boolean {
     return false;
   }
 
-  target.scrollIntoView({
-    block: "start",
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-  });
+  target.scrollIntoView({ block: "start", behavior: "auto" });
 
   return true;
 }
@@ -32,23 +19,6 @@ export interface SectionStart {
   id: string;
   /** Section top in viewport coordinates (`getBoundingClientRect().top`). */
   top: number;
-}
-
-/**
- * Whether a section top has reached the activation inset.
- *
- * Mirrors the threshold used by `getActiveSectionIndex`: a top counts as
- * arrived when it is at or above `activationOffset` plus the 1 px rounding
- * tolerance (so a top of 16.4 px with the default values still qualifies).
- * Kept as a separate pure helper so the indicator hold can be released at the
- * exact same moment geometry would activate the section.
- */
-export function hasReachedActivation(
-  top: number,
-  activationOffset = 16,
-  tolerance = 1,
-): boolean {
-  return top <= activationOffset + tolerance;
 }
 
 /**
