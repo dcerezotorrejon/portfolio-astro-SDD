@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm lint)",
+      "Bash(pnpm format:check)",
+      "Bash(pnpm build)",
+      "Bash(pnpm test:run)",
+      "Bash(pnpm test:a11y)",
+      "Bash(pnpm test:integration)",
+      "Bash(pnpm exec vitest run *)",
+      "Bash(pnpm exec prettier --write *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-agent-permissions.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

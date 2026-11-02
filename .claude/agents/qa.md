@@ -1,54 +1,10 @@
 ---
+name: qa
 description: Verifies one task on the shared spec branch, reviews Dev's unit tests for sufficiency, owns and runs the remaining tests and gates, updates assigned tests and evidence while the increment is active, and returns defects to the same Dev without production edits, commits, or pushes.
-mode: subagent
-model: opencode-go/deepseek-v4.1-flash
-color: "#E3B341"
-permissions:
-  - action: edit
-    resource: "**"
-    effect: deny
-  - action: edit
-    resource: "tests/**"
-    effect: allow
-  - action: edit
-    resource: "tests/unit/**"
-    effect: deny
-  - action: edit
-    resource: "specs/*/tasks.md"
-    effect: allow
-  - action: edit
-    resource: "specs/**/spec.md"
-    effect: deny
-  - action: edit
-    resource: "specs/*/spec.md"
-    effect: allow
-  - action: edit
-    resource: "specs/_template/**"
-    effect: deny
-  - action: shell
-    resource: "git*branch*"
-    effect: deny
-  - action: shell
-    resource: "git branch --show-current"
-    effect: allow
-  - action: shell
-    resource: "git*checkout*"
-    effect: deny
-  - action: shell
-    resource: "git*switch*"
-    effect: deny
-  - action: shell
-    resource: "git*merge*"
-    effect: deny
-  - action: shell
-    resource: "git*commit*"
-    effect: deny
-  - action: shell
-    resource: "git*push*"
-    effect: deny
-  - action: subagent
-    resource: "*"
-    effect: deny
+model: sonnet
+effort: medium
+color: yellow
+disallowedTools: Agent
 ---
 
 # QA
@@ -106,7 +62,8 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    change any other spec text or checkbox.
 6. Return either approval with evidence for all applicable gates or specific
    defects to the Lead. The Lead returns defects to the same Dev for correction
-   on the shared branch, then QA verifies again. A task remains active through
+   on the shared branch, or to a new Dev instance if the Lead escalates the model,
+   then QA verifies again. A task remains active through
    verification, evidence recording, and rework; it closes only after QA approval
    and recorded evidence. Do not mark a defective task complete.
 
@@ -128,7 +85,7 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
   production code yourself.
 - Do not read completed specification directories by default, including their
   `spec.md`, `plan.md`, `tasks.md`, and `summary.md`. The sole exception is an
-  explicit request from the maintainer or a `mode: primary` agent; it may
+  explicit request from the maintainer or a primary agent (`spec-refiner` or `dev-lead`); it may
   authorize all participants in that feature, including QA subagents, to read
   completed spec content without naming paths or a purpose. Read authorization
   never permits edits to a completed directory.

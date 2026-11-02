@@ -4,8 +4,8 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.11.2
-- **Last amended**: 2026-10-07
+- **Version**: 1.12.1
+- **Last amended**: 2026-11-02
 
 ---
 
@@ -104,8 +104,8 @@ with the rest of the historical snapshot.
   default. This includes opening, searching, indexing, summarizing, or quoting
   any completed `spec.md`, `plan.md`, `tasks.md`, or `summary.md`. Assignment to a
   new feature alone does not authorize a historical read.
-- The sole read exception is an explicit request from the maintainer or an agent
-  whose current prompt declares `mode: primary`. Such a request may authorize
+- The sole read exception is an explicit request from the maintainer or a primary
+  agent (`spec-refiner` or `dev-lead`). Such a request may authorize
   all participants in that feature, including subagents, to read completed
   specification content; it need not identify particular directories or state a
   purpose.
@@ -149,12 +149,16 @@ with the rest of the historical snapshot.
   assignment through verification approval, evidence, and any rework. It closes
   only after verification approval and recorded evidence. Verification MUST take
   place on the shared branch; defects return to the same implementer on that
-  branch. Verification may update assigned tests and task evidence but MUST NOT
+  branch, unless the Lead escalates the model after a failure, in which case a new
+  implementer instance on a higher model takes over the task on that branch. Verification may
+  update assigned tests and task evidence but MUST NOT
   edit production code.
 - The Dev Lead orchestrates work. Workflow Markdown — `AGENTS.md`,
-  `docs/constitution.md`, and the agent definitions (`.opencode/agents/*.md`) — is
-  owned by the Lead, who implements it directly and delegates only its
-  verification to QA; Dev NEVER edits these files. The Lead also owns the assigned
+  `docs/constitution.md`, and the agent definitions (`.claude/agents/*.md`) — and
+  the permission enforcement files (`.claude/agent-permissions.json`,
+  `.claude/hooks/**`, `.claude/settings.json`) are owned by the Lead, who
+  implements them directly and delegates only their verification to QA; Dev NEVER
+  edits these files. The Lead also owns the assigned
   current increment's `plan.md`, `tasks.md`, and `summary.md`, and delegates every
   other implementation to Dev with exact file ownership and within Dev's current
   permissions. The Lead MUST NOT implement application code, content, non-workflow
@@ -200,6 +204,18 @@ with the rest of the historical snapshot.
   process in §11. Completed specification files MUST NOT establish or override
   current workflow rules, permissions, role boundaries, or current behavior. The
   access and immutability rules in §4.2 apply to every completed increment.
+
+### 5.2 Project configuration changes
+
+- The role, branch, and task rules in §§5–5.1 apply to spec increments. A change
+  limited to agents, workflow guidance, tooling, lint/format/test configuration,
+  CI, or dependency maintenance that does not alter site behavior does not require
+  a spec, a `spec/*` branch, or the Dev/QA flow.
+- A change that alters generated HTML, content, routes, styles, client behavior,
+  or the published deployment is a spec increment.
+- The applicable §6 gates still apply, base-branch integration still requires
+  explicit affirmative maintainer approval, and amendments to this constitution
+  still follow §11.
 
 ## 6. Quality gates
 
@@ -277,6 +293,10 @@ The approved verification stack is:
 - **Lint / format**: ESLint and Prettier (already configured).
 - **CSS**: Tailwind CSS v4 through the official Vite plugin `@tailwindcss/vite` (global stylesheet at `src/styles/global.css` with `@import "tailwindcss";`). (Note: `@astrojs/tailwind`/Tailwind 3 is legacy and not used.)
 - **Client interactivity**: React through `@astrojs/react`, used only for interactive islands (see §2). The React Compiler is enabled (`react({ compiler: true })`) via the `oxc-transform-react` dev dependency.
+
+- **Agent runtime**: [Claude Code](https://code.claude.com/docs), with agents in
+  `.claude/agents/`, skills in `.claude/skills/`, and per-agent permissions enforced
+  by a `PreToolUse` hook from `.claude/agent-permissions.json`.
 
 Adding or replacing tools requires updating this section.
 
