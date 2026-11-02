@@ -62,7 +62,8 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
    change any other spec text or checkbox.
 6. Return either approval with evidence for all applicable gates or specific
    defects to the Lead. The Lead returns defects to the same Dev for correction
-   on the shared branch, then QA verifies again. A task remains active through
+   on the shared branch, or to a new Dev instance if the Lead escalates the model,
+   then QA verifies again. A task remains active through
    verification, evidence recording, and rework; it closes only after QA approval
    and recorded evidence. Do not mark a defective task complete.
 

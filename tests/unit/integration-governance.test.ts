@@ -15,7 +15,7 @@ const lead = read(".claude/agents/dev-lead.md");
 
 describe("integration gate governance", () => {
   it("versions the approved amendment and defines when integration applies", () => {
-    expect(constitution).toMatch(/\*\*Version\*\*: 1\.12\.0/);
+    expect(constitution).toMatch(/\*\*Version\*\*: 1\.12\.1/);
     expect(constitution).toMatch(/\*\*Last amended\*\*: 2026-11-02/);
     expect(normalized(constitution)).toContain(
       "The integration gate applies to changes that affect page rendering, routing, content, styles, or client behavior; browser-complex components; and the integration suite or its tooling.",

@@ -536,6 +536,21 @@ describe("shared and role-specific workflow guidance", () => {
     ]);
   });
 
+  it("escalates the model after a failure from haiku through sonnet to opus", () => {
+    expectPromptFragments("dev-lead", [
+      "Escalate that task from `haiku` to `sonnet` and from `sonnet` to `opus`.",
+      "Launch a new instance on the higher model",
+      "Record each escalation and why.",
+      "if it still cannot resolve the task, stop and notify the maintainer.",
+    ]);
+    expectPromptFragments("dev", [
+      "unless the Lead escalates the model, in which case a new Dev instance takes over the task.",
+    ]);
+    expect(normalizedWorkflow).toContain(
+      "unless the Lead escalates the model after a failure",
+    );
+  });
+
   it("documents task-boundary role-specific work and QA's evidence-backed checkbox exception", () => {
     expectPromptFragments("spec-refiner", [
       "Author or substantively re-anchor only the assigned current `spec.md`",
@@ -569,7 +584,7 @@ describe("shared and role-specific workflow guidance", () => {
       "Confirm the current branch using read-only inspection; if it differs, stop and notify the Lead rather than switching branches.",
       "Implement the smallest correct change that satisfies the task within the explicitly assigned file/scope ownership.",
       "Do not create, switch, or use task/developer branches (`dev/...`); do not merge, commit, or push.",
-      "the same Dev corrects them there and returns the task to QA.",
+      "the same Dev corrects them there and returns the task to QA",
     ]);
     expectPromptFragments("qa", [
       "Verify directly on the Lead's shared `spec/[NNN]-[slug]` branch.",

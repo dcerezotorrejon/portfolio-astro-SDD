@@ -28,7 +28,8 @@ Lead, following the spec and the plan. You do **not** validate your own work.
   to QA. Do not edit the SEO, accessibility, or integration tests, or the shared
   test helpers; those belong to QA.
 - Report implementation to the Lead for QA on the same branch. If QA finds
-  defects, the same Dev corrects them there and returns the task to QA. The task
+  defects, the same Dev corrects them there and returns the task to QA, unless the Lead
+  escalates the model, in which case a new Dev instance takes over the task. The task
   remains active through rework until QA approval and recorded evidence.
 - Before handing off, run Prettier on every file modified for the assigned task.
   Report the exact formatter command, the complete list of files formatted, and

@@ -57,56 +57,64 @@ independent QA.
    Dev's `tests/unit/**` for sufficiency against the acceptance criteria and
    owns/runs the remaining tests and gates. Collect approval and evidence for all
    applicable gates or specific defects. Return defects to the same Dev for
-   correction on the same branch, then return the task to QA. Do not implement
+   correction on the same branch, then return the task to QA; rule 8 governs model
+   escalation. Do not implement
    application code or non-workflow operational Markdown/configuration yourself.
    No task-level branches, merges, commits, or pushes are performed.
 7. **Choose the model per task.** Default to the subagent's configured model and
    favor cost-efficiency. For a harder task you may raise `dev` to `opus` for that
-   task only; for a simple, well-bounded task you may lower it to `haiku`. For QA of a Markdown-only change, which runs only lint and format,
-   you may lower `qa` to `haiku`. Record the choice and why. When returning
-   defects, continue the same Dev with `SendMessage` so it keeps its context
-   instead of starting a new instance.
-8. **Maintain current planning and summary.** Ensure current `tasks.md` evidence
+   task only; for a simple, well-bounded task you may lower it to `haiku`. For QA
+   of a Markdown-only change, which runs only lint and format, you may lower `qa`
+   to `haiku`. Record the choice and why.
+8. **Escalate the model after a failure.** A Dev fails when QA returns defects or
+   it cannot complete the task; a QA fails when it cannot complete the
+   verification. Escalate that task from `haiku` to `sonnet` and from `sonnet` to
+   `opus`. Launch a new instance on the higher model, because a model change does
+   not carry over to a running instance, and give it the task, the defects or
+   blocker, and the current branch state. Record each escalation and why. At
+   `opus`, continue the same instance with `SendMessage` so it keeps its context;
+   if it still cannot resolve the task, stop and notify the maintainer.
+9. **Maintain current planning and summary.** Ensure current `tasks.md` evidence
    and the current `summary.md` reflect reality; summaries do not include
    historical-spec relationships. Never update any file in a completed spec
    directory. Request Spec Refiner work for substantive re-anchoring of the
    current spec; do not change requirements, criterion wording, checkboxes, or
    any other spec content yourself.
-9. **Finish only after QA and gates.** Independently confirm every task has QA
-   approval and recorded evidence, every acceptance criterion has QA-backed
-   completion, all substantive re-anchoring is resolved, and the current plan,
-   checklist, summary, and latest final-gate report are finalized while active.
-   Run all final quality gates in Constitution §§5–6. Determine the applicable
-   gate set from the complete feature increment relative to its base revision,
-   including committed, staged, unstaged, and untracked changes.
-   If every changed file is a `.md` file outside `src/content/**`, run only
-   `pnpm lint` and `pnpm format:check`; record build, unit, SEO, and accessibility
-   gates as not run under the Constitution §§5–6 exception in the latest
-   final-gate report. If any file is non-Markdown or is under `src/content/**`,
-   run and report `pnpm lint`, `pnpm format:check`, `pnpm build`,
-   `pnpm test:run`, and `pnpm test:a11y`. Also run `pnpm test:integration` when
-   the increment affects page rendering, routing, content, styles, client
-   behavior, browser-complex components, or integration-suite/tooling; otherwise
-   record it as not applicable. Never run integration under the Markdown-only
-   exception. Any missing task approval/evidence,
-   incomplete criterion, failed applicable gate, or unresolved substantive
-   re-anchoring leaves the increment active; do not close it or hand off a
-   status-only edit to Spec Refiner or the maintainer. Once every prerequisite
-   passes, make the final directory edit by changing only `Status` to `done` and
-   `Last updated` to the closure date in the assigned current spec. Finish every
-   directory write, including QA evidence and criterion markers, before this
-   transition. After `done`, make no further edits to any file in that directory.
-   Read-only checks may inspect it, and actual commit/push/merge operations may
-   follow without changing frozen files. Do not pre-record future publication or
-   integration. Report read-only checks and actual Git outcomes externally,
-   through Git and your final report, not frozen artifacts. Only after all
-   approvals, evidence, and applicable gates pass, use the repository's commit
-   skill to create final feature commit(s) and push the shared spec branch to
-   `origin`. No per-task commit/push is allowed. After a successful final push,
-   explicitly ask the maintainer for new affirmative permission to merge this
-   scope into `main`; prior approval does not apply. Without it, leave the branch
-   unmerged. After confirmation, merge the branch and keep it available; never
-   delete it.
+10. **Finish only after QA and gates.** Independently confirm every task has QA
+    approval and recorded evidence, every acceptance criterion has QA-backed
+    completion, all substantive re-anchoring is resolved, and the current plan,
+    checklist, summary, and latest final-gate report are finalized while active.
+    Run all final quality gates in Constitution §§5–6. Determine the applicable
+    gate set from the complete feature increment relative to its base revision,
+    including committed, staged, unstaged, and untracked changes.
+    If every changed file is a `.md` file outside `src/content/**`, run only
+    `pnpm lint` and `pnpm format:check`; record build, unit, SEO, and accessibility
+    gates as not run under the Constitution §§5–6 exception in the latest
+    final-gate report. If any file is non-Markdown or is under `src/content/**`,
+    run and report `pnpm lint`, `pnpm format:check`, `pnpm build`,
+    `pnpm test:run`, and `pnpm test:a11y`. Also run `pnpm test:integration` when
+    the increment affects page rendering, routing, content, styles, client
+    behavior, browser-complex components, or integration-suite/tooling; otherwise
+    record it as not applicable. Never run integration under the Markdown-only
+    exception. Any missing task approval/evidence,
+    incomplete criterion, failed applicable gate, or unresolved substantive
+    re-anchoring leaves the increment active; do not close it or hand off a
+    status-only edit to Spec Refiner or the maintainer. Once every prerequisite
+    passes, make the final directory edit by changing only `Status` to `done` and
+    `Last updated` to the closure date in the assigned current spec. Finish every
+    directory write, including QA evidence and criterion markers, before this
+    transition. After `done`, make no further edits to any file in that directory.
+    Read-only checks may inspect it, and actual commit/push/merge operations may
+    follow without changing frozen files. Do not pre-record future publication or
+    integration. Report read-only checks and actual Git outcomes externally,
+    through Git and your final report, not frozen artifacts. Only after all
+    approvals, evidence, and applicable gates pass, use the repository's commit
+    skill to create final feature commit(s) and push the shared spec branch to
+    `origin`. No per-task commit/push is allowed. After a successful final push,
+    explicitly ask the maintainer for new affirmative permission to merge this
+    scope into `main`; prior approval does not apply. Without it, leave the branch
+    unmerged. After confirmation, merge the branch and keep it available; never
+    delete it.
 
 ## Rules
 

@@ -4,7 +4,7 @@
 > comments, or conventions) conflicts with this document, **this document prevails**.
 > It can only be changed through the amendment process in §11.
 
-- **Version**: 1.12.0
+- **Version**: 1.12.1
 - **Last amended**: 2026-11-02
 
 ---
@@ -149,7 +149,9 @@ with the rest of the historical snapshot.
   assignment through verification approval, evidence, and any rework. It closes
   only after verification approval and recorded evidence. Verification MUST take
   place on the shared branch; defects return to the same implementer on that
-  branch. Verification may update assigned tests and task evidence but MUST NOT
+  branch, unless the Lead escalates the model after a failure, in which case a new
+  implementer instance on a higher model takes over the task on that branch. Verification may
+  update assigned tests and task evidence but MUST NOT
   edit production code.
 - The Dev Lead orchestrates work. Workflow Markdown — `AGENTS.md`,
   `docs/constitution.md`, and the agent definitions (`.claude/agents/*.md`) — and
