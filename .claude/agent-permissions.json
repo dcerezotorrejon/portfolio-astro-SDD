@@ -53,11 +53,6 @@
       "effect": "deny"
     },
     {
-      "action": "shell",
-      "resource": "git merge *",
-      "effect": "allow"
-    },
-    {
       "action": "edit",
       "resource": "AGENTS.md",
       "effect": "allow"
@@ -86,6 +81,36 @@
       "action": "edit",
       "resource": ".claude/settings.json",
       "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git*push*--force*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git*push* -f*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git*push*--delete*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git*branch* -D*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git*branch* -d*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git*branch*--delete*",
+      "effect": "deny"
     }
   ],
   "dev": [
@@ -165,6 +190,11 @@
       "effect": "deny"
     },
     {
+      "action": "edit",
+      "resource": ".claude/settings.local.json",
+      "effect": "deny"
+    },
+    {
       "action": "shell",
       "resource": "git*branch*",
       "effect": "deny"
@@ -197,6 +227,26 @@
     {
       "action": "shell",
       "resource": "git*push*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* stash*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* reset*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* restore*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* clean*",
       "effect": "deny"
     }
   ],
@@ -270,6 +320,51 @@
       "action": "shell",
       "resource": "git*push*",
       "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* stash*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* reset*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* restore*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "git* clean*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "*prettier*--write*",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm format",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm lint:fix",
+      "effect": "deny"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm exec prettier --write tests/*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm exec prettier --write specs/*",
+      "effect": "allow"
     }
   ]
 }

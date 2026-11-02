@@ -22,6 +22,7 @@ import {
 import { fileURLToPath } from "node:url";
 
 const EDIT_TOOLS = new Set(["Edit", "Write", "NotebookEdit"]);
+const DONE_STATUS = /^- \*\*Status\*\*:\s*done\s*$/m;
 
 // `*` and `**` both cross `/`; a leading double-star directory also matches zero directories.
 export function matchesResource(pattern, resource) {
@@ -98,6 +99,14 @@ export function toRepoPath(projectDir, cwd, filePath) {
   return path.split(sep).join("/");
 }
 
+/** Returns whether a repo-relative path is inside a spec directory closed as done. */
+export function isInCompletedSpec(projectDir, path) {
+  const directory = /^specs\/([^/]+)\//.exec(path)?.[1];
+  if (directory === undefined || directory === "_template") return false;
+  const spec = join(projectDir, "specs", directory, "spec.md");
+  return existsSync(spec) && DONE_STATUS.test(readFileSync(spec, "utf8"));
+}
+
 /** Decides a tool call: "allow", "deny", or undefined for no decision. */
 export function decide(rules, input, projectDir) {
   const { tool_name: toolName, tool_input: toolInput = {} } = input;
@@ -106,7 +115,9 @@ export function decide(rules, input, projectDir) {
     const filePath = toolInput.file_path ?? toolInput.notebook_path;
     if (typeof filePath !== "string") return "deny";
     const path = toRepoPath(projectDir, input.cwd ?? projectDir, filePath);
-    return path === null ? undefined : effectivePermission(rules, "edit", path);
+    if (path === null) return undefined;
+    if (isInCompletedSpec(projectDir, path)) return "deny";
+    return effectivePermission(rules, "edit", path);
   }
 
   if (toolName === "Bash") {

@@ -37,7 +37,8 @@ independent QA.
    Dev and QA sessions must use this same branch; never create or use `dev/...`
    task/developer branches.
 3. **Write `plan.md`**: approach, files to change, approved decisions and
-   trade-offs, risks, and testing strategy.
+   trade-offs, risks, and testing strategy. For UI work, reference and follow the
+   applicable criteria in `docs/design.md` (Constitution §2.1).
 4. **Write `tasks.md`**: a checklist of **self-contained** tasks with explicit
    dependencies and named file/scope ownership. Confirm the plan with the
    maintainer before starting execution.

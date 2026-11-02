@@ -159,11 +159,25 @@ describe("custom agent definitions", () => {
     expect(lead.fields.tools).toContain("Agent(dev, qa)");
     expect(lead.fields.disallowedTools).toBeUndefined();
 
-    for (const id of ["spec-refiner", "dev", "qa"]) {
+    const expected = {
+      "spec-refiner": "Agent, Bash",
+      dev: "Agent",
+      qa: "Agent",
+    };
+    for (const [id, disallowedTools] of Object.entries(expected)) {
       const { fields } = agents.get(id)!;
-      expect(fields.disallowedTools).toBe("Agent");
+      expect(fields.disallowedTools).toBe(disallowedTools);
       expect(fields.tools).toBeUndefined();
     }
+  });
+
+  it("points every agent to the global design document", () => {
+    for (const id of ["spec-refiner", "dev-lead", "dev", "qa"]) {
+      expectPromptFragments(id, ["`docs/design.md`"]);
+    }
+    expectPromptFragments("dev", [
+      "Read `docs/constitution.md` before editing",
+    ]);
   });
 
   it("preserves the role-specific write boundaries and ordered Dev/QA policies", () => {
@@ -299,15 +313,25 @@ describe("custom agent definitions", () => {
         "git switch other",
         "git checkout other",
         "git branch new",
+        "git stash",
+        "git reset --hard",
+        "git restore .",
+        "git clean -fd",
       ]) {
         expect(effectivePermission(agent, "shell", command), command).toBe(
           "deny",
         );
       }
     }
+    expect(
+      effectivePermission(dev, "edit", ".claude/settings.local.json"),
+    ).toBe("deny");
+    expect(
+      effectivePermission(qa, "shell", "pnpm exec prettier --write src/a.ts"),
+    ).toBe("deny");
   });
 
-  it("keeps Dev Lead feature-spec and test edits denied and merge capability explicit", () => {
+  it("keeps Dev Lead feature-spec and test edits denied and merge without automatic approval", () => {
     const lead = agents.get("dev-lead")!;
     const tuples = permissionTuples(lead);
     expect(tuples).toContainEqual(["edit", "**", "deny"]);
@@ -317,7 +341,6 @@ describe("custom agent definitions", () => {
     expect(
       effectivePermission(lead, "edit", "specs/014-feature/tasks.md"),
     ).toBe("allow");
-    expect(tuples).toContainEqual(["shell", "git merge *", "allow"]);
 
     const staticallyAllowed = [
       "specs/014-feature/plan.md",
@@ -336,7 +359,16 @@ describe("custom agent definitions", () => {
         "deny",
       );
     }
-    expect(effectivePermission(lead, "shell", "git merge main")).toBe("allow");
+    expect(
+      effectivePermission(lead, "shell", "git merge main"),
+    ).toBeUndefined();
+    for (const command of [
+      "git push --force origin main",
+      "git push -f origin main",
+      "git branch -D spec/014-feature",
+    ]) {
+      expect(effectivePermission(lead, "shell", command), command).toBe("deny");
+    }
 
     expectPromptFragments("dev-lead", [
       "Your direct edits are the assigned current increment's `plan.md`, `tasks.md`, and `summary.md`",

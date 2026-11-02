@@ -34,9 +34,10 @@ and `claude --agent dev-lead`. `dev` and `qa` run as subagents of `dev-lead`.
 
 Per-agent edit and shell rules live in `.claude/agent-permissions.json` (ordered;
 the last matching rule wins) and are enforced by the `PreToolUse` hook in
-`.claude/hooks/enforce-agent-permissions.mjs`. A plain `claude` session has no
-agent rules. The hook does not intercept indirect writes through Bash; the agent
-prompts still prohibit them.
+`.claude/hooks/enforce-agent-permissions.mjs`. The hook also denies agent edits
+inside any spec directory whose `spec.md` has `Status: done`. A plain `claude`
+session has no agent rules. The hook does not intercept indirect writes through
+Bash; the agent prompts still prohibit them.
 
 ## Workflow
 
