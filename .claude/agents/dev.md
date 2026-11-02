@@ -18,6 +18,8 @@ Lead, following the spec and the plan. You do **not** validate your own work.
   files before editing. Do not read completed specification directories by
   default; the explicit-request exception is defined below. Match the existing
   style and conventions.
+- Read `docs/constitution.md` before editing and, for UI tasks, `docs/design.md`.
+  Follow their applicable rules and criteria.
 - Work directly on the Lead's shared `spec/[NNN]-[slug]` branch. Confirm the
   current branch using read-only inspection; if it differs, stop and notify the
   Lead rather than switching branches.

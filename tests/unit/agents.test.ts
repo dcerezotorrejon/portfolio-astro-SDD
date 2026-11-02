@@ -166,6 +166,15 @@ describe("custom agent definitions", () => {
     }
   });
 
+  it("points every agent to the global design document", () => {
+    for (const id of ["spec-refiner", "dev-lead", "dev", "qa"]) {
+      expectPromptFragments(id, ["`docs/design.md`"]);
+    }
+    expectPromptFragments("dev", [
+      "Read `docs/constitution.md` before editing",
+    ]);
+  });
+
   it("preserves the role-specific write boundaries and ordered Dev/QA policies", () => {
     const specRefiner = agents.get("spec-refiner")!;
     expect(permissionTuples(specRefiner)).toEqual([

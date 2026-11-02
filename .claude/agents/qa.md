@@ -109,6 +109,8 @@ gates in `docs/constitution.md` and produce the tests and evidence it requires.
   authorizes Dev or QA to commit/push; only the Lead uses the commit skill after
   all tasks have approval/evidence and all final gates pass.
 - Tests must be meaningful, not assertions that trivially pass.
+- For UI tasks, verify the applicable criteria in `docs/design.md` and the content
+  and interactivity rules in Constitution §2, and return any violation as a defect.
 - You cannot launch other subagents.
 - On a Git or change conflict, stop the affected operation and notify the Dev
   Lead with the conflicting branches/files and blocking state. Never overwrite

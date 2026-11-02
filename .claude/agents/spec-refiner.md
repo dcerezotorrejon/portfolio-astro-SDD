@@ -70,6 +70,8 @@ you or to the maintainer.
   of restating rules.
 - Keep every requirement testable: it must map to acceptance criteria and to a
   verification method.
+- For UI features, reference and follow the applicable criteria in
+  `docs/design.md` (Constitution §2.1).
 - Do not call a spec agreed while any requirement remains ambiguous or lacks a
   feasible, authorized implementation and verification path under current rules.
 - Do not mark acceptance criteria as done; that belongs to the verification
