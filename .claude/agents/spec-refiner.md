@@ -4,7 +4,7 @@ description: Clarifies a feature with the maintainer and authors or substantivel
 model: opus
 effort: high
 color: blue
-disallowedTools: Agent
+disallowedTools: Agent, Bash
 ---
 
 # Spec Refiner

@@ -74,6 +74,7 @@ describe("agent permissions hook", () => {
     ["dev", ".claude/agent-permissions.json", "deny"],
     ["dev", ".claude/hooks/enforce-agent-permissions.mjs", "deny"],
     ["dev", ".claude/settings.json", "deny"],
+    ["dev", ".claude/settings.local.json", "deny"],
     ["dev-lead", ".claude/agent-permissions.json", "allow"],
     ["dev-lead", "AGENTS.md", "allow"],
     ["dev-lead", "specs/031-example/plan.md", "allow"],
@@ -132,7 +133,98 @@ describe("agent permissions hook", () => {
     expect(shell("dev", "git branch --show-current 2>&1")).toBe("allow");
     expect(shell("dev", "git branch --show-current && pnpm lint")).toBe("none");
     expect(shell("dev", "pnpm lint")).toBe("none");
-    expect(shell("dev-lead", "git merge spec/031-example")).toBe("allow");
+  });
+
+  it("leaves Dev Lead merges to the normal permission flow", () => {
+    expect(shell("dev-lead", "git merge spec/031-example")).toBe("none");
+  });
+
+  it("denies history rewrites and branch deletion for Dev Lead", () => {
+    for (const command of [
+      "git push --force origin main",
+      "git push --force-with-lease origin main",
+      "git push -f origin main",
+      "git push origin --delete spec/031-example",
+      "git branch -D spec/031-example",
+      "git branch -d spec/031-example",
+      "git branch --delete spec/031-example",
+    ]) {
+      expect(shell("dev-lead", command), command).toBe("deny");
+    }
+    expect(shell("dev-lead", "git push -u origin spec/031-example")).toBe(
+      "none",
+    );
+  });
+
+  it("denies commands that discard shared working-tree changes", () => {
+    for (const command of [
+      "git stash",
+      "git reset --hard",
+      "git restore .",
+      "git clean -fd",
+    ]) {
+      expect(shell("dev", command), command).toBe("deny");
+      expect(shell("qa", command), command).toBe("deny");
+    }
+    expect(shell("dev", "git diff src/lib/navigation.ts")).toBe("none");
+    expect(shell("qa", "git status")).toBe("none");
+  });
+
+  it("limits QA formatting to tests and specs", () => {
+    for (const command of [
+      "pnpm exec prettier --write src/pages/index.astro",
+      "pnpm exec prettier --write .",
+      "pnpm format",
+      "pnpm lint:fix",
+    ]) {
+      expect(shell("qa", command), command).toBe("deny");
+    }
+    expect(shell("qa", "pnpm exec prettier --write tests/a11y/home.ts")).toBe(
+      "allow",
+    );
+    expect(
+      shell("qa", "pnpm exec prettier --write specs/031-example/tasks.md"),
+    ).toBe("allow");
+    expect(shell("qa", "pnpm format:check")).toBe("none");
+  });
+
+  it("denies edits inside a spec directory closed as done", () => {
+    const project = tempProject();
+    cpSync(
+      join(repoRoot, ".claude", "agent-permissions.json"),
+      join(project, ".claude", "agent-permissions.json"),
+    );
+    for (const agent of ["qa", "dev-lead", "spec-refiner"]) {
+      writeFileSync(join(project, ".claude", "agents", `${agent}.md`), "");
+    }
+    for (const [directory, spec] of [
+      ["031-closed", "- **Status**: done\n"],
+      ["032-active", "- **Status**: in progress\n\nCloses with status done.\n"],
+    ]) {
+      mkdirSync(join(project, "specs", directory), { recursive: true });
+      writeFileSync(join(project, "specs", directory, "spec.md"), spec);
+    }
+    const editIn = (agent: string, file_path: string) =>
+      run(
+        {
+          agent_type: agent,
+          tool_name: "Edit",
+          cwd: project,
+          tool_input: { file_path },
+        },
+        project,
+      );
+
+    expect(editIn("spec-refiner", "specs/031-closed/spec.md")).toBe("deny");
+    expect(editIn("dev-lead", "specs/031-closed/summary.md")).toBe("deny");
+    expect(editIn("qa", "specs/031-closed/tasks.md")).toBe("deny");
+
+    expect(editIn("spec-refiner", "specs/032-active/spec.md")).toBe("allow");
+    expect(editIn("dev-lead", "specs/032-active/summary.md")).toBe("allow");
+    expect(editIn("qa", "specs/032-active/tasks.md")).toBe("allow");
+
+    expect(editIn("qa", "specs/033-without-spec/tasks.md")).toBe("allow");
+    expect(editIn("qa", "specs/033-without-spec/plan.md")).toBe("deny");
   });
 
   it("does not restrict sessions without a custom agent", () => {
