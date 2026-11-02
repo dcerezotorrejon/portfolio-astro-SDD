@@ -62,7 +62,7 @@ independent QA.
    No task-level branches, merges, commits, or pushes are performed.
 7. **Choose the model per task.** Default to the subagent's configured model and
    favor cost-efficiency. For a harder task you may raise `dev` to `opus` for that
-   task only. For QA of a Markdown-only change, which runs only lint and format,
+   task only; for a simple, well-bounded task you may lower it to `haiku`. For QA of a Markdown-only change, which runs only lint and format,
    you may lower `qa` to `haiku`. Record the choice and why. When returning
    defects, continue the same Dev with `SendMessage` so it keeps its context
    instead of starting a new instance.
