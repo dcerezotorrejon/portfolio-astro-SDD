@@ -4,89 +4,52 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
+import { effectivePermission as ruleEffect } from "../../.claude/hooks/enforce-agent-permissions.mjs";
+
 /**
- * Structural verification for the custom agents in `.opencode/agents/`.
+ * Structural verification for the custom agents in `.claude/agents/` and their
+ * rules in `.claude/agent-permissions.json`.
  *
- * The agent files use a small, stable subset of YAML frontmatter (top-level
- * scalars plus a flat list of permission rules), so they are parsed with a tiny
- * local parser instead of adding a YAML dependency.
+ * The agent files use only top-level scalar frontmatter, so they are parsed with
+ * a tiny local parser instead of adding a YAML dependency.
  */
 
 interface PermissionRule {
-  action?: string;
-  resource?: string;
-  effect?: string;
+  action: string;
+  resource: string;
+  effect: string;
 }
 
 interface AgentFile {
   id: string;
+  fields: Record<string, string>;
   description?: string;
-  mode?: string;
-  model?: string;
   permissions: PermissionRule[];
-  topLevelKeys: string[];
   body: string;
 }
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const agentsDir = join(repoRoot, ".opencode", "agents");
-
-function unquote(value: string): string {
-  const trimmed = value.trim();
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1);
-  }
-  return trimmed;
-}
+const agentsDir = join(repoRoot, ".claude", "agents");
+const permissionRules = JSON.parse(
+  readFileSync(join(repoRoot, ".claude", "agent-permissions.json"), "utf8"),
+) as Record<string, PermissionRule[]>;
 
 function parseAgent(id: string, raw: string): AgentFile {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(raw);
   if (!match) throw new Error(`${id}: missing frontmatter`);
 
   const [, frontmatter, body] = match;
-  const scalars: Record<string, string> = {};
-  const topLevelKeys: string[] = [];
-  const permissions: PermissionRule[] = [];
-  let inPermissions = false;
-  let current: PermissionRule | undefined;
-
+  const fields: Record<string, string> = {};
   for (const line of frontmatter.split(/\r?\n/)) {
-    if (line.trim() === "" || line.trimStart().startsWith("#")) continue;
-    const indent = line.length - line.trimStart().length;
-    const stripped = line.trim();
-
-    if (indent === 0) {
-      const pair = /^([A-Za-z0-9_]+):\s*(.*)$/.exec(stripped);
-      if (!pair) continue;
-      const [, key, value] = pair;
-      topLevelKeys.push(key);
-      inPermissions = key === "permissions";
-      if (!inPermissions) scalars[key] = unquote(value);
-      continue;
-    }
-
-    if (!inPermissions) continue;
-    const rule = /^-?\s*(action|resource|effect):\s*(.*)$/.exec(stripped);
-    if (!rule) continue;
-    const [, key, value] = rule;
-    if (key === "action") {
-      current = { action: unquote(value) };
-      permissions.push(current);
-    } else if (current) {
-      current[key as "resource" | "effect"] = unquote(value);
-    }
+    const pair = /^([A-Za-z0-9_]+):\s*(.*)$/.exec(line);
+    if (pair) fields[pair[1]] = pair[2].trim();
   }
 
   return {
     id,
-    description: scalars.description,
-    mode: scalars.mode,
-    model: scalars.model,
-    permissions,
-    topLevelKeys,
+    fields,
+    description: fields.description,
+    permissions: permissionRules[id] ?? [],
     body: body.trim(),
   };
 }
@@ -103,53 +66,19 @@ function loadAgents(): Map<string, AgentFile> {
 
 function permissionTuples(agent: AgentFile): Array<[string, string, string]> {
   return agent.permissions.map((rule) => [
-    rule.action ?? "",
-    rule.resource ?? "",
-    rule.effect ?? "",
+    rule.action,
+    rule.resource,
+    rule.effect,
   ]);
 }
 
-function matchesPermissionResource(pattern: string, resource: string): boolean {
-  let expression = "^";
-
-  for (let index = 0; index < pattern.length; index += 1) {
-    const character = pattern[index];
-
-    if (character === "*" && pattern[index + 1] === "*") {
-      if (pattern[index + 2] === "/") {
-        expression += "(?:.*/)?";
-        index += 2;
-      } else {
-        expression += ".*";
-        index += 1;
-      }
-    } else if (character === "*") {
-      expression += "[^/]*";
-    } else {
-      expression += character.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
-    }
-  }
-
-  return new RegExp(`${expression}$`).test(resource);
-}
-
-/** Later matching rules override earlier rules, as in the agent permission list. */
+/** Uses the matcher the hook enforces; later matching rules override earlier ones. */
 function effectivePermission(
   agent: AgentFile,
   action: string,
   resource: string,
 ): string | undefined {
-  return agent.permissions.reduce<string | undefined>((effect, rule) => {
-    if (
-      rule.action === action &&
-      rule.resource &&
-      matchesPermissionResource(rule.resource, resource)
-    ) {
-      return rule.effect;
-    }
-
-    return effect;
-  }, undefined);
+  return ruleEffect(agent.permissions, action, resource);
 }
 
 function prompt(agentId: string): string {
@@ -172,18 +101,15 @@ const constitution = readFileSync(
 );
 const agentsGuide = readFileSync(join(repoRoot, "AGENTS.md"), "utf8");
 
-/** Valid top-level fields for an OpenCode V2 agent definition. */
+/** Claude Code frontmatter fields used by the agent definitions. */
 const validAgentFields = new Set([
+  "name",
   "description",
-  "mode",
   "model",
-  "system",
-  "permissions",
-  "steps",
-  "hidden",
+  "effort",
   "color",
-  "disabled",
-  "request",
+  "tools",
+  "disallowedTools",
 ]);
 
 describe("custom agent definitions", () => {
@@ -200,24 +126,25 @@ describe("custom agent definitions", () => {
     }
   });
 
-  it("uses the approved OpenCode Go model and mode for each agent", () => {
+  it("uses the approved model and effort for each agent", () => {
     const expected = {
-      "spec-refiner": ["primary", "opencode-go/deepseek-v4.1-flash#high"],
-      "dev-lead": ["primary", "opencode-go/deepseek-v4.1-flash#high"],
-      dev: ["subagent", "opencode-go/deepseek-v4.1-flash"],
-      qa: ["subagent", "opencode-go/deepseek-v4.1-flash"],
+      "spec-refiner": ["opus", "high"],
+      "dev-lead": ["opus", "medium"],
+      dev: ["sonnet", "medium"],
+      qa: ["sonnet", "medium"],
     };
 
-    for (const [id, [mode, model]] of Object.entries(expected)) {
-      const agent = agents.get(id)!;
-      expect(agent.mode).toBe(mode);
-      expect(agent.model).toBe(model);
+    for (const [id, [model, effort]] of Object.entries(expected)) {
+      const { fields } = agents.get(id)!;
+      expect(fields.name).toBe(id);
+      expect(fields.model).toBe(model);
+      expect(fields.effort).toBe(effort);
     }
   });
 
-  it("uses only valid V2 agent frontmatter fields", () => {
+  it("uses only known Claude Code frontmatter fields", () => {
     for (const agent of agents.values()) {
-      const invalid = agent.topLevelKeys.filter(
+      const invalid = Object.keys(agent.fields).filter(
         (key) => !validAgentFields.has(key),
       );
       expect(
@@ -229,24 +156,13 @@ describe("custom agent definitions", () => {
 
   it("lets only Dev Lead launch Dev and QA subagents", () => {
     const lead = agents.get("dev-lead")!;
-    expect(lead.permissions).toContainEqual({
-      action: "subagent",
-      resource: "dev",
-      effect: "allow",
-    });
-    expect(lead.permissions).toContainEqual({
-      action: "subagent",
-      resource: "qa",
-      effect: "allow",
-    });
+    expect(lead.fields.tools).toContain("Agent(dev, qa)");
+    expect(lead.fields.disallowedTools).toBeUndefined();
 
     for (const id of ["spec-refiner", "dev", "qa"]) {
-      expect(effectivePermission(agents.get(id)!, "subagent", "dev")).toBe(
-        "deny",
-      );
-      expect(effectivePermission(agents.get(id)!, "subagent", "qa")).toBe(
-        "deny",
-      );
+      const { fields } = agents.get(id)!;
+      expect(fields.disallowedTools).toBe("Agent");
+      expect(fields.tools).toBeUndefined();
     }
   });
 
@@ -256,7 +172,6 @@ describe("custom agent definitions", () => {
       ["edit", "**", "deny"],
       ["edit", "specs/*/spec.md", "allow"],
       ["edit", "specs/_template/**", "deny"],
-      ["subagent", "*", "deny"],
     ]);
     expect(
       effectivePermission(specRefiner, "edit", "specs/_template/spec.md"),
@@ -277,7 +192,7 @@ describe("custom agent definitions", () => {
       "deny",
     );
     expect(effectivePermission(dev, "edit", "AGENTS.md")).toBe("deny");
-    expect(effectivePermission(dev, "edit", ".opencode/agents/dev.md")).toBe(
+    expect(effectivePermission(dev, "edit", ".claude/agents/dev.md")).toBe(
       "deny",
     );
     expect(
@@ -403,9 +318,6 @@ describe("custom agent definitions", () => {
       effectivePermission(lead, "edit", "specs/014-feature/tasks.md"),
     ).toBe("allow");
     expect(tuples).toContainEqual(["shell", "git merge *", "allow"]);
-    expect(tuples).toContainEqual(["subagent", "*", "deny"]);
-    expect(tuples).toContainEqual(["subagent", "dev", "allow"]);
-    expect(tuples).toContainEqual(["subagent", "qa", "allow"]);
 
     const staticallyAllowed = [
       "specs/014-feature/plan.md",
@@ -454,7 +366,7 @@ describe("shared and role-specific workflow guidance", () => {
 
   it("amends the constitution with an incremented version and actual amendment date", () => {
     expect(constitution).toMatch(/\*\*Version\*\*: \d+\.\d+\.\d+/);
-    expect(constitution).toContain("**Last amended**: 2026-10-07");
+    expect(constitution).toContain("**Last amended**: 2026-11-02");
     expect(constitution).toContain(
       "### 4.2 Historical specification access and references",
     );
@@ -549,17 +461,12 @@ describe("shared and role-specific workflow guidance", () => {
     expect(agentsGuide).not.toContain("Dev MUST");
   });
 
-  it("lists the exact per-agent model selector and reasoning variant in AGENTS.md", () => {
+  it("lists the exact per-agent model and effort in AGENTS.md", () => {
     const guide = agentsGuide.replace(/\s+/g, " ");
-    expect(guide).toContain(
-      "- `spec-refiner`: `opencode-go/deepseek-v4.1-flash#high`",
-    );
-    expect(guide).toContain(
-      "- `dev-lead`: `opencode-go/deepseek-v4.1-flash#high`",
-    );
-    expect(guide).toContain("- `dev`: `opencode-go/deepseek-v4.1-flash`");
-    expect(guide).toContain("- `qa`: `opencode-go/deepseek-v4.1-flash`");
-    expect(guide).toContain("select the model's `high` reasoning variant");
+    expect(guide).toContain("- `spec-refiner`: `opus`, effort `high`");
+    expect(guide).toContain("- `dev-lead`: `opus`, effort `medium`");
+    expect(guide).toContain("- `dev`: `sonnet`, effort `medium`");
+    expect(guide).toContain("- `qa`: `sonnet`, effort `medium`");
   });
 
   it("requires explicit post-push maintainer confirmation for Lead merge and forbids Dev/QA integration", () => {
@@ -670,47 +577,5 @@ describe("shared and role-specific workflow guidance", () => {
       "The Lead returns defects to the same Dev for correction on the shared branch",
       "Do not create, switch, or use task/developer branches (`dev/...`); do not merge, commit, or push.",
     ]);
-  });
-});
-
-describe("auto router model variants", () => {
-  const config = JSON.parse(
-    readFileSync(join(repoRoot, "opencode.json"), "utf8"),
-  ) as {
-    providers?: {
-      openrouter?: {
-        models?: Record<
-          string,
-          {
-            variants?: Array<{
-              id?: string;
-              settings?: Record<string, unknown>;
-            }>;
-          }
-        >;
-      };
-    };
-  };
-
-  const auto = config.providers?.openrouter?.models?.["openrouter/auto"];
-
-  it("defines the Auto Router with high and medium reasoning variants", () => {
-    expect(auto).toBeDefined();
-    const variants = auto?.variants ?? [];
-    const effort = Object.fromEntries(
-      variants.map((variant) => [
-        variant.id,
-        variant.settings?.reasoningEffort,
-      ]),
-    );
-    expect(effort.high).toBe("high");
-    expect(effort.medium).toBe("medium");
-  });
-
-  it("controls reasoning effort, not cost, in the variants", () => {
-    for (const variant of auto?.variants ?? []) {
-      expect(variant.settings).toHaveProperty("reasoningEffort");
-      expect(variant.settings).not.toHaveProperty("cost_tier");
-    }
   });
 });

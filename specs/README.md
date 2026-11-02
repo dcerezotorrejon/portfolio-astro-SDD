@@ -57,7 +57,8 @@ for task concurrency, QA handoffs, and final commit/push rules.
 ## Historical specifications
 
 Agents MUST NOT read completed specification contents by default. An explicit
-request from the maintainer or an agent with `mode: primary` may authorize all
+request from the maintainer or a primary agent (`spec-refiner` or
+`dev-lead`) may authorize all
 participants in that feature, including subagents, to read completed specs.
 Reading never authorizes writing: no file in a completed directory may be
 changed. New increment artifacts MUST NOT identify or link completed specs, and

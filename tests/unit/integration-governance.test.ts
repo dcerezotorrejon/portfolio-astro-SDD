@@ -10,13 +10,13 @@ const normalized = (text: string) => text.replace(/\s+/g, " ");
 const constitution = read("docs/constitution.md");
 const agentsGuide = read("AGENTS.md");
 const specsGuide = read("specs/README.md");
-const qa = read(".opencode/agents/qa.md");
-const lead = read(".opencode/agents/dev-lead.md");
+const qa = read(".claude/agents/qa.md");
+const lead = read(".claude/agents/dev-lead.md");
 
 describe("integration gate governance", () => {
   it("versions the approved amendment and defines when integration applies", () => {
-    expect(constitution).toMatch(/\*\*Version\*\*: 1\.11\.2/);
-    expect(constitution).toMatch(/\*\*Last amended\*\*: 2026-10-07/);
+    expect(constitution).toMatch(/\*\*Version\*\*: 1\.12\.0/);
+    expect(constitution).toMatch(/\*\*Last amended\*\*: 2026-11-02/);
     expect(normalized(constitution)).toContain(
       "The integration gate applies to changes that affect page rendering, routing, content, styles, or client behavior; browser-complex components; and the integration suite or its tooling.",
     );

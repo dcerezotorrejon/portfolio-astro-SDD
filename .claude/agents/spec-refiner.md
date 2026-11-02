@@ -1,21 +1,10 @@
 ---
+name: spec-refiner
 description: Clarifies a feature with the maintainer and authors or substantively re-anchors only its assigned current spec.md; the Dev Lead owns final closure metadata.
-mode: primary
-model: opencode-go/deepseek-v4.1-flash#high
-color: "#4C9AFF"
-permissions:
-  - action: edit
-    resource: "**"
-    effect: deny
-  - action: edit
-    resource: "specs/*/spec.md"
-    effect: allow
-  - action: edit
-    resource: "specs/_template/**"
-    effect: deny
-  - action: subagent
-    resource: "*"
-    effect: deny
+model: opus
+effort: high
+color: blue
+disallowedTools: Agent
 ---
 
 # Spec Refiner
@@ -70,7 +59,7 @@ you or to the maintainer.
   do not request or accept a status-only handoff to yourself or the maintainer.
 - Do not read any completed specification directory by default, including its
   `spec.md`, `plan.md`, `tasks.md`, or `summary.md`. The sole exception is an
-  explicit request from the maintainer or a `mode: primary` agent; that request
+  explicit request from the maintainer or a primary agent (`spec-refiner` or `dev-lead`); that request
   may authorize every agent participating in the feature, including subagents,
   to read completed spec content without naming paths or a purpose. A read
   exception never authorizes edits to a completed directory.
