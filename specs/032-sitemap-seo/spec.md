@@ -1,7 +1,7 @@
 # Sitemap SEO
 
 - **Spec ID**: `032-sitemap-seo`
-- **Status**: draft
+- **Status**: done
 - **Last updated**: 2026-11-02
 
 > Keep this increment's spec anchored to code while it is active. On closure
