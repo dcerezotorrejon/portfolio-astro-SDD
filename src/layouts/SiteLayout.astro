@@ -36,6 +36,7 @@ const fontFaceCss = `@font-face {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
     <style is:inline set:html={fontFaceCss}></style>
     <ClientRouter />
   </head>
