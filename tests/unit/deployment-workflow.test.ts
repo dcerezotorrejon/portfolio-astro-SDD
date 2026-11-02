@@ -212,6 +212,15 @@ describe("GitHub Pages deployment workflow", () => {
     expect(chromiumIndex).toBeLessThan(indexOfRun("pnpm lint"));
   });
 
+  it("checks out full git history so sitemap lastmod resolves commit dates", () => {
+    const checkout = steps.find(
+      (step) => asString(step.uses) === "actions/checkout@v4",
+    );
+
+    expect(checkout, "actions/checkout step").toBeDefined();
+    expect(asString(withOptions(checkout as YamlMap)["fetch-depth"])).toBe("0");
+  });
+
   it("sets up pnpm 10 and Node 22 with the pnpm cache", () => {
     const pnpmSetup = steps.find(
       (step) => asString(step.uses) === "pnpm/action-setup@v4",

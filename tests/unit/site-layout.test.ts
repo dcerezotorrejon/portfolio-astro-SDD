@@ -20,6 +20,16 @@ describe("site layout client router", () => {
     expect(meta?.getAttribute("content")).toBe("true");
   });
 
+  it("emits exactly one sitemap discovery link in the head", async () => {
+    const html = await render(Home);
+    const { document } = new JSDOM(html).window;
+
+    const links = document.head.querySelectorAll('link[rel="sitemap"]');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute("href")).toBe("/sitemap-index.xml");
+    expect(links[0].hasAttribute("type")).toBe(false);
+  });
+
   it("keeps the default ClientRouter prefetch behavior", () => {
     const config = readFileSync("astro.config.mjs", "utf8");
     expect(config).not.toMatch(/\bprefetch\b/);

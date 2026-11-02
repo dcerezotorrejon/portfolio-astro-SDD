@@ -4,6 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import { BASE, SITE } from "./src/lib/base-url.ts";
+import { createSitemapSerializer } from "./src/lib/sitemap-lastmod.ts";
 
 export const site = SITE;
 export const base = BASE;
@@ -19,7 +20,10 @@ export default defineConfig({
   // tests see an empty store. Pointing `cacheDir` at `.astro/` makes build/sync
   // write the store exactly where the tests read it, with no extra CI step.
   cacheDir: "./.astro",
-  integrations: [sitemap(), react({ compiler: true })],
+  integrations: [
+    sitemap({ serialize: createSitemapSerializer() }),
+    react({ compiler: true }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

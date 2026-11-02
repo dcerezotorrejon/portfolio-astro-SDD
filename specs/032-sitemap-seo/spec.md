@@ -1,0 +1,376 @@
+# Sitemap SEO
+
+- **Spec ID**: `032-sitemap-seo`
+- **Status**: done
+- **Last updated**: 2026-11-02
+
+> Keep this increment's spec anchored to code while it is active. On closure
+> with status `done`, the entire directory becomes an immutable historical
+> snapshot, and code remains the source of truth for current behavior. Later
+> changes belong in a new increment. Do not add historical-spec relationship
+> lists to new increment artifacts, and leave completed directories untouched.
+
+## Context
+
+[Constitution §8](../../docs/constitution.md#8-seo) requires a generated sitemap
+and verification over the sitemap build output, and
+[§10](../../docs/constitution.md#10-tooling) names `@astrojs/sitemap` as the
+approved tool.
+
+Current state (inspected on the base revision of this branch):
+
+- `astro.config.mjs` registers `sitemap()` with no options, with `site` and
+  `base` imported from `src/lib/base-url.ts`, where `SITE` is
+  `https://portfolio.dcerezo.com` and `BASE` is `/`. `@astrojs/sitemap`
+  `^3.7.4` is a dev dependency.
+- The site is single-language Spanish (`<html lang="es">`). No Astro `i18n`
+  configuration exists.
+- Indexable routes are the home page (`src/pages/index.astro`, `/`) and one
+  detail page per `experience` collection entry
+  (`src/pages/experiencia/[slug].astro`, `/experiencia/<slug>/`). No custom
+  error page or other endpoint exists under `src/pages/`.
+- `src/layouts/SiteLayout.astro` emits the title, meta description, and an
+  absolute canonical URL (`new URL(Astro.url.pathname, Astro.site)`), but no
+  sitemap discovery link.
+- The generated sitemap entries carry no `<lastmod>`, so crawlers get no signal
+  about which pages changed. The content schema has no update-date field.
+- `.github/workflows/deploy.yml` checks out the repository with
+  `actions/checkout@v4` and no `fetch-depth`, so CI builds run on a shallow
+  clone (depth 1) where per-file Git history is not available.
+- The repository has no `robots.txt` (neither in `public/` nor as an
+  endpoint). The deployed site (GitHub Pages behind Cloudflare) serves a
+  Cloudflare "Managed robots.txt" with a `Content-Signal` (`ai-train=no`) and
+  `Disallow` groups for AI-training crawlers; Cloudflare prepends that block to
+  the origin's `robots.txt`. Nothing in the served file points crawlers to the
+  sitemap.
+- The only existing sitemap check (`tests/seo/experience.test.ts`) reads
+  `dist/sitemap-0.xml` and is skipped when no build output exists.
+
+This increment makes the sitemap discoverable, adds a per-URL `<lastmod>`
+derived from Git history with a build-date fallback, and pins down the exact,
+verified sitemap content, without touching other SEO topics.
+
+## Goals
+
+- Crawlers can discover the sitemap through `robots.txt` and through a
+  `<link rel="sitemap">` on every page.
+- The generated sitemap lists exactly the indexable pages, with absolute URLs
+  identical to each page's canonical URL.
+- Every sitemap URL carries a `<lastmod>`: at minimum the build date, and,
+  whenever full Git history is available, the date of the last commit that
+  changed the content or template that renders that URL.
+- The sitemap and `robots.txt` build output is covered by verification that
+  always runs against a fresh build and cannot be silently skipped, and the
+  `<lastmod>` logic is covered by deterministic tests with an injected clock.
+
+## Non-goals
+
+- Open Graph, Twitter cards, structured data (JSON-LD), `meta robots`,
+  hreflang, title/description/canonical changes, or any other SEO topic beyond
+  the sitemap and its discovery.
+- Sitemap `i18n` configuration: the site is single-language and has no Astro
+  i18n routing. A future multilingual change belongs in a new increment.
+- `<changefreq>` and `<priority>` values (see Assumption A2).
+- `<lastmod>` on the `<sitemap>` entries of `sitemap-index.xml`; this increment
+  only specifies `<lastmod>` on the `<url>` entries of `sitemap-0.xml`.
+- An update-date frontmatter field in the content schema, uncommitted
+  working-tree changes, and changes to shared components, styles, or assets as
+  inputs to `<lastmod>` (see Assumption A8).
+- Image, video, or news sitemap extensions, and an XSL stylesheet for the
+  sitemap.
+- Changing `trailingSlash`, `build.format`, routes, or page content.
+- Search-engine submission (for example, Google Search Console), DNS, GitHub
+  Pages, or Cloudflare settings, which live outside the repository.
+- Supporting a non-root `BASE` for `robots.txt` (see Assumption A4).
+- The AI-training crawler policy and any per-bot policy in the repository
+  (per-bot `robots.txt` groups or `Disallow` rules, `Content-Signal` lines,
+  `noai` meta tags, `X-Robots-Tag` headers, `ai.txt`, or TDM reservation
+  files). Cloudflare manages that policy outside the repository (see
+  Assumption A3).
+
+## Requirements
+
+- **R1 — Official integration and output files.** The sitemap MUST continue to
+  be generated by `@astrojs/sitemap` registered in `astro.config.mjs`, using its
+  default file names: `pnpm build` emits `dist/sitemap-index.xml` and
+  `dist/sitemap-0.xml`. No custom sitemap generator is added.
+- **R2 — Exact URL set.** `sitemap-0.xml` MUST contain exactly one `<url>` entry
+  for each indexable HTML page and nothing else: the home page and one detail
+  page per `experience` collection entry (by its `slug`). It MUST NOT list
+  `robots.txt`, sitemap files, assets, or any non-HTML output, and MUST NOT
+  contain duplicates. If the integration's default page discovery would
+  include a non-HTML output, the integration's `filter` option is used to
+  exclude it.
+- **R3 — URL form.** Every `<loc>` in `sitemap-0.xml` MUST be an absolute
+  `https` URL on the `SITE` origin, prefixed by `BASE`, with no `//` in the path
+  and no legacy `/portfolio-astro-SDD` segment, and MUST be byte-for-byte equal
+  to the `href` of the canonical link rendered by that page (including the
+  trailing slash).
+- **R4 — Sitemap index.** `sitemap-index.xml` MUST be well-formed XML using the
+  `http://www.sitemaps.org/schemas/sitemap/0.9` namespace and MUST reference
+  `sitemap-0.xml` by its absolute URL derived from `SITE` and `BASE`
+  (`https://portfolio.dcerezo.com/sitemap-0.xml`).
+- **R5 — Entry elements.** Every `<url>` entry MUST contain exactly one
+  `<lastmod>` element and MUST NOT contain `<changefreq>` or `<priority>`.
+  The `<lastmod>` value MUST denote the date resolved by R5a–R5c, serialized
+  either as `YYYY-MM-DD` or as `YYYY-MM-DDT00:00:00.000Z` (the integration may
+  normalize a date-only value to a midnight-UTC timestamp); its first ten
+  characters MUST equal the resolved `YYYY-MM-DD` date.
+- **R5a — Resolver module.** `<lastmod>` values MUST be produced by a single
+  build-time module, `src/lib/sitemap-lastmod.ts`, wired into the integration
+  through the `serialize` option of `sitemap()` in `astro.config.mjs`, which
+  sets `lastmod` on each item from its URL. The module MUST take its
+  side-effecting dependencies as injectable parameters with production
+  defaults: a clock (`now: () => Date`), a Git reader (shallow-repository check
+  and latest commit timestamp for a set of paths), and a reader for the
+  experience content files. Default Git access MUST run the `git` executable
+  without a shell (for example, `execFileSync("git", [...])`) from the
+  repository root. All dates are UTC calendar dates in `YYYY-MM-DD` form.
+- **R5b — Build-date fallback (mandatory minimum).** The build date is the UTC
+  calendar date of the injected clock. A URL's `<lastmod>` MUST be the build
+  date whenever its Git date cannot be resolved, namely when:
+  - `git` is not available, the build does not run inside a Git work tree, or
+    any Git command fails;
+  - the repository is shallow (`git rev-parse --is-shallow-repository` prints
+    `true`), in which case every URL uses the build date;
+  - no commit touches any path in the URL's source set; or
+  - the URL's path matches no route in R5c (for example, a future page), or no
+    experience file declares the URL's slug.
+
+  Resolution failures MUST NOT fail the build.
+
+- **R5c — Git-derived date (automation target, mandatory in this increment).**
+  When the repository has full history, a URL's `<lastmod>` MUST be the UTC
+  calendar date of the committer timestamp of the most recent commit that
+  touches any path in its source set (equivalent to
+  `git log -1 --format=%cI -- <paths>`). Source sets, relative to the
+  repository root:
+  - Home (`/`): `src/pages/index.astro`, `src/layouts/SiteLayout.astro`,
+    `src/content/profile/profile.md`, and the `src/content/experience/`
+    directory (the home page lists every experience).
+  - Experience detail (`/experiencia/<slug>/`):
+    `src/pages/experiencia/[slug].astro`, `src/layouts/SiteLayout.astro`, and
+    the single `src/content/experience/*.md` file whose frontmatter `slug`
+    equals `<slug>`.
+
+  URL paths are matched after removing the configured `BASE` prefix.
+
+- **R5d — Full history in CI.** The `Checkout` step of
+  `.github/workflows/deploy.yml` MUST set `fetch-depth: 0` so deployment builds
+  resolve R5c dates instead of falling back to the build date. No other
+  workflow step changes.
+- **R6 — `robots.txt`.** `pnpm build` MUST emit `dist/robots.txt` served at the
+  site root (`https://portfolio.dcerezo.com/robots.txt`) whose content is
+  exactly the following lines, ending with a newline:
+
+  ```text
+  User-agent: *
+  Allow: /
+
+  Sitemap: https://portfolio.dcerezo.com/sitemap-index.xml
+  ```
+
+  The origin file MUST NOT contain any other `User-agent` group, `Disallow`
+  rule, or `Content-Signal` line: the AI-training crawler policy is handled by
+  Cloudflare (Assumption A3), and the endpoint MUST NOT duplicate it. The
+  `Sitemap` URL MUST be derived at build time from the shared configuration in
+  `src/lib/base-url.ts` (or the equivalent `site` value Astro passes to the
+  endpoint), not hardcoded as a literal origin. The file is produced by a
+  static Astro endpoint `src/pages/robots.txt.ts` that responds with
+  `Content-Type: text/plain; charset=utf-8`.
+
+- **R7 — Discovery link.** Every page rendered through `SiteLayout` MUST include
+  exactly one `<link rel="sitemap" href="/sitemap-index.xml">` in `<head>`, with
+  the `href` produced through `withBase`.
+- **R8 — No other behavior change.** Titles, meta descriptions, canonical URLs,
+  visible content, styles, and client JavaScript MUST remain unchanged. No
+  `client:*` island or client script is added.
+
+## Acceptance criteria
+
+- [x] AC1 (R1): After `pnpm build`, `dist/sitemap-index.xml` and
+      `dist/sitemap-0.xml` exist, and `astro.config.mjs` still registers the
+      integration imported from `@astrojs/sitemap`.
+- [x] AC2 (R2): The set of `<loc>` values in `dist/sitemap-0.xml` equals exactly
+      the home URL plus one detail URL per experience entry slug, with no
+      duplicates and no `robots.txt`, `.xml`, or asset URLs. The expected slugs
+      are derived from the experience content, not hardcoded as a fixed list or
+      count.
+- [x] AC3 (R3): Every `<loc>` starts with `https://portfolio.dcerezo.com/`, has
+      no `//` in its path, does not contain `/portfolio-astro-SDD`, and equals
+      the canonical `href` found in the corresponding built HTML page.
+- [x] AC4 (R4): `dist/sitemap-index.xml` parses as XML, declares the
+      sitemaps.org 0.9 namespace, and contains exactly one `<sitemap><loc>`
+      equal to `https://portfolio.dcerezo.com/sitemap-0.xml`.
+- [x] AC5 (R5): In `dist/sitemap-0.xml`, every `<url>` has exactly one
+      `<lastmod>` matching `^\d{4}-\d{2}-\d{2}(T00:00:00\.000Z)?$`, whose date
+      is a valid calendar date not later than the UTC date at test time, and no
+      `<url>` contains `<changefreq>` or `<priority>`.
+- [x] AC6 (R6): `dist/robots.txt` exists with exactly the three-line content
+      in R6 (`User-agent: *`, `Allow: /`, blank line, `Sitemap:` line with the
+      sitemap index URL), byte-for-byte including the trailing newline, and
+      nothing else; the preview server serves `/robots.txt` with that body,
+      status 200, and a `text/plain` content type; a unit test shows the
+      endpoint output is built from the configured site/base values; and
+      `src/pages/robots.txt.ts` contains no hardcoded
+      `https://portfolio.dcerezo.com` literal.
+- [x] AC7 (R7): The rendered home page and every experience detail page contain
+      exactly one `link[rel="sitemap"]`, whose `href` is `/sitemap-index.xml`,
+      and that URL resolves with status 200 on the preview server.
+- [x] AC8 (R8): The existing SEO, accessibility, unit, and integration suites
+      pass with their title, description, canonical, and content assertions
+      unchanged; no new `astro-island` or client script appears in the built
+      pages.
+- [x] AC9 (gates): `pnpm lint`, `pnpm format:check`, `pnpm build`,
+      `pnpm test:run`, `pnpm test:a11y`, and `pnpm test:integration` pass.
+- [x] AC10 (R5a, R5b): With an injected fixed clock, unit tests show that the
+      resolver returns the build date as the UTC calendar date (including a
+      clock instant whose local date differs from its UTC date) for each
+      fallback case in R5b: Git unavailable or failing, shallow repository, no
+      commit for the source set, unknown route, and unknown slug. No test
+      depends on the real current date.
+- [x] AC11 (R5c): With an injected Git reader, unit tests show that the
+      resolver queries exactly the R5c source set for the home URL and for a
+      detail URL (matching the experience file by its frontmatter `slug`, not
+      by file name), and returns the UTC calendar date of the returned
+      committer timestamp (including a timestamp whose offset date differs
+      from its UTC date).
+- [x] AC12 (R5a, R5): A unit test shows that the `serialize` function wired in
+      `astro.config.mjs` sets `lastmod` from the resolver for each item,
+      preserves `url`, and adds no `changefreq` or `priority`.
+- [x] AC13 (R5c): When the build runs in a non-shallow repository, each
+      `<lastmod>` date in the built `sitemap-0.xml` equals the UTC date of the
+      latest commit touching that URL's R5c source set, computed independently
+      by the test with `git log`. When the repository is shallow, the test
+      instead asserts only AC5 and records that R5c was not exercised.
+- [x] AC14 (R5d): The `Checkout` step of `.github/workflows/deploy.yml` sets
+      `fetch-depth: 0`, and the rest of the workflow is unchanged.
+
+## Verification
+
+Applicable gates follow [Constitution §§5–6](../../docs/constitution.md#5-task-lifecycle-and-verification-gates).
+The change set is not Markdown-only, so all gates apply. Integration applies
+because the change alters generated HTML (R7), adds a route (R6), and changes
+the sitemap output (R5). [`docs/design.md`](../../docs/design.md) is not
+applicable: there is no visual change.
+
+- **AC1** (QA): build gate plus an integration test (`tests/integration/**`)
+  that fetches both sitemap files from the managed preview of the fresh build.
+- **AC2** (QA): integration test parsing `sitemap-0.xml` and comparing it with
+  the slugs read from the `src/content/experience/*.md` frontmatter.
+- **AC3** (QA): integration test comparing each `<loc>` with the canonical
+  `href` of the page served at that path.
+- **AC4** (QA): integration test parsing `sitemap-index.xml`.
+- **AC5** (QA): integration test over `sitemap-0.xml`. The "not later than the
+  UTC date at test time" check is deterministic because the build always
+  precedes the test run.
+- **AC6** (Dev and QA): Dev unit test (`tests/unit/**`) asserting the exact
+  `src/pages/robots.txt.ts` endpoint output (the full expected text from R6)
+  and its content type; QA integration test fetching `/robots.txt` and
+  comparing body (byte-for-byte with R6), status, and content type, plus a
+  recorded source check for the absence of the literal origin.
+- **AC7** (QA): SEO test (`tests/seo/**`) over the rendered home and detail
+  HTML; integration test resolving the `href`.
+- **AC8** (QA): existing suites, plus an integration or SEO check that the
+  built pages contain no islands or client scripts beyond the current ones.
+- **AC9** (QA): gate commands and results recorded in `tasks.md`.
+- **AC10–AC12** (Dev, reviewed by QA for sufficiency): unit tests under
+  `tests/unit/**` for `src/lib/sitemap-lastmod.ts` and the `serialize` wiring,
+  using a fixed injected clock, fake Git readers, and fake experience-file
+  readers. They MUST NOT spawn `git`, read the real clock, or depend on the
+  repository's actual history.
+- **AC13** (QA): integration test that reads the built `sitemap-0.xml` and
+  computes the expected dates with `git rev-parse --is-shallow-repository` and
+  `git log -1 --format=%cI -- <paths>` over the R5c source sets. It runs
+  against the committed history only, so uncommitted changes on the shared
+  branch do not affect the result.
+- **AC14** (QA): inspection of `.github/workflows/deploy.yml` (diff limited to
+  the `fetch-depth: 0` input), plus the lint and format gates. The effect on
+  the deployed sitemap can only be observed after deployment (see Open
+  questions).
+
+Build-output checks (AC1–AC6, AC13) live in the integration suite because
+`pnpm test:integration` always runs `pnpm build` first, so they cannot be
+skipped for lack of a `dist/` directory. The existing skippable sitemap check in
+`tests/seo/experience.test.ts` may remain; QA decides whether to keep or
+consolidate it within `tests/seo/**`. These tests run against the local preview
+build, not the deployed edge response, so they do not cover changes Cloudflare
+prepends to the served `robots.txt` (see the open question on A3).
+
+Ownership feasibility under current permissions
+(`.claude/agent-permissions.json` and the current agent prompts):
+
+- Dev may edit `astro.config.mjs` (the `serialize` wiring, plus `filter` only if
+  R2 needs it), `src/lib/sitemap-lastmod.ts`, `src/pages/robots.txt.ts`,
+  `src/layouts/SiteLayout.astro`, and `tests/unit/**`.
+- `.github/workflows/deploy.yml` is CI repository configuration. Dev's
+  permissions allow it, and the Dev prompt allows repository configuration
+  (including CI) when the Lead assigns the exact path. It is not a workflow
+  Markdown or permission-enforcement file, so it is not reserved to the Lead.
+- QA owns `tests/seo/**` and `tests/integration/**` and the task evidence.
+- No workflow-Markdown, permission, or constitution change is needed.
+
+## Assumptions
+
+- **A1 — No i18n.** The site is Spanish-only with no Astro i18n routing, so the
+  sitemap `i18n` option and `xhtml:link` alternates are not configured.
+- **A2 — `<lastmod>` included; `<changefreq>` and `<priority>` excluded.**
+  Google ignores `<changefreq>` and `<priority>`, so they stay out. `<lastmod>`
+  is used by crawlers when it is consistently accurate. At the maintainer's
+  request, every URL gets a `<lastmod>`, with the build date as the mandatory
+  minimum and the Git-derived date as the target. Both are delivered in this
+  increment rather than in two phases. The build-date fallback alone would
+  change every URL's date on each deploy, which crawlers learn to distrust.
+  The Git resolver is small, fully testable with injected dependencies, and
+  degrades to the fallback by design.
+- **A3 — AI-training policy lives in Cloudflare.** The site is served from
+  GitHub Pages behind Cloudflare, whose "Managed robots.txt" already publishes
+  the AI-training opt-out (`Content-Signal` with `ai-train=no` and `Disallow`
+  groups for known training crawlers) and prepends that block to the origin's
+  `robots.txt`. That policy is configured outside the repository and is out of
+  scope. The origin `robots.txt` therefore only allows all paths for
+  `User-agent: *` (matching today's effective origin behavior) and declares the
+  sitemap; it MUST NOT duplicate or restate Cloudflare's crawler list.
+- **A4 — Root base.** `BASE` is `/`. `robots.txt` is only honored at the origin
+  root; deriving it from `BASE` keeps it correct for the current root
+  deployment. Behavior under a non-root base is out of scope.
+- **A5 — Endpoint over static file.** `robots.txt` is an Astro endpoint rather
+  than `public/robots.txt` so the sitemap URL comes from the single source of
+  truth in `src/lib/base-url.ts` instead of a duplicated literal origin.
+- **A6 — Discovery link markup.** The link uses the form recommended by the
+  Astro sitemap guide (`<link rel="sitemap" href="/sitemap-index.xml" />`),
+  without a `type` attribute.
+- **A7 — Shallow clones fall back entirely.** In a depth-1 clone every file
+  would report the single fetched commit's date, which is not the real
+  per-file date. The resolver therefore treats any shallow repository as
+  having no usable history (R5b) instead of reporting that date.
+- **A8 — Source sets are content plus page template.** R5c counts the page's
+  own route file, the shared layout, and the Markdown content it renders.
+  Shared components, styles, images, and the resolver itself are excluded, so
+  cosmetic or refactoring changes do not bump `<lastmod>`. The detail page's
+  use of `profile.md` (only its back-link label) is also excluded.
+  Uncommitted changes are not visible to `git log` and are ignored.
+- **A9 — Serialized form.** `@astrojs/sitemap` may emit a `YYYY-MM-DD` input
+  unchanged or normalize it to `YYYY-MM-DDT00:00:00.000Z`. Both denote the
+  same UTC date and are valid W3C Datetime values, so R5 and AC5 accept either
+  form. The plan records the form actually emitted.
+
+## Open questions
+
+None blocking. The maintainer may revisit:
+
+- A2: whether to keep delivering R5c and R5d in this increment (current
+  decision) or move them to a follow-up increment and ship only the build-date
+  `<lastmod>` now.
+- A8: whether shared components or styles should also count toward a page's
+  `<lastmod>`.
+- R5d: after the first deployment with `fetch-depth: 0`, confirm on the live
+  `sitemap-0.xml` that `<lastmod>` values show per-page commit dates rather
+  than the deploy date. The repository tests cannot observe the deployed
+  output.
+- A3: after deployment, confirm that the `robots.txt` served by Cloudflare
+  (its managed block prepended to the origin file) still contains the origin's
+  `User-agent: *` / `Allow: /` group and `Sitemap:` line, and that the
+  combined file does not conflict (for example, two `User-agent: *` groups
+  with contradictory rules). This concerns the deployed edge response, which
+  the repository tests do not cover.
