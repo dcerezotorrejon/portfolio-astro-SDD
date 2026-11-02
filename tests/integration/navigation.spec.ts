@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { navigationSections } from "./helpers/content";
 import { basePath, withBase } from "./helpers/site";
 
 /**
@@ -282,4 +283,75 @@ test("keyboard activation keeps the focused link visible and current", async ({
   // Focus is inside the navigator, so it must stay visible.
   await expect(navigation).not.toHaveAttribute("data-focus-obscured", "true");
   await expect(navigation).toBeVisible();
+});
+
+test("client-only navigation mounts after load with every configured link and its accessible name", async ({
+  page,
+}) => {
+  await page.goto(withBase("/"));
+
+  const navigation = page.getByRole("navigation", {
+    name: "Navegación por secciones",
+  });
+
+  // The island is client-only: wait for its mount before asserting content.
+  await expect(navigation).toHaveAttribute("data-positioned", "true");
+  await expect(navigation).toBeVisible();
+
+  const links = navigation.getByRole("link");
+  await expect(links).toHaveCount(navigationSections.length);
+  for (const [index, { id, label }] of navigationSections.entries()) {
+    await expect(links.nth(index)).toHaveText(label);
+    await expect(links.nth(index)).toHaveAttribute(
+      "href",
+      new RegExp(`#${id}$`),
+    );
+  }
+});
+
+for (const [index, { id, label }] of navigationSections.entries()) {
+  test(`opening /#${id} marks "${label}" active on first mount`, async ({
+    page,
+  }) => {
+    await page.goto(withBase(`/#${id}`));
+
+    const navigation = page.getByRole("navigation", {
+      name: "Navegación por secciones",
+    });
+    await expect(navigation).toHaveAttribute("data-positioned", "true");
+
+    const link = navigation.getByRole("link", { name: label });
+    await expect(link).toHaveAttribute("aria-current", "location");
+    await expect(navigation).toHaveAttribute("data-active-index", `${index}`);
+    await expect(navigation.locator('[aria-current="location"]')).toHaveCount(
+      1,
+    );
+  });
+}
+
+test("scrolling still updates the active link after a fragment first mount", async ({
+  page,
+}) => {
+  await page.goto(withBase("/#inicio"));
+
+  const navigation = page.getByRole("navigation", {
+    name: "Navegación por secciones",
+  });
+  const profileLink = navigation.getByRole("link", { name: "Inicio" });
+  const experienceLink = navigation.getByRole("link", {
+    name: "Trayectoria",
+  });
+
+  await expect(navigation).toHaveAttribute("data-positioned", "true");
+  await expect(profileLink).toHaveAttribute("aria-current", "location");
+
+  await page.evaluate(() => {
+    document.getElementById("trayectoria")?.scrollIntoView();
+  });
+  await expect(experienceLink).toHaveAttribute("aria-current", "location");
+  await expect(profileLink).not.toHaveAttribute("aria-current", "location");
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(profileLink).toHaveAttribute("aria-current", "location");
+  await expect(experienceLink).not.toHaveAttribute("aria-current", "location");
 });

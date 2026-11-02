@@ -24,5 +24,5 @@ const experiences = sortExperiences(experienceEntries);
     <ProfileIntroduction profile={profile} />
     <ExperienceHistory experiences={experiences} profile={profile} />
   </main>
-  <FloatingNav sections={profile.navigation} client:load />
+  <FloatingNav sections={profile.navigation} client:only="react" />
 </SiteLayout>

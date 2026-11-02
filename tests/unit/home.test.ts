@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
 
@@ -241,12 +243,24 @@ describe("home page", () => {
         (section) => section.id,
       ),
     ).toEqual(["inicio", "trayectoria"]);
-    expect(document.querySelector(".floating-nav")).not.toBeNull();
+    expect(document.querySelector(".floating-nav")).toBeNull();
     const islands = document.querySelectorAll("astro-island");
     expect(islands).toHaveLength(1);
-    expect(islands[0]?.getAttribute("client")).toBe("load");
+    expect(islands[0]?.getAttribute("client")).toBe("only");
     expect(islands[0]?.getAttribute("component-url")).toMatch(
       /\/FloatingNav\.tsx$/,
+    );
+    expect(JSON.parse(islands[0]?.getAttribute("opts") ?? "{}")).toEqual({
+      name: "FloatingNav",
+      value: "react",
+    });
+  });
+
+  it("declares the navigation island as client-only react in the page source", () => {
+    const source = readFileSync("src/pages/index.astro", "utf8");
+
+    expect(source).toContain(
+      '<FloatingNav sections={profile.navigation} client:only="react" />',
     );
   });
 });

@@ -50,6 +50,17 @@ export const profile = (() => {
   };
 })();
 
+export const navigationSections = (() => {
+  const source = readFrontmatter("profile/profile.md");
+  const block = /^navigation:\s*\r?\n((?:[ \t]+.*\r?\n?)*)/m.exec(source)?.[1];
+  if (!block) throw new Error("Missing profile navigation content");
+  return block
+    .split(/\r?\n(?=\s*- id:)/)
+    .filter(Boolean)
+    .map((item) => item.replace(/^\s*-\s*/, "  "))
+    .map((item) => ({ id: scalar(item, "id"), label: scalar(item, "label") }));
+})();
+
 export const experiences = readdirSync(join(contentRoot, "experience"))
   .filter((file) => file.endsWith(".md"))
   .sort()
