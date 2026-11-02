@@ -53,3 +53,14 @@ explicitly.
     pages); `pnpm test:run` pass (31 files, 225 tests); `pnpm test:a11y` pass (4
     files, 5 tests); `pnpm test:integration` pass (37 tests, Chromium).
   - No defects. AC1–AC5 verified.
+
+## Final gate (Dev Lead, before closure)
+
+- Re-run on the working tree with the spec files in place: `pnpm lint`,
+  `pnpm format:check`, `pnpm build`, `pnpm test:run` (31 files, 225 tests),
+  `pnpm test:a11y` (4 files, 5 tests), `pnpm test:integration` (37 tests,
+  Chromium). All pass. Integration applies: page rendering and client behavior
+  change.
+- The working tree also held uncommitted workflow files outside this spec
+  (`.claude/**`, `AGENTS.md`, two agent-permission unit tests); they are not part
+  of this increment's change set.
