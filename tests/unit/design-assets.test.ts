@@ -269,14 +269,18 @@ describe("T2/T10 global style contracts", () => {
     expect(floatingNavSource).toContain("nav-glass");
 
     // Indicator transition and transform states are utility-driven.
-    expect(floatingNavSource).toContain("transition-transform");
+    expect(floatingNavSource).toContain(
+      "transition-[transform,translate,width]",
+    );
     expect(floatingNavSource).toContain("duration-control");
     expect(floatingNavSource).toContain(
-      "group-data-[active-index=0]:translate-x-0",
+      "translate-x-[var(--nav-indicator-x,0px)]",
     );
-    expect(floatingNavSource).toContain(
-      "group-data-[active-index=1]:translate-x-full",
-    );
+    expect(floatingNavSource).toContain("w-[var(--nav-indicator-width)]");
+    // No two-destination assumptions remain (spec 033, R29).
+    expect(floatingNavSource).not.toContain("grid-cols-2");
+    expect(floatingNavSource).not.toContain("calc(50%-4px)");
+    expect(floatingNavSource).not.toMatch(/active-index=\d\]:translate/);
 
     // Minimum tap target is preserved on links.
     expect(floatingNavSource).toContain("min-h-11");

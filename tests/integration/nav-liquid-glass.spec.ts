@@ -439,14 +439,15 @@ test("AC6: placement, size, destinations, and indicator motion are unchanged", a
   // Centered horizontally: equal gaps on both sides.
   expect(Math.abs(geometry.left - geometry.right)).toBeLessThanOrEqual(1);
 
-  // Two destinations with the settled labels and order.
+  // Three destinations with the settled labels and order (spec 033, R29).
   const links = nav.getByRole("link");
-  await expect(links).toHaveCount(2);
+  await expect(links).toHaveCount(3);
   await expect(links.nth(0)).toHaveText("Inicio");
   await expect(links.nth(1)).toHaveText("Trayectoria");
+  await expect(links.nth(2)).toHaveText("Proyectos");
 
   // Indicator wiring is unchanged: hidden from AT and still transitioned on
-  // transform (the glass task only swapped the navigator's surface class).
+  // its position (`translate`, set by the measured offset) and width.
   const indicator = await page
     .locator(".floating-nav-indicator")
     .evaluate((el) => {
@@ -460,7 +461,8 @@ test("AC6: placement, size, destinations, and indicator motion are unchanged", a
     });
 
   expect(indicator.ariaHidden).toBe("true");
-  expect(indicator.transitionProperty).toContain("transform");
+  expect(indicator.transitionProperty).toMatch(/\btranslate\b/);
+  expect(indicator.transitionProperty).toContain("width");
   // The glass task only swapped the surface class, so the indicator transition
   // stays live (a positive duration) rather than being removed.
   expect(Number.parseFloat(indicator.transitionDuration)).toBeGreaterThan(0);

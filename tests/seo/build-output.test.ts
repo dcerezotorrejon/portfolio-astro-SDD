@@ -97,7 +97,16 @@ describe("built output root-resolved URLs", () => {
       const htmlFiles = await collectHtmlFiles("dist");
       for (const file of htmlFiles) {
         const html = await readFile(file, "utf8");
-        expect(html, file).not.toContain("/portfolio-astro-SDD");
+        // The portfolio project's GitHub repository link (spec 033, R3) is an
+        // external URL and legitimately ends in the repository name; only a
+        // site-relative subpath would be a leftover of the former base.
+        const withoutRepositoryLink = html.replaceAll(
+          "https://github.com/dcerezotorrejon/portfolio-astro-SDD",
+          "",
+        );
+        expect(withoutRepositoryLink, file).not.toContain(
+          "/portfolio-astro-SDD",
+        );
       }
     },
   );

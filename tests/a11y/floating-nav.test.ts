@@ -12,6 +12,7 @@ describe("FloatingNav accessibility", () => {
         sections: [
           { id: "inicio", label: "Inicio" },
           { id: "trayectoria", label: "Trayectoria" },
+          { id: "proyectos", label: "Proyectos" },
         ],
       },
     });

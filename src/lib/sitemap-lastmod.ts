@@ -19,10 +19,14 @@ export interface GitReader {
 /** Finds the repo-relative experience file whose frontmatter `slug` matches. */
 export type ExperienceReader = (slug: string) => string | undefined;
 
+/** Finds the repo-relative project file whose frontmatter `slug` matches. */
+export type ProjectReader = (slug: string) => string | undefined;
+
 export interface LastmodDeps {
   now: () => Date;
   git: GitReader;
   readExperience: ExperienceReader;
+  readProject: ProjectReader;
   base: string;
 }
 
@@ -37,6 +41,7 @@ function resolveRepoRoot(): string {
 
 const repoRoot = resolveRepoRoot();
 const EXPERIENCE_DIR = "src/content/experience/";
+const PROJECTS_DIR = "src/content/projects/";
 const LAYOUT = "src/layouts/SiteLayout.astro";
 
 export function createGitReader(cwd: string = repoRoot): GitReader {
@@ -53,19 +58,27 @@ export function createGitReader(cwd: string = repoRoot): GitReader {
   };
 }
 
-export function createExperienceReader(
-  cwd: string = repoRoot,
-): ExperienceReader {
-  return (slug) => {
-    for (const name of readdirSync(`${cwd}${EXPERIENCE_DIR}`).sort()) {
+function createSlugReader(dir: string, cwd: string) {
+  return (slug: string): string | undefined => {
+    for (const name of readdirSync(`${cwd}${dir}`).sort()) {
       if (!name.endsWith(".md")) continue;
-      const text = readFileSync(`${cwd}${EXPERIENCE_DIR}${name}`, "utf8");
+      const text = readFileSync(`${cwd}${dir}${name}`, "utf8");
       const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? "";
       const match = /^slug:\s*["']?([^"'\r\n]+?)["']?\s*$/m.exec(front);
-      if (match?.[1] === slug) return `${EXPERIENCE_DIR}${name}`;
+      if (match?.[1] === slug) return `${dir}${name}`;
     }
     return undefined;
   };
+}
+
+export function createExperienceReader(
+  cwd: string = repoRoot,
+): ExperienceReader {
+  return createSlugReader(EXPERIENCE_DIR, cwd);
+}
+
+export function createProjectReader(cwd: string = repoRoot): ProjectReader {
+  return createSlugReader(PROJECTS_DIR, cwd);
 }
 
 const utcDate = (date: Date) => date.toISOString().slice(0, 10);
@@ -84,6 +97,7 @@ export function createLastmodResolver(
     now: () => new Date(),
     git: createGitReader(),
     readExperience: createExperienceReader(),
+    readProject: createProjectReader(),
     base: BASE,
     ...overrides,
   };
@@ -108,11 +122,19 @@ export function createLastmodResolver(
         LAYOUT,
         "src/content/profile/profile.md",
         EXPERIENCE_DIR,
+        PROJECTS_DIR,
       ];
     }
-    const match = /^\/experiencia\/([^/]+)\/?$/.exec(path);
+    const match = /^\/(experiencia|proyectos)\/([^/]+)\/?$/.exec(path);
     if (!match) return undefined;
-    const file = deps.readExperience(decodeURIComponent(match[1]));
+    const slug = decodeURIComponent(match[2]);
+    if (match[1] === "proyectos") {
+      const file = deps.readProject(slug);
+      return file
+        ? ["src/pages/proyectos/[slug].astro", LAYOUT, file]
+        : undefined;
+    }
+    const file = deps.readExperience(slug);
     return file
       ? ["src/pages/experiencia/[slug].astro", LAYOUT, file]
       : undefined;

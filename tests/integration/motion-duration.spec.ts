@@ -49,7 +49,10 @@ test("AC1: the navigator indicator and a primary button transition at 200 ms", a
   // The restored `duration-control` utility feeds the indicator's transform
   // transition; it must resolve to the documented 200 ms, not the 150 ms
   // Tailwind fallback.
-  expect(indicatorStyles.transitionProperty).toContain("transform");
+  // The indicator is positioned through the CSS `translate` property and
+  // sized through `width`, so both must be transitioned (spec 033, R29).
+  expect(indicatorStyles.transitionProperty).toMatch(/\btranslate\b/);
+  expect(indicatorStyles.transitionProperty).toContain("width");
   expect(indicatorStyles.transitionDuration).toBe("0.2s");
 
   const buttonStyles = await readTransitionStyles(primaryButton);

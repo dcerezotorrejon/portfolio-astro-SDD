@@ -170,11 +170,16 @@ describe("T9 primary-button color tokens", () => {
       "shadow-[0_4px_20px_rgb(15_20_25/14%)]",
     );
     expect(floatingNavSource).toContain(
-      "group-data-[active-index=0]:translate-x-0",
+      "translate-x-[var(--nav-indicator-x,0px)]",
     );
+    expect(floatingNavSource).toContain("w-[var(--nav-indicator-width)]");
     expect(floatingNavSource).toContain(
-      "group-data-[active-index=1]:translate-x-full",
+      "transition-[transform,translate,width]",
     );
+    // No two-destination assumptions remain (spec 033, R29).
+    expect(floatingNavSource).not.toContain("grid-cols-2");
+    expect(floatingNavSource).not.toContain("calc(50%-4px)");
+    expect(floatingNavSource).not.toMatch(/active-index=\d\]:translate/);
     expect(floatingNavSource).toContain(
       "group-data-[positioned=false]:transition-none",
     );

@@ -233,7 +233,7 @@ describe("home page", () => {
     }
   });
 
-  it("renders both sections in document order with the requested navigation island", async () => {
+  it("renders all sections in document order with the requested navigation island", async () => {
     const html = await render(Home);
     const { document } = new JSDOM(html).window;
 
@@ -242,9 +242,12 @@ describe("home page", () => {
         document.querySelectorAll("main > section"),
         (section) => section.id,
       ),
-    ).toEqual(["inicio", "trayectoria"]);
+    ).toEqual(["inicio", "trayectoria", "proyectos"]);
     expect(document.querySelector(".floating-nav")).toBeNull();
-    const islands = document.querySelectorAll("astro-island");
+    const islands = [...document.querySelectorAll("astro-island")].filter(
+      (island) =>
+        /\/FloatingNav\.tsx$/.test(island.getAttribute("component-url") ?? ""),
+    );
     expect(islands).toHaveLength(1);
     expect(islands[0]?.getAttribute("client")).toBe("only");
     expect(islands[0]?.getAttribute("component-url")).toMatch(

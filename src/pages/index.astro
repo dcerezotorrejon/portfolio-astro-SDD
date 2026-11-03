@@ -3,10 +3,13 @@ import { getCollection, getEntry } from "astro:content";
 import FloatingNav from "../components/home/FloatingNav/FloatingNav";
 import ExperienceHistory from "../components/home/ExperienceHistory.astro";
 import ProfileIntroduction from "../components/home/ProfileIntroduction.astro";
+import ProjectsSection from "../components/home/ProjectsSection.astro";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import {
   assertUniqueExperienceSlugs,
+  assertUniqueProjects,
   sortExperiences,
+  sortProjects,
 } from "../content/parsers/content";
 
 const profileEntry = await getEntry("profile", "profile");
@@ -17,12 +20,16 @@ const profile = profileEntry.data;
 const experienceEntries = await getCollection("experience");
 assertUniqueExperienceSlugs(experienceEntries);
 const experiences = sortExperiences(experienceEntries);
+const projectEntries = await getCollection("projects");
+assertUniqueProjects(projectEntries);
+const projects = sortProjects(projectEntries);
 ---
 
 <SiteLayout title={profile.seo.title} description={profile.seo.description}>
   <main class="site-container home-main">
     <ProfileIntroduction profile={profile} />
     <ExperienceHistory experiences={experiences} profile={profile} />
+    <ProjectsSection projects={projects} profile={profile} />
   </main>
   <FloatingNav sections={profile.navigation} client:only="react" />
 </SiteLayout>

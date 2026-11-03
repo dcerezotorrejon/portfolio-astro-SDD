@@ -1,0 +1,64 @@
+---
+import { Image } from "astro:assets";
+
+import defaultImage from "../../assets/project-default.svg";
+import type {
+  ProfileData,
+  ProjectData,
+} from "../../content/parsers/content-schema";
+import Button from "../../components/molecules/Button.astro";
+import Heading from "../../components/molecules/Heading.astro";
+import { withBase } from "../../lib/base-url";
+import TechnologyBadges from "./TechnologyBadges.astro";
+
+interface Props {
+  project: ProjectData;
+  profile: ProfileData;
+}
+
+const { project, profile } = Astro.props;
+const { slug, name, summary, technologies, repositoryUrl, archived, image } =
+  project;
+---
+
+<article
+  transition:name={`project-transition-${slug}`}
+  class="project-card flex w-full min-w-0 flex-col gap-5 rounded-card border border-border bg-surface p-6"
+>
+  <Image
+    class="project-card-image"
+    src={image?.src ?? defaultImage}
+    alt={image?.alt ?? ""}
+    width={640}
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="flex flex-col gap-1">
+    <Heading level={3} variant="card">
+      {name}
+    </Heading>
+    {archived && (
+      <p class="project-status font-semibold">
+        {profile.projectsArchivedLabel}
+      </p>
+    )}
+  </div>
+  <p class="project-summary">{summary}</p>
+  <TechnologyBadges technologies={technologies} />
+  <div class="project-links mt-auto flex flex-wrap gap-2">
+    <Button
+      variant="primary"
+      href={withBase(`/proyectos/${slug}/`)}
+      aria-label={`${profile.moreInfoLabel}: ${name}`}
+    >
+      {profile.moreInfoLabel}
+    </Button>
+    <Button
+      variant="secondary"
+      href={repositoryUrl}
+      aria-label={`${profile.projectsGithubLabel}: ${name}`}
+    >
+      {profile.projectsGithubLabel}
+    </Button>
+  </div>
+</article>

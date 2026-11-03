@@ -1,0 +1,93 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import TechnologyBadges from "../../components/home/TechnologyBadges.astro";
+import Button from "../../components/molecules/Button.astro";
+import Heading from "../../components/molecules/Heading.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { assertUniqueProjects } from "../../content/parsers/content";
+import type { ProfileData } from "../../content/parsers/content-schema";
+import { withBase } from "../../lib/base-url";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  profile: ProfileData;
+}
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  assertUniqueProjects(projects);
+
+  const profileEntry = await getEntry("profile", "profile");
+  if (!profileEntry)
+    throw new Error('The required "profile/profile" content entry is missing.');
+
+  return projects.map((project) => ({
+    params: { slug: project.data.slug },
+    props: { project, profile: profileEntry.data },
+  }));
+}
+
+const { project, profile } = Astro.props as Props;
+const { Content } = await render(project);
+const { slug, name, technologies, repositoryUrl, archived, license, seo } =
+  project.data;
+---
+
+<SiteLayout title={seo.title} description={seo.description}>
+  <main class="site-container my-8">
+    <article
+      transition:name={`project-transition-${slug}`}
+      class="project-detail-card w-full rounded-card border border-border bg-surface p-6 flex flex-col gap-5"
+      data-project-slug={slug}
+    >
+      <header class="flex flex-col gap-1">
+        <Heading level={1} variant="display">
+          {name}
+        </Heading>
+        {archived && (
+          <p class="project-status font-semibold">
+            {profile.projectsArchivedLabel}
+          </p>
+        )}
+        {license && (
+          <p class="project-license">
+            {profile.projectsLicenseLabel}: {license}
+          </p>
+        )}
+      </header>
+      <TechnologyBadges technologies={technologies} />
+      <div class="detail-content">
+        <Content />
+      </div>
+      <div class="project-detail-links flex flex-wrap justify-end gap-2">
+        <Button variant="secondary" href={repositoryUrl}>
+          {profile.projectsGithubLabel}
+        </Button>
+        <Button variant="primary" href={withBase("/#proyectos")}>
+          {profile.projectsBackLabel}
+        </Button>
+      </div>
+    </article>
+  </main>
+</SiteLayout>
+
+<style>
+  .detail-content {
+    max-width: 70ch;
+    line-height: 1.75;
+  }
+
+  .detail-content :global(h2),
+  .detail-content :global(h3) {
+    margin-block-end: var(--heading-section-gap);
+    color: var(--heading-section-ink);
+    font-size: var(--heading-section-size);
+    font-weight: var(--heading-section-weight);
+    line-height: var(--heading-section-leading);
+  }
+
+  .detail-content :global(p) {
+    margin-block: 0 1.25em;
+  }
+</style>

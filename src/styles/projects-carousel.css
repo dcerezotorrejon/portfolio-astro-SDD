@@ -1,0 +1,114 @@
+/* Projects carousel geometry and its no-JS fallback. It lives apart from
+   global.css because this is the only scroll-snap surface on the site.
+
+   The slide width comes from the scroller's own inline size, which keeps two
+   slots for the peeks and leaves one stop per card at every viewport. The 768 px
+   breakpoint stays explicit because custom properties do not resolve inside
+   media-query conditions. */
+
+.projects-carousel {
+  --projects-visible: 1;
+  --projects-peek: var(--space-20);
+  --projects-gap: var(--space-12);
+  --projects-edge: calc(var(--projects-peek) + var(--projects-gap));
+  --projects-slide-width: calc(
+    (
+        100cqi - 2 * var(--projects-edge) - (var(--projects-visible) - 1) *
+          var(--projects-gap)
+      ) /
+      var(--projects-visible)
+  );
+}
+
+.projects-carousel-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+  margin-block-end: var(--space-16);
+}
+
+.projects-carousel-scroller {
+  container-type: inline-size;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overflow-anchor: none;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline-start: var(--projects-edge);
+  scrollbar-width: none;
+}
+
+.projects-carousel-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.projects-list {
+  display: flex;
+  gap: var(--projects-gap);
+  width: max-content;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--projects-edge);
+  list-style: none;
+}
+
+/* Lets a restored position reach the last stop at two cards per view before
+   hydration adds the clones, which take this space over. */
+.projects-list[data-carousel-end-space] {
+  padding-inline-end: calc(
+    var(--projects-edge) + var(--projects-slide-width) + var(--projects-gap)
+  );
+}
+
+.project-slide {
+  display: flex;
+  flex: none;
+  width: var(--projects-slide-width);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.project-card {
+  overflow-wrap: anywhere;
+}
+
+.project-card-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--space-12);
+  background: var(--color-page);
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .projects-carousel {
+    --projects-visible: 2;
+    --projects-peek: var(--space-40);
+    --projects-gap: var(--space-16);
+  }
+}
+
+/* Without scripting there are no arrows and no loop, so the cards wrap and
+   every link stays reachable by every input method. */
+@media (scripting: none) {
+  .projects-carousel-controls {
+    display: none;
+  }
+
+  .projects-carousel-scroller {
+    container-type: normal;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .projects-list {
+    display: grid;
+    grid-template-columns: repeat(var(--projects-visible), minmax(0, 1fr));
+    width: auto;
+    padding-inline: 0;
+  }
+
+  .project-slide {
+    width: auto;
+  }
+}
