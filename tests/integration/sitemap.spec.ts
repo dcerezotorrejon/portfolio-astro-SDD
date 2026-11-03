@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { expect, test, type APIRequestContext } from "@playwright/test";
 import { JSDOM } from "jsdom";
 import { SITE } from "../../src/lib/base-url";
-import { experiences } from "./helpers/content";
+import { experiences, projects } from "./helpers/content";
 import { withBase } from "./helpers/site";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -43,6 +43,7 @@ async function readSitemap(request: APIRequestContext) {
 const expectedLocs = [
   `${origin}/`,
   ...experiences.map((e) => `${origin}/experiencia/${e.slug}/`),
+  ...projects.map((p) => `${origin}/proyectos/${p.slug}/`),
 ];
 
 test.describe("sitemap files (AC1, AC4)", () => {
@@ -76,7 +77,7 @@ test.describe("sitemap files (AC1, AC4)", () => {
 });
 
 test.describe("sitemap-0.xml URL set (AC2, AC3)", () => {
-  test("lists exactly the home page and one URL per experience slug (AC2)", async ({
+  test("lists exactly the home page and one URL per experience and project slug (AC2, spec 033 AC32)", async ({
     request,
   }) => {
     const urls = await readSitemap(request);
@@ -150,6 +151,17 @@ function experienceFileFor(slug: string): string {
   throw new Error(`No experience file for slug ${slug}`);
 }
 
+function projectFileFor(slug: string): string {
+  const dir = join(root, "src", "content", "projects");
+  for (const name of readdirSync(dir).filter((n) => n.endsWith(".md"))) {
+    const text = readFileSync(join(dir, name), "utf8");
+    if (new RegExp(`^slug:\\s*["']?${slug}["']?\\s*$`, "m").test(text)) {
+      return name;
+    }
+  }
+  throw new Error(`No project file for slug ${slug}`);
+}
+
 function expectedDate(paths: string[]): string | undefined {
   const iso = git([
     "log",
@@ -186,11 +198,20 @@ test("lastmod equals the latest commit date of the R5c source set (AC13)", async
         layout,
         "src/content/profile/profile.md",
         "src/content/experience/",
+        "src/content/projects/",
       ],
     ],
     ...experiences.map((e): [string, string[]] => [
       `${origin}/experiencia/${e.slug}/`,
       ["src/pages/experiencia/[slug].astro", layout, experienceFileFor(e.slug)],
+    ]),
+    ...projects.map((p): [string, string[]] => [
+      `${origin}/proyectos/${p.slug}/`,
+      [
+        "src/pages/proyectos/[slug].astro",
+        layout,
+        `src/content/projects/${projectFileFor(p.slug)}`,
+      ],
     ]),
   ]);
 

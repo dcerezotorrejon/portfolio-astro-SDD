@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { experiences } from "./helpers/content";
+import { experiences, projects } from "./helpers/content";
 import { withBase } from "./helpers/site";
 
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
@@ -12,6 +12,7 @@ test("home and every content-derived detail page pass browser axe", async ({
   const routes = [
     homePath,
     ...experiences.map(({ slug }) => withBase(`/experiencia/${slug}/`)),
+    ...projects.map(({ slug }) => withBase(`/proyectos/${slug}/`)),
   ];
 
   for (const route of routes) {

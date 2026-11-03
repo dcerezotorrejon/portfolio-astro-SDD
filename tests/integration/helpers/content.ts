@@ -80,3 +80,27 @@ export const experiences = readdirSync(join(contentRoot, "experience"))
       },
     };
   });
+
+function optionalScalar(frontmatter: string, key: string): string | undefined {
+  // Top-level keys only: nested `seo`/`image` values are indented.
+  const match = new RegExp(
+    `^${key}:\\s*["']?([^\\r\\n"']+)["']?\\s*$`,
+    "m",
+  ).exec(frontmatter);
+  return match?.[1].trim();
+}
+
+export const projects = readdirSync(join(contentRoot, "projects"))
+  .filter((file) => file.endsWith(".md"))
+  .sort()
+  .map((file) => {
+    const source = readFrontmatter(join("projects", file));
+    return {
+      slug: scalar(source, "slug"),
+      name: scalar(source, "name"),
+      repositoryUrl: scalar(source, "repositoryUrl"),
+      archived: scalar(source, "archived") === "true",
+      license: optionalScalar(source, "license"),
+      order: Number(scalar(source, "order")),
+    };
+  });
