@@ -1,8 +1,9 @@
 # Personal Portfolio
 
 A responsive, Spanish-language personal portfolio built with Astro. The homepage
-introduces the profile and professional experience; each experience entry also has
-its own detail page. Profile and experience content is sourced from validated
+introduces the profile, the professional experience, and a looping carousel of
+personal projects; each experience entry and each project also has its own detail
+page. Profile, experience, and project content is sourced from validated
 Markdown collections, while the site is statically rendered by default.
 
 > **Content is still provisional.** Replace the sample profile, experience
@@ -12,8 +13,9 @@ Markdown collections, while the site is statically rendered by default.
 
 - [Astro](https://astro.build/) for static pages and content collections.
 - [Tailwind CSS v4](https://tailwindcss.com/) through `@tailwindcss/vite`.
-- React only for the interactive floating section navigator; the rest of the
-  site stays statically rendered.
+- React only for two islands: the interactive floating section navigator and the
+  projects carousel (server-rendered, then hydrated); the rest of the site stays
+  statically rendered.
 - Markdown content validated with schemas.
 - Vitest, Astro's Container API, and axe-core for tests and accessibility checks.
 - Playwright Test with Chromium and browser-based axe checks for integration
@@ -107,6 +109,11 @@ components:
 - `src/content/experience/*.md` — one Markdown entry per experience, including its
   unique slug, dates, summary, technologies, local company icon, detail-page SEO
   metadata, and expanded description.
+- `src/content/projects/*.md` — one Markdown entry per project, including its
+  unique slug, name, summary, technologies, GitHub repository URL, archived flag,
+  optional license and card image, display order, detail-page
+  SEO metadata, and expanded description. Each project generates a static
+  `/proyectos/<slug>/` page; there is no projects index page.
 
 Collections and frontmatter schemas are defined in `src/content.config.ts` and
 `src/content/parsers/content-schema.ts`. Keep slugs unique, use local image assets with
@@ -121,11 +128,11 @@ src/
 ├── components/       # Shared atoms/molecules and page-grouped components
 │   ├── atoms/         # Shared primitive components
 │   ├── molecules/     # Shared composed components
-│   └── home/          # Profile, experience history, badges, floating navigator
-├── content/          # Profile and experience Markdown collections
+│   └── home/          # Profile, experience history, projects carousel, badges, floating navigator
+├── content/          # Profile, experience, and projects Markdown collections
 ├── layouts/          # Shared page layout and metadata
 ├── lib/              # Content helpers, schemas, and navigation logic
-├── pages/            # Homepage and generated experience detail pages
+├── pages/            # Homepage and generated experience and project detail pages
 └── styles/           # Global styles and design tokens
 public/               # Local fonts and image assets
 docs/                 # Project constitution and global design guidance

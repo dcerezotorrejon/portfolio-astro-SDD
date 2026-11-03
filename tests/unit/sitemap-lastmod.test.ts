@@ -24,11 +24,15 @@ function fakeGit(overrides: Partial<GitReader> = {}) {
 const readExperience = (slug: string) =>
   slug === "my-slug" ? "src/content/experience/different-name.md" : undefined;
 
+const readProject = (slug: string) =>
+  slug === "my-project" ? "src/content/projects/other-name.md" : undefined;
+
 function make(git: GitReader, exp = readExperience) {
   return createLastmodResolver({
     now: () => NOW,
     git,
     readExperience: exp,
+    readProject,
     base: "/",
   });
 }
@@ -46,7 +50,52 @@ describe("createLastmodResolver", () => {
       "src/layouts/SiteLayout.astro",
       "src/content/profile/profile.md",
       "src/content/experience/",
+      "src/content/projects/",
     ]);
+  });
+
+  it("queries the project source set, matching the slug by frontmatter", () => {
+    expect(make(git)(`${SITE}/proyectos/my-project/`)).toBe("2026-01-05");
+    expect(git.lastCommitDate).toHaveBeenCalledWith([
+      "src/pages/proyectos/[slug].astro",
+      "src/layouts/SiteLayout.astro",
+      "src/content/projects/other-name.md",
+    ]);
+  });
+
+  it("strips a non-root base before matching project routes", () => {
+    const resolve = createLastmodResolver({
+      now: () => NOW,
+      git,
+      readExperience,
+      readProject,
+      base: "/portfolio/",
+    });
+    resolve(`${SITE}/portfolio/proyectos/my-project/`);
+    expect(git.lastCommitDate.mock.calls[0][0][2]).toBe(
+      "src/content/projects/other-name.md",
+    );
+  });
+
+  it("falls back for unknown or failing project slugs without querying Git", () => {
+    expect(make(git)(`${SITE}/proyectos/nope/`)).toBe(BUILD);
+    const throwing = createLastmodResolver({
+      now: () => NOW,
+      git,
+      readExperience,
+      readProject: () => {
+        throw new Error("fs");
+      },
+      base: "/",
+    });
+    expect(throwing(`${SITE}/proyectos/my-project/`)).toBe(BUILD);
+    expect(git.lastCommitDate).not.toHaveBeenCalled();
+  });
+
+  it("does not resolve the experience slug as a project, nor the reverse", () => {
+    expect(make(git)(`${SITE}/proyectos/my-slug/`)).toBe(BUILD);
+    expect(make(git)(`${SITE}/experiencia/my-project/`)).toBe(BUILD);
+    expect(git.lastCommitDate).not.toHaveBeenCalled();
   });
 
   it("queries the detail source set, matching the slug by frontmatter", () => {
