@@ -1,8 +1,8 @@
 # Projects section
 
 - **Spec ID**: `033-projects-section`
-- **Status**: in progress
-- **Last updated**: 2026-11-02
+- **Status**: done
+- **Last updated**: 2026-11-03
 
 > Keep this increment's spec anchored to code while it is active. On closure
 > with status `done`, the entire directory becomes an immutable historical
