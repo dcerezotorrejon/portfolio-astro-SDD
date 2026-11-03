@@ -3,6 +3,7 @@ import { glob } from "astro/loaders";
 import {
   experienceSchema,
   profileSchema,
+  projectSchema,
 } from "./content/parsers/content-schema";
 
 const profile = defineCollection({
@@ -23,4 +24,13 @@ const experience = defineCollection({
   schema: experienceSchema,
 });
 
-export const collections = { profile, experience };
+const projects = defineCollection({
+  loader: glob({
+    base: "./src/content/projects",
+    pattern: "*.md",
+    generateId: ({ entry }) => entry.replace(/\.md$/, ""),
+  }),
+  schema: ({ image }) => projectSchema(image),
+});
+
+export const collections = { profile, experience, projects };

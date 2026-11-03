@@ -79,6 +79,47 @@ export function assertUniqueExperienceSlugs(
   }
 }
 
+type ProjectRecord = {
+  id?: string;
+  data: { slug: string; order: number };
+};
+
+/** Throw before route generation if two projects share a slug or an order. */
+export function assertUniqueProjects(projects: readonly ProjectRecord[]): void {
+  const slugs = new Map<string, string>();
+  const orders = new Map<number, string>();
+
+  for (const project of projects) {
+    const { slug, order } = project.data;
+    const entryId = project.id ?? slug;
+
+    const firstSlugId = slugs.get(slug);
+    if (firstSlugId) {
+      throw new Error(
+        `Duplicate project slug "${slug}" is used by entries "${firstSlugId}" and "${entryId}".`,
+      );
+    }
+    slugs.set(slug, entryId);
+
+    const firstOrderId = orders.get(order);
+    if (firstOrderId) {
+      throw new Error(
+        `Duplicate project order ${order} is used by entries "${firstOrderId}" and "${entryId}".`,
+      );
+    }
+    orders.set(order, entryId);
+  }
+}
+
+/** Sort project collection entries by ascending order without mutating the input. */
+export function sortProjects<T extends ProjectRecord>(
+  projects: readonly T[],
+): T[] {
+  return [...projects].sort(
+    (first, second) => first.data.order - second.data.order,
+  );
+}
+
 /** Format an ISO date or Date in Spanish as “enero de 2024 – actualidad”. */
 export function formatDateRange(
   startDate: Date | string,

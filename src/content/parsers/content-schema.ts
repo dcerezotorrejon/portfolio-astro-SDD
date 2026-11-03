@@ -28,6 +28,11 @@ export const companyIconSchema = z.object({
   alt: nonEmptyString,
 });
 
+const kebabSlug = nonEmptyString.regex(
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+  "Must be a kebab-case slug",
+);
+
 const seoSchema = z.object({
   title: nonEmptyString,
   description: nonEmptyString.max(160, "Must be at most 160 characters"),
@@ -52,9 +57,16 @@ export const profileSchema = (image: () => z.ZodType) =>
     historyHeading: nonEmptyString,
     moreInfoLabel: nonEmptyString,
     backLabel: nonEmptyString,
+    projectsHeading: nonEmptyString,
+    projectsPreviousLabel: nonEmptyString,
+    projectsNextLabel: nonEmptyString,
+    projectsGithubLabel: nonEmptyString,
+    projectsBackLabel: nonEmptyString,
+    projectsArchivedLabel: nonEmptyString,
+    projectsLicenseLabel: nonEmptyString,
     navigation: z.array(
       z.object({
-        id: z.enum(["inicio", "trayectoria"]),
+        id: z.enum(["inicio", "trayectoria", "proyectos"]),
         label: nonEmptyString,
       }),
     ),
@@ -63,10 +75,7 @@ export const profileSchema = (image: () => z.ZodType) =>
 
 export const experienceSchema = z
   .object({
-    slug: nonEmptyString.regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Must be a kebab-case slug",
-    ),
+    slug: kebabSlug,
     role: nonEmptyString,
     company: nonEmptyString,
     companyIcon: companyIconSchema,
@@ -86,6 +95,25 @@ export const experienceSchema = z
     }
   });
 
+export const projectSchema = (image: () => z.ZodType) =>
+  z.object({
+    slug: kebabSlug,
+    name: nonEmptyString,
+    summary: nonEmptyString,
+    technologies: z.array(nonEmptyString).min(1),
+    repositoryUrl: safeHttpUrl,
+    archived: z.boolean(),
+    license: nonEmptyString.optional(),
+    image: z
+      .object({
+        src: image(),
+        alt: nonEmptyString,
+      })
+      .optional(),
+    order: z.number().int(),
+    seo: seoSchema,
+  });
+
 export interface ProfileData {
   name: string;
   headline: string;
@@ -102,8 +130,15 @@ export interface ProfileData {
   historyHeading: string;
   moreInfoLabel: string;
   backLabel: string;
+  projectsHeading: string;
+  projectsPreviousLabel: string;
+  projectsNextLabel: string;
+  projectsGithubLabel: string;
+  projectsBackLabel: string;
+  projectsArchivedLabel: string;
+  projectsLicenseLabel: string;
   navigation: Array<{
-    id: "inicio" | "trayectoria";
+    id: "inicio" | "trayectoria" | "proyectos";
     label: string;
   }>;
   seo: {
@@ -113,3 +148,13 @@ export interface ProfileData {
 }
 
 export type ExperienceData = z.infer<typeof experienceSchema>;
+
+export type ProjectData = Omit<
+  z.infer<ReturnType<typeof projectSchema>>,
+  "image"
+> & {
+  image?: {
+    src: ImageMetadata;
+    alt: string;
+  };
+};

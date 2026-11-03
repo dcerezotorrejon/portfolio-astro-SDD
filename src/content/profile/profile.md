@@ -15,11 +15,20 @@ socials:
 historyHeading: Trayectoria profesional
 moreInfoLabel: Más información
 backLabel: Volver a la trayectoria
+projectsHeading: Proyectos
+projectsPreviousLabel: Proyecto anterior
+projectsNextLabel: Proyecto siguiente
+projectsGithubLabel: GitHub
+projectsBackLabel: Volver a los proyectos
+projectsArchivedLabel: Archivado
+projectsLicenseLabel: Licencia
 navigation:
   - id: inicio
     label: Inicio
   - id: trayectoria
     label: Trayectoria
+  - id: proyectos
+    label: Proyectos
 seo:
   title: Daniel Cerezo Torrejón | Senior Frontend Engineer | Portfolio profesional
   description: Presentación y trayectoria profesional de Daniel Cerezo Torrejón, Senior Frontend Engineer & Software Architect.
