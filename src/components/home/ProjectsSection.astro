@@ -1,0 +1,43 @@
+---
+import type {
+  ProfileData,
+  ProjectData,
+} from "../../content/parsers/content-schema";
+import Heading from "../../components/molecules/Heading.astro";
+import ProjectCard from "./ProjectCard.astro";
+import ProjectsCarousel from "./ProjectsCarousel/ProjectsCarousel";
+import { returnScriptSource } from "./ProjectsCarousel/helpers/return-listeners";
+import "../../styles/projects-carousel.css";
+
+interface ProjectRecord {
+  data: ProjectData;
+}
+
+interface Props {
+  projects: ProjectRecord[];
+  profile: ProfileData;
+}
+
+const { projects, profile } = Astro.props;
+---
+
+<section id="proyectos" class="mt-10" aria-labelledby="projects-heading">
+  <Heading level={2} variant="section" id="projects-heading">
+    {profile.projectsHeading}
+  </Heading>
+  <ProjectsCarousel
+    previousLabel={profile.projectsPreviousLabel}
+    nextLabel={profile.projectsNextLabel}
+    client:load
+  >
+    <ul class="projects-list">
+      {projects.map((project) => (
+        <li class="project-slide" data-project-slug={project.data.slug}>
+          <ProjectCard project={project.data} profile={profile} />
+        </li>
+      ))}
+    </ul>
+  </ProjectsCarousel>
+  {/* Inline so a full-document history entry restores before the first paint. */}
+  <script is:inline set:html={returnScriptSource()}></script>
+</section>

@@ -42,5 +42,10 @@ const fontFaceCss = `@font-face {
   </head>
   <body>
     <slot />
+    <script>
+      import { installReturnListeners } from "../components/home/ProjectsCarousel/helpers/return-listeners";
+
+      installReturnListeners();
+    </script>
   </body>
 </html>
