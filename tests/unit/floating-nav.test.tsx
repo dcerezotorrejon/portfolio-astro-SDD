@@ -491,6 +491,76 @@ describe("FloatingNav", () => {
     control.remove();
   });
 
+  it("re-checks a focused control when a nested scroller moves it, both ways", () => {
+    const realMatches = Element.prototype.matches;
+    vi.spyOn(Element.prototype, "matches").mockImplementation(function (
+      this: Element,
+      selector: string,
+    ) {
+      if (selector === ":focus-visible") {
+        return true;
+      }
+
+      return realMatches.call(this, selector);
+    });
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    render(<FloatingNav sections={initialSections} />);
+    flushFrame();
+    setRect(document.querySelector(".floating-nav") as Element, {
+      top: 700,
+      bottom: 744,
+      left: 50,
+      right: 350,
+    });
+
+    const scroller = document.createElement("div");
+    const control = document.createElement("button");
+    control.type = "button";
+    scroller.append(control);
+    document.body.append(scroller);
+    // At the navigator's height, but beside it.
+    setRect(control, { top: 700, bottom: 744, left: 500, right: 600 });
+    act(() => control.focus());
+    act(() => document.dispatchEvent(new Event("focusin")));
+    flushFrame();
+    expect(focusObscuredState()).toBeNull();
+
+    // `scroll` on an element does not bubble, as in a real scroller.
+    setRect(control, { top: 700, bottom: 744, left: 100, right: 200 });
+    act(() => scroller.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(focusObscuredState()).toBe("true");
+
+    setRect(control, { top: 700, bottom: 744, left: 500, right: 600 });
+    act(() => scroller.dispatchEvent(new Event("scroll")));
+    flushFrame();
+    expect(focusObscuredState()).toBeNull();
+
+    scroller.remove();
+  });
+
+  it("ignores a nested scroller that does not hold the focused control", () => {
+    setTop("inicio", 0);
+    setTop("trayectoria", 300);
+    render(<FloatingNav sections={initialSections} />);
+    flushFrame();
+
+    const scroller = document.createElement("div");
+    const control = document.createElement("button");
+    control.type = "button";
+    document.body.append(scroller, control);
+    act(() => control.focus());
+    flushFrame();
+    const queued = frames.size;
+
+    act(() => scroller.dispatchEvent(new Event("scroll")));
+    expect(frames.size).toBe(queued);
+
+    scroller.remove();
+    control.remove();
+  });
+
   it("disconnects its ResizeObserver and does not retain removed section nodes", () => {
     setTop("inicio", 0);
     setTop("trayectoria", 300);
@@ -503,5 +573,58 @@ describe("FloatingNav", () => {
     unmount();
 
     expect(observerInstances[0]?.disconnected).toBe(true);
+  });
+
+  it("supports three destinations with a measured indicator and content-sized columns (R29, R30)", () => {
+    const projects = document.createElement("section");
+    projects.id = "proyectos";
+    document.body.append(projects);
+    const threeSections = [
+      ...initialSections,
+      { id: "proyectos", label: "Proyectos" },
+    ];
+    setTop("inicio", -600);
+    setTop("trayectoria", -100);
+    setTop("proyectos", 16);
+    const { container } = render(<FloatingNav sections={threeSections} />);
+    const list = container.querySelector(".floating-nav-list") as HTMLElement;
+    const indicator = container.querySelector(
+      ".floating-nav-indicator",
+    ) as HTMLElement;
+    const links = [...list.querySelectorAll("a")];
+
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Inicio",
+      "Trayectoria",
+      "Proyectos",
+    ]);
+    expect(list.style.gridTemplateColumns).toBe("repeat(3, auto)");
+    expect(list.className).not.toContain("grid-cols-2");
+    expect(links.every((link) => link.className.includes("min-h-11"))).toBe(
+      true,
+    );
+
+    // The indicator takes the exact box of the active link.
+    flushFrame();
+    expect(navLink("Proyectos")).toHaveAttribute("aria-current", "location");
+    expect(container.querySelector("nav")).toHaveAttribute(
+      "data-active-index",
+      "2",
+    );
+    Object.defineProperty(links[2], "offsetLeft", { value: 150 });
+    Object.defineProperty(links[2], "offsetWidth", { value: 101 });
+    const measuring = observerInstances.findLast((observer) =>
+      observer.observed.includes(list),
+    );
+    act(() => measuring?.callback([], measuring as never));
+    expect(indicator.style.getPropertyValue("--nav-indicator-x")).toBe("150px");
+    expect(indicator.style.getPropertyValue("--nav-indicator-width")).toBe(
+      "101px",
+    );
+
+    // Activation by click selects the middle destination.
+    act(() => navLink("Trayectoria").click());
+    expect(navLink("Trayectoria")).toHaveAttribute("aria-current", "location");
+    projects.remove();
   });
 });

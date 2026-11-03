@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -33,6 +34,8 @@ export default function FloatingNav({
   const [isPositioned, setIsPositioned] = useState(false);
   const activeSectionIdRef = useRef(activeSectionId);
   const navRef = useRef<HTMLElement>(null);
+  const indicatorRef = useRef<HTMLSpanElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const activeIndex = Math.max(
     0,
     sections.findIndex(({ id }) => id === activeSectionId),
@@ -123,6 +126,50 @@ export default function FloatingNav({
     };
   }, [sections]);
 
+  // Columns are content-sized, so the indicator takes the exact box of the
+  // active link instead of an equal share of the list.
+  const placeIndicator = useCallback(() => {
+    const indicator = indicatorRef.current;
+    const link = listRef.current?.children[activeIndex];
+
+    if (!indicator || !(link instanceof HTMLElement)) {
+      return;
+    }
+
+    indicator.style.setProperty("--nav-indicator-x", `${link.offsetLeft}px`);
+    indicator.style.setProperty(
+      "--nav-indicator-width",
+      `${link.offsetWidth}px`,
+    );
+  }, [activeIndex]);
+
+  // Place before paint so the first frame is already aligned.
+  useIsomorphicLayoutEffect(() => {
+    placeIndicator();
+  }, [placeIndicator, sections]);
+
+  // Re-measure when the list or its font changes size.
+  useEffect(() => {
+    const list = listRef.current;
+    const resizeObserver =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(placeIndicator);
+
+    if (list) {
+      resizeObserver?.observe(list);
+    }
+
+    window.addEventListener("resize", placeIndicator);
+    document.fonts?.addEventListener("loadingdone", placeIndicator);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", placeIndicator);
+      document.fonts?.removeEventListener("loadingdone", placeIndicator);
+    };
+  }, [placeIndicator]);
+
   // Keep keyboard focus clear: if a focus-visible control outside the navigator
   // would be covered by the fixed navigator, hide the navigator until focus
   // moves into the navigator or out of the overlapping region. The navigator
@@ -184,15 +231,27 @@ export default function FloatingNav({
       }
     };
 
+    // A nested scroller's `scroll` does not bubble, so only capture sees it. A
+    // scroller that does not hold the focused control cannot move it.
+    const handleScroll = ({ target }: Event) => {
+      if (
+        !(target instanceof Node) ||
+        target.contains(document.activeElement)
+      ) {
+        handleFocusChange();
+      }
+    };
+    const scrollOptions = { capture: true, passive: true };
+
     document.addEventListener("focusin", handleFocusChange);
     document.addEventListener("focusout", handleFocusChange);
-    window.addEventListener("scroll", handleFocusChange, { passive: true });
+    window.addEventListener("scroll", handleScroll, scrollOptions);
     window.addEventListener("resize", handleFocusChange);
 
     return () => {
       document.removeEventListener("focusin", handleFocusChange);
       document.removeEventListener("focusout", handleFocusChange);
-      window.removeEventListener("scroll", handleFocusChange);
+      window.removeEventListener("scroll", handleScroll, scrollOptions);
       window.removeEventListener("resize", handleFocusChange);
 
       if (focusAnimationFrame !== null) {
@@ -242,13 +301,18 @@ export default function FloatingNav({
       ref={navRef}
     >
       <span
-        className="floating-nav-indicator pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-pill bg-button transition-transform duration-control group-data-[positioned=false]:transition-none motion-reduce:transition-none group-data-[active-index=0]:translate-x-0 group-data-[active-index=1]:translate-x-full"
+        className="floating-nav-indicator pointer-events-none absolute inset-y-1 left-1 w-[var(--nav-indicator-width)] translate-x-[var(--nav-indicator-x,0px)] rounded-pill bg-button transition-[transform,translate,width] duration-control group-data-[positioned=false]:transition-none motion-reduce:transition-none"
+        ref={indicatorRef}
         aria-hidden="true"
       />
-      <div className="floating-nav-list relative m-0 grid w-full list-none grid-cols-2 p-0">
+      <div
+        className="floating-nav-list relative m-0 grid w-full list-none p-0"
+        style={{ gridTemplateColumns: `repeat(${sections.length}, auto)` }}
+        ref={listRef}
+      >
         {sections.map(({ id, label }) => (
           <a
-            className="floating-nav-link relative z-[1] flex min-h-11 min-w-0 items-center justify-center rounded-pill px-3 py-2 text-center font-semibold leading-tight no-underline whitespace-nowrap text-ink decoration-2 hover:underline aria-[current=location]:text-surface"
+            className="floating-nav-link relative z-[1] flex min-h-11 min-w-0 items-center justify-center rounded-pill px-2 py-2 text-center min-[360px]:px-3 font-semibold leading-tight no-underline whitespace-nowrap text-ink decoration-2 hover:underline aria-[current=location]:text-surface"
             href={`#${id}`}
             aria-current={activeSectionId === id ? "location" : undefined}
             onClick={(event) => handleLinkClick(event, id)}

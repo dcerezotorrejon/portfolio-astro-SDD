@@ -199,9 +199,6 @@
   --nav-link-radius: var(--radius-pill);
   --nav-link-text: var(--color-ink);
   --nav-link-text-active: var(--color-surface);
-  --nav-indicator-inset: var(--space-4);
-  --nav-indicator-width: calc(50% - var(--nav-indicator-inset));
-  --nav-indicator-radius: var(--radius-pill);
   /* Shared primary blue keeps the active label at >= 4.5:1 contrast. */
   --nav-indicator-background: var(--color-button);
   /* Liquid-glass navigator surface: the opaque surface (--color-surface,
@@ -297,7 +294,11 @@
 }
 
 .home-main {
-  --home-end-scroll-space: max(112px, calc(100svh - 610px));
+  /* 780px stays below the #proyectos section's smallest measured height (794px
+     at 1280x800 and 1920x1080; 857-922px at the narrower listed viewports), so
+     its top can reach the 16px activation offset, with about 30px to spare if
+     a card's copy gets shorter. */
+  --home-end-scroll-space: max(112px, calc(100svh - 780px));
 
   padding-block-end: calc(
     var(--home-end-scroll-space) + env(safe-area-inset-bottom, 0px)
