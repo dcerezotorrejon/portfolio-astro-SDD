@@ -171,10 +171,23 @@ async function settled(page: Page) {
     .toBe(true);
 }
 
+/**
+ * The router's view transition has ended. A navigation that starts earlier makes
+ * the router skip it, and Chromium reports the rejected `ready` promise, which the
+ * router leaves unhandled, as a page error. The URL changes before the transition
+ * ends, so waiting for the URL does not rule this out.
+ */
+async function transitionDone(page: Page) {
+  await expect(page.locator("html")).not.toHaveAttribute(
+    "data-astro-transition",
+  );
+}
+
 /** The detail page is on screen, not just in the address bar. */
 async function onDetailPage(page: Page) {
   await expect(page.locator("main h1")).toBeVisible();
   await expect(page.locator("#proyectos")).toHaveCount(0);
+  await transitionDone(page);
 }
 
 async function hydrated(page: Page) {
@@ -215,6 +228,7 @@ async function openFullCard(page: Page, position: number, clone = false) {
     [scroller, position, clone] as const,
   );
   await expect(page).toHaveURL(new RegExp(`/proyectos/${slug}/$`));
+  await transitionDone(page);
   return slug;
 }
 
@@ -223,6 +237,7 @@ async function returnBy(page: Page, how: "link" | "back") {
   else await page.goBack();
   await hydrated(page);
   await settled(page);
+  await transitionDone(page);
 }
 
 const record = (page: Page) =>
@@ -381,6 +396,7 @@ for (const viewport of viewports) {
         .first()
         .evaluate((a) => (a as HTMLAnchorElement).click());
       await expect(page).toHaveURL(/\/experiencia\//);
+      await transitionDone(page);
       await page.goBack();
       await atStart("experience history");
 
@@ -617,6 +633,7 @@ test.describe("history and records", () => {
       await page.goBack();
       await hydrated(page);
       await settled(page);
+      await transitionDone(page);
       await page.locator(".projects-carousel button").nth(arrow).click();
       await settled(page);
       await page.goForward();
