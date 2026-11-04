@@ -105,7 +105,14 @@ function parseBlock(
     const rest = (match[2] ?? "").trim();
     index += 1;
 
-    if (rest !== "") {
+    if (rest === "|") {
+      const block: string[] = [];
+      while (index < lines.length && lines[index].indent > indent) {
+        block.push(lines[index].content);
+        index += 1;
+      }
+      map[key] = block.join("\n");
+    } else if (rest !== "") {
       map[key] = parseInline(rest);
     } else if (index < lines.length && lines[index].indent > indent) {
       const [child, next] = parseBlock(lines, index, lines[index].indent);
@@ -265,6 +272,7 @@ describe("GitHub Pages deployment workflow", () => {
       "actions/checkout@v4",
       "pnpm/action-setup@v4",
       "actions/setup-node@v4",
+      "actions/upload-artifact@v7",
       "actions/configure-pages@v5",
       "actions/upload-pages-artifact@v3",
       "actions/deploy-pages@v4",
@@ -286,6 +294,31 @@ describe("GitHub Pages deployment workflow", () => {
     expect(withOptions(steps[configureIndex]).token).toBeUndefined();
     expect(uploadIndex).toBeGreaterThan(configureIndex);
     expect(asString(withOptions(steps[uploadIndex]).path)).toBe("./dist");
+  });
+
+  it("uploads Playwright output only when the integration step fails", () => {
+    const integrationIndex = indexOfRun("pnpm test:integration");
+    const uploadIndex = indexOfUses("actions/upload-artifact@v7");
+    const pagesUploadIndex = indexOfUses("actions/upload-pages-artifact@v3");
+    const upload = steps[uploadIndex];
+    const pagesArtifactName = withOptions(steps[pagesUploadIndex]).name;
+
+    expect(asString(steps[integrationIndex].id)).toBe("integration-tests");
+    expect(uploadIndex).toBe(integrationIndex + 1);
+    expect(asString(upload.name)).toBe("Upload Playwright output");
+    expect(asString(upload.if)).toBe(
+      "failure() && steps.integration-tests.outcome == 'failure'",
+    );
+    expect(asString(withOptions(upload).path).split("\n")).toEqual([
+      "playwright-report/",
+      "test-results/",
+    ]);
+    const artifactName = asString(withOptions(upload).name);
+    expect(artifactName).toBe("playwright-output");
+    expect(artifactName).not.toBe(
+      asString(pagesArtifactName) || "github-pages",
+    );
+    expect(asString(steps[integrationIndex].run)).toBe("pnpm test:integration");
   });
 
   it("deploys with actions/deploy-pages and exposes the deployed URL", () => {
