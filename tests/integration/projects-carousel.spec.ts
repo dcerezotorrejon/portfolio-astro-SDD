@@ -163,6 +163,9 @@ for (const viewport of viewports) {
     test("AC7/AC10: ten activations each way land on the expected card, never move focus or the pixels across the wrap", async ({
       page,
     }) => {
+      // Twenty activations, each waiting for the carousel to settle, take close
+      // to the 30 s default even on an unloaded machine.
+      test.setTimeout(90_000);
       await openHome(page);
       for (const [direction, step] of [
         ["next", 1],
